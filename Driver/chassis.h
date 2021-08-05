@@ -2,11 +2,21 @@
 #define __CHASSIS_H
 #include "main.h"
 #include <stdbool.h>
+#include "motor.h"
+#include "tim_control.h"
 typedef struct chassis_structure{
-    bool _switch;
-    float x_speed;
-    float y_speed;
-}chassis;
+    bool _switch;//是否使能底盘
+    float x_speed;//x方向底盘速度
+    float y_speed;//y方向底盘速度
+    float w_speed;//w方向底盘角速度
+}CHASSIS;
+
+
+
+
+
+extern CHASSIS chassis;
 void set_speed (int x,int y);
-void change_switch_stage(bool stage);
+void change_switch_stage(bool status);
+void chassis_synthetic_control(void);
 #endif
