@@ -11,10 +11,10 @@ short time_count;
 *@param:两个方向的速度
 *@return:无
 **************************************************************/
-void set_speed (int x,int y)
+void set_speed (int x, int y)
 {
-    chassis.x_speed=x;
-    chassis.y_speed=y;
+    chassis.x_speed = x;
+    chassis.y_speed = y;
 }
 /************************************************************
 *@name:change_switch_stage
@@ -24,7 +24,7 @@ void set_speed (int x,int y)
 **************************************************************/
 void change_switch_stage(bool status)
 {
-    chassis._switch=status;
+    chassis._switch = status;
 }
 /************************************************************
 *@name:chassis_synthetic_control
@@ -35,20 +35,20 @@ void change_switch_stage(bool status)
 void chassis_synthetic_control(void)
 {
     int  i;
-    float x,y,w,max_val,factor;
+    float x, y, w, max_val, factor;
     if(chassis._switch == false) return;//如果底盘不被使能，则没有后续操作
-    
-    if(++time_count == TIME_PARAM) 
-    {
-        time_count = 0;
-        //在这里刷一些陀螺仪和寻迹的PID更新值.把修改值叠加在chassis的x y速度上
-    }
+
+    if(++time_count == TIME_PARAM)
+        {
+            time_count = 0;
+            //在这里刷一些陀螺仪和寻迹的PID更新值.把修改值叠加在chassis的x y速度上
+        }
     max_val = 0;//对最大值数据进行初始化
     factor = 1;//倍率因子初始化
-    
+
     x = chassis.x_speed;
     y = chassis.y_speed;
-    w = chassis.w_speed; 
+    w = chassis.w_speed;
     /***************************************
     * motor1  左上角
     * motor2  左下角
@@ -56,40 +56,42 @@ void chassis_synthetic_control(void)
     * motor4  右上角
     * 从左上角逆时针旋转一圈，就是4个电机 1 2 3 4
     ****************************************/
-    
+
     motor_target[1] = -0.707 * x - 0.707 * y + CHASSIS_RADIUS * w;
     motor_target[2] = 0.707 * x - 0.707 * y + CHASSIS_RADIUS * w;
     motor_target[3] = 0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
-    motor_target[4]= -0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
-    
+    motor_target[4] = -0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
+
     //再来一个限幅操作，避免单边速度过高导致控制效果不理想
-    for(i=1;i<=4;++i)//找出最大值
-    {
-        if(motor_target[i]>max_val)
-            max_val = motor_target[i];
-    }
-    factor = ( max_val > MAX_SPEED ) ? MAX_SPEED / max_val : 1;
-    if(max_val > MAX_SPEED)
-    {
-        factor = MAX_SPEED / max_val;
-        for(i = 1;i < 4; ++ i)
+    //
+    for(i = 1; i <= 4; ++i) //找出最大值
         {
-            motor_target[i] *= factor;
+            if(motor_target[i] > max_val)
+                max_val = motor_target[i];
         }
-        
-    }
-    for(i=1;i<=4;++i)
-    {   /*
-        *对电机进行遍历
-        *首先获取转速期待值
-        *读取编码器参数
-        *传入PID计算函数得到计算值,以返回值形式传参
-        *由计算值控制电机
-        */
-        motor_controler[i].expect=motor_target[i];
-        motor_controler[i].feedback=read_encoder(i);
-        set_motor(i,pid_control(&motor_controler[i]));
-    }
-   
-    
+    factor = ( max_val > MAX_SPEED ) ? MAX_SPEED / max_val : 1;
+    if(max_val > MAX_SPEED)//最大值是否超限制，进行操作，确保最大值仍在范围内且转速比例 不变
+        {
+            factor = MAX_SPEED / max_val;
+            for(i = 1; i < 4; ++ i)
+                {
+                    motor_target[i] *= factor;
+                }
+
+        }
+    for(i = 1; i <= 4; ++i)
+        {
+            /*
+            *对电机进行遍历
+            *首先获取转速期待值
+            *读取编码器参数
+            *传入PID计算函数得到计算值,以返回值形式传参
+            *由计算值控制电机
+            */
+            motor_controler[i].expect = motor_target[i];
+            motor_controler[i].feedback = read_encoder(i);
+            set_motor(i, pid_control(&motor_controler[i]));
+        }
+
+
 }
