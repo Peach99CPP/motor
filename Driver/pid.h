@@ -4,7 +4,8 @@
 #define NULL 0
 typedef unsigned char uint8_t;
 typedef  int  Testime;
-typedef struct pid_controler {
+typedef struct pid_controler
+{
     //期望
     float last_expect;
     //期望
@@ -52,6 +53,7 @@ typedef struct pid_controler {
     void (*err_callback)(struct pid_controler *);
 } pid_controler_t;
 
-float pid_control(pid_controler_t *controler);
+extern float pid_control(pid_controler_t *controler);
 
 #endif
+
