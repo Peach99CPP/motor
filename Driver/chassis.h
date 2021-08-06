@@ -1,3 +1,12 @@
+#ifndef __CHASSIS_H_
+#define __CHASSIS_H_
+
+
+#endif
+
+
+ 
+
 #ifndef __CHASSIS_H
 #define __CHASSIS_H
 #include "main.h"
@@ -17,7 +26,8 @@ typedef struct chassis_structure
 
 
 extern CHASSIS chassis;
-void set_speed (int x,int y);
+void speed_variation(float x_var,float y_var,float w_var);
+void set_speed (float x,float y,float w);
 void change_switch_stage(bool status);
 void chassis_synthetic_control(void);
 #endif
