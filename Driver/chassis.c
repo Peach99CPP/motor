@@ -33,7 +33,7 @@ void set_speed(float x, float y, float w)
 *@param:×´Ì¬£¬boolÖµ
 *@return:ÎÞ
 **************************************************************/
-void change_switch_staus(bool status)
+void change_switch_status(bool status)
 {
     chassis._switch = status;
 }
