@@ -6,7 +6,7 @@
 CHASSIS chassis;
 float motor_target[5];
 short time_count;
-
+extern pid_paramer_t motor_param;
 /**********************************************************************
   * @Name    set_speed
   * @brief     直接修改器底盘的速度值
@@ -124,7 +124,7 @@ void chassis_synthetic_control(void)
         */
         motor_controler[i].expect = motor_target[i];
         motor_controler[i].feedback = read_encoder(i);
-        set_motor(i, pid_control(&motor_controler[i]));
+        set_motor(i, pid_control(&motor_controler[i], &motor_param));
     }
 
 

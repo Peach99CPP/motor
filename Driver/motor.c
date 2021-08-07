@@ -2,7 +2,25 @@
 
 #define MAX_VAL 7000
 
-pid_controler_t motor_controler[5];
+pid_data_t motor_controler[5];
+
+pid_paramer_t motor_param;
+
+
+
+
+/**********************************************************************
+  * @Name    Motor_PID_Init
+  * @功能说明 
+  * @param   : [输入/出] 
+  * @返回值
+  * @author  peach99CPP
+***********************************************************************/
+
+void Motor_PID_Init()
+{
+
+}
 
 
 /************************************************************
@@ -101,3 +119,40 @@ void set_motor(int motor_id, short control_val)
         return;
     }
 }
+
+
+/**********************************************************************
+  * @Name    set_motor_pid
+  * @功能说明 ki kd kp param changg interface
+  * @param   kp: [输入/出] kp param
+**			 ki: [输入/出] ki param
+**			 kd: [输入/出] kd param
+  * @返回值 void
+  * @author  peach99CPP
+***********************************************************************/
+
+void set_motor_pid(int kp, int ki, int kd)
+{
+    motor_param.kp = kp;
+    motor_param.ki = ki;
+    motor_param.kd = kd;
+}
+
+
+/**********************************************************************
+  * @Name    set_motor_maxparam
+  * @功能说明 change max value
+  * @param   integrate_max: [输入/出]  mav value of I
+**			 control_output_limit: [输入/出]  general max value
+  * @返回值  void
+  * @author  peach99CPP
+***********************************************************************/
+
+void set_motor_maxparam(int integrate_max, int control_output_limit)
+{
+    motor_param.control_output_limit = control_output_limit;
+    motor_param.integrate_max = integrate_max;
+}
+
+
+

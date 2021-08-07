@@ -1,6 +1,7 @@
 #include "tim_control.h"
-int encoder_val[5];//默认为0
+double encoder_val[5];//默认为0
 short status_flag[5];//
+double encoder_sum, temp_sum;
 int rising_val[5], falling_val[5], direct_[5], update_count[5];
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
@@ -11,6 +12,24 @@ extern TIM_HandleTypeDef htim5;
 #define  BACKWARD   -1
 #define SPEED_PARAM    10000
 #define TIM_COUNT_VAL  0xFFFF
+
+
+/**********************************************************************
+  * @Name    all_tim_init
+  * @功能说明 init nterface of all tim related setting
+  * @param   None
+  * @返回值
+  * @author  peach99CPP
+***********************************************************************/
+void All_Tim_Init(void)
+{
+    HAL_TIM_Base_Start_IT(&htim1);
+    HAL_TIM_Base_Start_IT(&htim2);
+    HAL_TIM_Base_Start_IT(&htim3);
+    HAL_TIM_Base_Start_IT(&htim5);
+    Get_Time_Init();
+
+}
 /**********************
 *@name:HAL_TIM_IC_CaptureCallback
 *@function:处理捕获的数据，编码器
@@ -132,6 +151,11 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             }
         }
     }
+
+
+    for(uint8_t i = 1; i <= 4; ++i) temp_sum += fabs(encoder_val[i]);//求转速均值，用于move by encoder时的数据，开始计数时会置0
+    encoder_sum  += temp_sum / (4.0);
+    temp_sum = 0;
 }
 /*******************
 *@name:HAL_TIM_PeriodElapsedCallback
