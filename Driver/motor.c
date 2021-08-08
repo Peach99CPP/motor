@@ -5,21 +5,30 @@
 pid_data_t motor_controler[5];
 
 pid_paramer_t motor_param;
-
+float param_[5] = {2000, \
+                   70000,
+                   30, \
+                   40, \
+                   0
+                  };
 
 
 
 /**********************************************************************
   * @Name    Motor_PID_Init
-  * @功能说明 
-  * @param   : [输入/出] 
-  * @返回值
+  * @功能说明 Init for Motor PID param
+  * @param   : [输入/出] void
+  * @返回值  void
   * @author  peach99CPP
 ***********************************************************************/
 
 void Motor_PID_Init()
 {
-
+    motor_param.integrate_max = param_[0];
+    motor_param.control_output_limit = param_[1];
+    motor_param.kp = param_[2];
+    motor_param.ki = param_[3];
+    motor_param.kd = param_[4];
 }
 
 

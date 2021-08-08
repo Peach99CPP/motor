@@ -16,15 +16,27 @@ extern TIM_HandleTypeDef htim5;
 
 /**********************************************************************
   * @Name    all_tim_init
-  * @功能说明 init nterface of all tim related setting
+  * @功能说明 init nterface of all tim related settings
   * @param   None
   * @返回值
   * @author  peach99CPP
 ***********************************************************************/
 void All_Tim_Init(void)
 {
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
     HAL_TIM_Base_Start_IT(&htim1);
+
+
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
     HAL_TIM_Base_Start_IT(&htim2);
+
+
     HAL_TIM_Base_Start_IT(&htim3);
     HAL_TIM_Base_Start_IT(&htim5);
     Get_Time_Init();
@@ -41,7 +53,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
     if(htim->Instance == TIM3)//判断定时器
     {
-        if(htim->Channel == TIM_CHANNEL_1)//判断触发的通道
+        if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)//判断触发的通道
         {
             if(!status_flag[1])//初始捕获状态标志位判断,此时捕获到上升沿
             {
@@ -67,11 +79,14 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             {
                 status_flag[1] = 0;//清空标志位
                 falling_val[1] = HAL_TIM_ReadCapturedValue(&htim3, TIM_CHANNEL_1); //读取此时的CNT值
-                encoder_val[1] = (SPEED_PARAM / (falling_val[1] - rising_val[1] + update_count[1] * TIM_COUNT_VAL)) * direct_[1]; //把脉宽值反比例转化到转速，加上方向
+                encoder_val[1] = (encoder_val[2] + \
+                                  (SPEED_PARAM / (falling_val[2] - rising_val[2] + update_count[2] * TIM_COUNT_VAL)) * direct_[2]) \
+                                 / (2.0);//做一次均值滤波
+                //把脉宽值反比例转化到转速，加上方向
                 __HAL_TIM_SET_CAPTUREPOLARITY(&htim3, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING); //设置上升沿捕获，回到第一步
             }
         }
-        else if(htim->Channel == TIM_CHANNEL_3)//MOTOR2
+        else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)//MOTOR2
         {
             if(!status_flag[2])
             {
@@ -92,14 +107,16 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             {
                 status_flag[2] = 0;
                 falling_val[2] = HAL_TIM_ReadCapturedValue(&htim3, TIM_CHANNEL_3);
-                encoder_val[2] = (SPEED_PARAM / (falling_val[2] - rising_val[2] + update_count[2] * TIM_COUNT_VAL)) * direct_[2];
+                encoder_val[2] = (encoder_val[2] + \
+                                  (SPEED_PARAM / (falling_val[2] - rising_val[2] + update_count[2] * TIM_COUNT_VAL)) * direct_[2]) \
+                                 / (2.0);//做一次均值滤波
                 __HAL_TIM_SET_CAPTUREPOLARITY(&htim3, TIM_CHANNEL_3, TIM_ICPOLARITY_RISING);
             }
         }
     }
     else if( htim->Instance == TIM5)
     {
-        if(htim->Channel == TIM_CHANNEL_1) //MOTOR3
+        if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) //MOTOR3
         {
             if(!status_flag[3])
             {
@@ -120,12 +137,14 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             {
                 status_flag[3] = 0;
                 falling_val[3] = HAL_TIM_ReadCapturedValue(&htim5, TIM_CHANNEL_1);
-                encoder_val[3] = (SPEED_PARAM / (falling_val[3] - rising_val[3] + update_count[3] * TIM_COUNT_VAL)) * direct_[3];
+                encoder_val[3] = (encoder_val[3] + \
+                                  (SPEED_PARAM / (falling_val[3] - rising_val[3] + update_count[3] * TIM_COUNT_VAL)) * direct_[3]) \
+                                 / (2.0);//做一次均值滤波
                 __HAL_TIM_SET_CAPTUREPOLARITY(&htim5, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING);
             }
         }
 
-        else  if(htim->Channel == TIM_CHANNEL_3)//MOTOR4
+        else  if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)//MOTOR4
         {
             if(!status_flag[4])
             {
@@ -146,7 +165,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             {
                 status_flag[4] = 0;
                 falling_val[4] = HAL_TIM_ReadCapturedValue(&htim5, TIM_CHANNEL_3);
-                encoder_val[4] = (SPEED_PARAM / (falling_val[4] - rising_val[4] + update_count[4] * TIM_COUNT_VAL)) * direct_[4];
+                encoder_val[4] = (encoder_val[4] + \
+                                  (SPEED_PARAM / (falling_val[4] - rising_val[4] + update_count[4] * TIM_COUNT_VAL)) * direct_[4]) \
+                                 / (2.0);//做一次均值滤波
                 __HAL_TIM_SET_CAPTUREPOLARITY(&htim5, TIM_CHANNEL_3, TIM_ICPOLARITY_RISING);
             }
         }
