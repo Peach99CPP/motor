@@ -30,4 +30,6 @@ void speed_variation(float x_var, float y_var, float w_var);
 void set_speed (float x, float y, float w);
 void change_switch_status(bool status);
 void chassis_synthetic_control(void);
+
+extern float motor_target[5];
 #endif

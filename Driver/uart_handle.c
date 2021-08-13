@@ -1,7 +1,9 @@
 #include "uart_handle.h"
 #define MAX_BUFFER_SIZE 100
-static uint8_t uart1_state = 0, rec_flag = 0;
-uint8_t uart1_rxbuffer[MAX_BUFFER_SIZE], rec_count = 0;
+#define MAX_SIZE 200
+uint16_t USART_RX_STA = 0;
+uint32_t rec_count = 0;
+uint8_t USART_RX_BUF[MAX_SIZE];
 
 #if 1
 #pragma import(__use_no_semihosting)
@@ -40,42 +42,29 @@ void USART1_IRQHandler(void)
     uint8_t rec;
     if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
     {
-        __HAL_UART_ENABLE_IT(&huart1,UART_IT_RXNE);
+        __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
         rec =  huart1.Instance->RDR;
-        
-        if(!rec_flag)
+        if(!(USART_RX_STA & 0x8000))//接收未完成
         {
-            if(uart1_state == 0)
+
+            if((USART_RX_STA & 0X4000) )
             {
-                if(rec == 0xff)
+                if(rec == 0x0a)
                 {
-                    uart1_state = 1;
-                    rec_count = 0;
-                }
-            }
-            else if(uart1_state == 1 )
-            {
-                if(rec == 0xff)
-                {
-                    uart1_state = 0;
-                    rec_flag = 1;
-                    uart1_decode();
-                    if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE)) printf("not cleared\r\n");
+                    USART_RX_STA |= 0x8000;
                     return ;
                 }
-                else
-                {
-                    uart1_rxbuffer[rec_count++] = rec;
-                }
-                if(rec_count == MAX_BUFFER_SIZE )
-                {
-                    rec_flag = 1;
-                    uart1_state = 0;
-                    uart1_decode();
-
-                }
+                else USART_RX_STA = 0;
             }
+            if(rec == 0x0d) USART_RX_STA |= 0x4000;
+            else
+            {
+                USART_RX_BUF[USART_RX_STA & 0x3fff] = rec;
+                USART_RX_STA++;
+            }
+
         }
+
     }
 
 }
@@ -87,15 +76,16 @@ void USART1_IRQHandler(void)
   * @param   None
   * @返回值  void
   * @author  peach99CPP
+  * @debug  abandoned use usmart
 ***********************************************************************/
 
-void uart1_decode(void)
-{
-    // change th value of motor_pid_param
-    set_motor_pid(uart1_rxbuffer[0] + uart1_rxbuffer[1], \
-                  uart1_rxbuffer[2], \
-                  uart1_rxbuffer[3]);
-    rec_flag = 0;//clear rec flag to enable rec data handle
-    memset(uart1_rxbuffer, 0, rec_count * sizeof(rec_count)); // claer the buffer
-    printf("setting param completed\r\n");
-}
+//void uart1_decode(void)
+//{
+//    // change th value of motor_pid_param
+//    set_motor_pid(uart1_rxbuffer[0] + uart1_rxbuffer[1], \
+//                  uart1_rxbuffer[2], \
+//                  uart1_rxbuffer[3]);
+//    rec_flag = 0;//clear rec flag to enable rec data handle
+//    memset(uart1_rxbuffer, 0, rec_count * sizeof(rec_count)); // claer the buffer
+//    printf("setting param completed\r\n");
+//}

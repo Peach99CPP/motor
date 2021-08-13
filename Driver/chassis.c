@@ -91,28 +91,32 @@ void chassis_synthetic_control(void)
     * 从左上角逆时针旋转一圈，就是4个电机 1 2 3 4
     ****************************************/
 
-    motor_target[1] = -0.707 * x - 0.707 * y + CHASSIS_RADIUS * w;
-    motor_target[2] = 0.707 * x - 0.707 * y + CHASSIS_RADIUS * w;
-    motor_target[3] = 0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
-    motor_target[4] = -0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
+//    motor_target[1] = -0.707 * x - 0.707 * y + CHASSIS_RADIUS * w;
+//    motor_target[2] = 0.707 * x - 0.707 * y + CHASSIS_RADIUS * w;
+//    motor_target[3] = 0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
+//    motor_target[4] = -0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
 
-    //再来一个限幅操作，避免单边速度过高导致控制效果不理想
-    //
-    for (i = 1; i <= 4; ++i) //找出最大值
-    {
-        if (motor_target[i] > max_val)
-            max_val = motor_target[i];
-    }
-    factor = (max_val > MAX_SPEED) ? MAX_SPEED / max_val : 1;
-    if (max_val > MAX_SPEED)//最大值是否超限制，进行操作，确保最大值仍在范围内且转速比例 不变
-    {
-        factor = MAX_SPEED / max_val;
-        for (i = 1; i < 4; ++i)
-        {
-            motor_target[i] *= factor;
-        }
+//    //再来一个限幅操作，避免单边速度过高导致控制效果不理想
+//    //
+//
 
-    }
+//
+//    for (i = 1; i <= 4; ++i) //找出最大值
+//    {
+//        if (motor_target[i] > max_val)
+//            max_val = motor_target[i];
+//    }
+//    factor = (max_val > MAX_SPEED) ? MAX_SPEED / max_val : 1;
+//    if (max_val > MAX_SPEED)//最大值是否超限制，进行操作，确保最大值仍在范围内且转速比例 不变
+//    {
+//        factor = MAX_SPEED / max_val;
+//        for (i = 1; i < 4; ++i)
+//        {
+//            motor_target[i] *= factor;
+//        }
+
+//    }
+
     for (i = 1; i <= 4; ++i)
     {
         /*
@@ -122,9 +126,9 @@ void chassis_synthetic_control(void)
         *传入PID计算函数得到计算值,以返回值形式传参
         *由计算值控制电机
         */
-        motor_controler[i].expect = motor_target[i];
-        motor_controler[i].feedback = read_encoder(i);
-        set_motor(i, pid_control(&motor_controler[i], &motor_param));
+        motor_data[i].expect = motor_target[i];
+        motor_data[i].feedback = read_encoder(i);
+        set_motor(i, pid_control(&motor_data[i], &motor_param));
     }
 
 

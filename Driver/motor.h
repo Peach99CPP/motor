@@ -3,11 +3,58 @@
 #include "tim_control.h"
 #include <stdbool.h>
 #include "pid.h"
-void Motor_PID_Init();
-short read_encoder(int motor_id);
-void set_motor(int motor_id, short control_val);
+#include "tim.h"
+#include "uart_handle.h"
+#include "delay.h"
+typedef enum
+{
+    Channel1 = 1,
+    Channel2,
+    Channel3,
+    Channel4
+} Channel_t;
+typedef struct
+{
+    TIM_HandleTypeDef * Tim;
+    uint32_t Channel_A, Channel_B;
+} PWM_CHANNEL_t;
+typedef  struct
+{
+    GPIO_TypeDef * Port;
+    uint16_t Pin;
+} Enocede_IO;
+typedef struct
+{
+    TIM_HandleTypeDef * Tim;
+    HAL_TIM_ActiveChannel Active_Channel;
+    uint32_t  Channel;
+
+} IC_t;
+typedef struct
+{
+    Enocede_IO Encoder_IO;
+    IC_t IC;
+    PWM_CHANNEL_t PWM ;
+} motor_t;
+
+volatile uint32_t * get_motor_channelA_ptr( int motor_id);
+volatile uint32_t * get_motor_channelB_ptr( int motor_id);
+
+
+void get_motor_pwm_ptr(volatile uint32_t * c1_ptr, volatile uint32_t * c2_ptr, int motor_id);
+void motor_init(void);
+void Motor_PID_Init(void);
+int  read_encoder(int motor_id);
+void set_motor(int motor_id, int control_val);
 void set_motor_pid(int kp, int ki, int kd);
 void set_motor_maxparam(int integrate_max, int control_output_limit);
 void pid_param_init(pid_paramer_t *controler, float params[]); //此函数后期移动回去pid.c中
-extern pid_data_t motor_controler[5];
+void set_debug_motor(int status, int motor_id);
+void motor_debug(void);
+void set_debug_speed(int speed);
+void show_speed(void);
+void clear_all_speed(void);
+
+extern pid_data_t motor_data[5];
+extern motor_t motor1, motor2, motor3, motor4;
 #endif
