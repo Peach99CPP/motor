@@ -13,7 +13,7 @@ struct _m_usmart_nametab usmart_nametab[] =
     (void*)read_addr, "u32 read_addr(u32 addr)",
     (void*)write_addr, "void write_addr(u32 addr,u32 val)",
 #endif
-    (void*)read_encoder, "int read_encoder(int motor_id)",
+    (void*)read_encoder, "float read_encoder(int motor_id)",
     (void*)set_motor, "void set_motor(int motor_id, int control_val)",
     (void*)set_motor_pid, "void set_motor_pid(int kp, int ki, int kd)",
     (void*)set_motor_maxparam, "void set_motor_maxparam(int integrate_max, int control_output_limit)",
@@ -22,6 +22,7 @@ struct _m_usmart_nametab usmart_nametab[] =
     (void*)set_debug_speed, "void set_debug_speed(int speed)",
     (void*)set_debug_motor, "void set_debug_motor(int status, int motor_id)",
     (void*)change_switch_status, "void change_switch_status(bool status))",
+    (void*)clear_pid_param, "void clear_pid_param(void)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

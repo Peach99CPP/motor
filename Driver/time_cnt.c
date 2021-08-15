@@ -53,8 +53,7 @@ void TIM6_DAC_IRQHandler(void)
             usmart_dev.scan();
         }
         if(tim6_tick > 65535) tim6_tick = 0;
-        show_speed();
-
+//        show_speed();
         chassis_synthetic_control();
 
 

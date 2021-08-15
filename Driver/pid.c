@@ -1,7 +1,7 @@
 #include "pid.h"
 
 #define ABS(X)  (((X) > 0)? (X) : -(X))
-
+float  Iout, Pout, Dout;
 /**********************************************************************************************************
 *函 数 名: pid_control
 *功能说明: pid控制器计算
@@ -46,6 +46,43 @@ float pid_control(pid_data_t *data, pid_paramer_t *para)
                            + data->integrate
                            + para->kd * data->dis_err;
     //总输出限幅
+    if (para->control_output_limit)
+    {
+        if (data->control_output >= para->control_output_limit)
+            data->control_output = para->control_output_limit;
+        if (data->control_output <= -para->control_output_limit)
+            data->control_output = -para->control_output_limit;
+    }
+    //返回总输出
+    return data->control_output;
+}
+float pid_incremental(pid_data_t *data, pid_paramer_t *para)
+{
+    float controller_dt;
+    //短路直接输出期待值
+    if (data->short_circuit_flag)
+    {
+        data->control_output = data->expect;
+        return data->control_output;
+    }
+    //获取dt
+    Get_Time_Period(&data->pid_controller_dt);
+    controller_dt = data->pid_controller_dt.Time_Delta / 1000000.0;
+    //第一次计算间隔时间将出现间隔时间很大的情况
+    if (controller_dt < 0.001f)
+        return 0;
+    //开始进行增量式计算
+    data->last2_err = data->last_err;
+    data->last_err = data->err;
+    data->err =  data->expect - data->feedback;
+
+    Pout = para->kp * (data->err - data->last_err);
+    Iout = para->ki * data->err;
+    Dout = para->kd * (data->err - 2.0f * data->last_err + data->last2_err);
+
+    data->delta = Pout + Iout + Dout;
+    data->control_output += data->delta;
+
     if (para->control_output_limit)
     {
         if (data->control_output >= para->control_output_limit)

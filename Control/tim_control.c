@@ -5,6 +5,7 @@ double encoder_sum, temp_sum;
 int rising_val[5], falling_val[5], direct_[5], update_count[5];
 double   cap_temp_val[5];
 short cap_cnt[5];
+int first_flag[5];
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
@@ -14,7 +15,7 @@ extern TIM_HandleTypeDef htim5;
 #define  BACKWARD   1
 #define SPEED_PARAM    10000
 #define TIM_COUNT_VAL  0xFFFF
-#define FILTER 10.0
+#define FILTER 4.0
 #define THRESHOLD_ 5
 
 
@@ -80,8 +81,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             __HAL_TIM_SET_CAPTUREPOLARITY(motor1.IC.Tim, motor1.IC.Channel, TIM_ICPOLARITY_RISING);//准备对上升沿进行采样
             if(cap_cnt[1] == FILTER)//采样次数到达了
             {
-                if(encoder_val[1] == 0)//第一次，懒得设置变量，直接判断非 0
+                if(!first_flag[1])//第一次，设置变量
                 {
+                    first_flag[1] = 1;
                     encoder_val[1] = cap_temp_val[1] / FILTER;
                 }
                 else
@@ -130,8 +132,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             __HAL_TIM_SET_CAPTUREPOLARITY(motor2.IC.Tim, motor2.IC.Channel, TIM_ICPOLARITY_RISING);
             if(cap_cnt[2] == FILTER)
             {
-                if(encoder_val[2] == 0)
+                if(!first_flag[2])
                 {
+                    first_flag[2] = 1;
                     encoder_val[2] = cap_temp_val[2] / FILTER;
                 }
                 else
@@ -178,8 +181,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             __HAL_TIM_SET_CAPTUREPOLARITY(motor3.IC.Tim, motor3.IC.Channel, TIM_ICPOLARITY_RISING);
             if(cap_cnt[3] == FILTER)
             {
-                if(encoder_val[3] == 0)
+                if(!first_flag[3])
                 {
+                    first_flag[3] = 1;
                     encoder_val[3] = cap_temp_val[3] / FILTER;
                 }
                 else
@@ -226,8 +230,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             __HAL_TIM_SET_CAPTUREPOLARITY(motor4.IC.Tim, motor4.IC.Channel, TIM_ICPOLARITY_RISING);
             if(cap_cnt[4] == FILTER)
             {
-                if(encoder_val[4] == 0)
+                if(!first_flag[4])
                 {
+                    first_flag[4] = 1;
                     encoder_val[4] = cap_temp_val[4] / FILTER;
                 }
                 else

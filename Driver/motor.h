@@ -44,7 +44,7 @@ volatile uint32_t * get_motor_channelB_ptr( int motor_id);
 void get_motor_pwm_ptr(volatile uint32_t * c1_ptr, volatile uint32_t * c2_ptr, int motor_id);
 void motor_init(void);
 void Motor_PID_Init(void);
-int  read_encoder(int motor_id);
+float read_encoder(int motor_id);
 void set_motor(int motor_id, int control_val);
 void set_motor_pid(int kp, int ki, int kd);
 void set_motor_maxparam(int integrate_max, int control_output_limit);
@@ -54,7 +54,9 @@ void motor_debug(void);
 void set_debug_speed(int speed);
 void show_speed(void);
 void clear_all_speed(void);
+void clear_pid_param(void);
 
+extern int debug_motor_id, switch_status, debug_speed ;
 extern pid_data_t motor_data[5];
 extern motor_t motor1, motor2, motor3, motor4;
 #endif

@@ -32,4 +32,5 @@ void change_switch_status(bool status);
 void chassis_synthetic_control(void);
 
 extern float motor_target[5];
+extern float control_val[5];
 #endif

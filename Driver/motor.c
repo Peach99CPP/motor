@@ -1,7 +1,7 @@
 #include "motor.h"
 #include "chassis.h"
 #define MAX_VAL 7000
-//#define DEBUG_MODE
+#define DEBUG_MODE
 int debug_motor_id = 0, switch_status = 0;
 int debug_speed = 0;
 pid_data_t motor_data[5];
@@ -10,7 +10,7 @@ pid_paramer_t motor_param;
 float param_[5] = {2000, \
                    7000,
                    30, \
-                   40, \
+                   0, \
                    0
                   };
 
@@ -46,7 +46,7 @@ void motor_init(void)
 
 
     HAL_TIM_IC_Start_IT(motor1.IC.Tim, motor1.IC.Channel); //IC捕获使能
-
+    set_motor(1, 0);
 
 
     /*****************电机2*****************/
@@ -65,6 +65,7 @@ void motor_init(void)
     HAL_TIM_PWM_Start(motor2.PWM.Tim, motor2.PWM.Channel_B);//
 
     HAL_TIM_IC_Start_IT(motor2.IC.Tim, motor2.IC.Channel); //IC捕获使能
+    set_motor(2, 0);
 
     /*****************电机3*****************/
     motor3.Encoder_IO.Port = MOTOR3_ENCODER_GPIO_Port;//配置编码器GPIO_PORT
@@ -83,6 +84,7 @@ void motor_init(void)
 
 
     HAL_TIM_IC_Start_IT(motor3.IC.Tim, motor3.IC.Channel); //IC捕获使能
+    set_motor(3, 0);
 
 
     /*****************电机4*****************/
@@ -101,6 +103,7 @@ void motor_init(void)
 
 
     HAL_TIM_IC_Start_IT(motor4.IC.Tim, motor4.IC.Channel); //IC捕获使能
+    set_motor(4, 0);
 
 }
 
@@ -130,9 +133,9 @@ void Motor_PID_Init()
 *@param:想要读取的电机编号
 *@return:编码器的值
 **************************************************************/
-int  read_encoder(int motor_id)
+float read_encoder(int motor_id)
 {
-    double temp_num = encoder_val[motor_id]+1;
+    double temp_num = encoder_val[motor_id] ;
     encoder_val[motor_id] = 0;
 #ifdef DEBUG_MODE
     printf("\r\nmotor%d sppeed =%d\r\n", motor_id, (int)temp_num);
@@ -344,9 +347,9 @@ volatile uint32_t * get_motor_channelB_ptr( int motor_id)
         {
             ptr = &(motor1.PWM.Tim->Instance->CCR3);
         }
-        else if(motor1.PWM.Channel_B  == TIM_CHANNEL_3)
+        else if(motor1.PWM.Channel_B  == TIM_CHANNEL_4)
         {
-            ptr = &(motor1.PWM.Tim->Instance->CCR3);
+            ptr = &(motor1.PWM.Tim->Instance->CCR4);
         }
         break;
     case 2:
@@ -362,9 +365,9 @@ volatile uint32_t * get_motor_channelB_ptr( int motor_id)
         {
             ptr = &(motor2.PWM.Tim->Instance->CCR3);
         }
-        else if(motor2.PWM.Channel_B  == TIM_CHANNEL_3)
+        else if(motor2.PWM.Channel_B  == TIM_CHANNEL_4)
         {
-            ptr = &(motor2.PWM.Tim->Instance->CCR3);
+            ptr = &(motor2.PWM.Tim->Instance->CCR4);
         }
         break;
     case 3:
@@ -380,9 +383,9 @@ volatile uint32_t * get_motor_channelB_ptr( int motor_id)
         {
             ptr = &(motor3.PWM.Tim->Instance->CCR3);
         }
-        else if(motor3.PWM.Channel_B  == TIM_CHANNEL_3)
+        else if(motor3.PWM.Channel_B  == TIM_CHANNEL_4)
         {
-            ptr = &(motor3.PWM.Tim->Instance->CCR3);
+            ptr = &(motor3.PWM.Tim->Instance->CCR4);
         }
         break;
     case 4:
@@ -398,9 +401,9 @@ volatile uint32_t * get_motor_channelB_ptr( int motor_id)
         {
             ptr = &(motor4.PWM.Tim->Instance->CCR3);
         }
-        else if(motor4.PWM.Channel_B  == TIM_CHANNEL_3)
+        else if(motor4.PWM.Channel_B  == TIM_CHANNEL_4)
         {
-            ptr = &(motor4.PWM.Tim->Instance->CCR3);
+            ptr = &(motor4.PWM.Tim->Instance->CCR4);
         }
         break;
     default:
@@ -423,7 +426,7 @@ volatile uint32_t * get_motor_channelB_ptr( int motor_id)
 void show_speed(void)
 {
     if(debug_motor_id == 0 || !switch_status ) return ;
-    printf("%d\r\n", (int)encoder_val[debug_motor_id]);
+    printf("%.2lf,  %d,  %.2f,  %.2f\r\n", read_encoder(debug_motor_id), (int)motor_target[debug_motor_id], control_val[debug_motor_id], motor_data[debug_motor_id].err);
 }
 
 
@@ -482,7 +485,7 @@ void motor_debug(void)
 /**********************************************************************
   * @Name    set_debug_speed
   * @declaration :  set debug speed
-  * @param   speed: [输入/出] 
+  * @param   speed: [输入/出]
   * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
@@ -495,4 +498,25 @@ void set_debug_speed(int speed)
         return ;
     }
     debug_speed = speed;
+}
+
+
+/**********************************************************************
+  * @Name    clear_pid_param
+  * @declaration : clear pid output for increment pid
+  * @param   None
+  * @retval   :void
+  * @author  peach99CPP
+***********************************************************************/
+
+void clear_pid_param(void)
+{
+    for(uint8_t i = 1; i <= 4; ++i)
+    {
+        motor_data[i].last2_err = 0;
+        motor_data[i].last_err = 0;
+        motor_data[i].err = 0;
+        motor_data[i].control_output = 0;
+    }
+
 }

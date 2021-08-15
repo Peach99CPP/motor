@@ -1,6 +1,5 @@
 #include "delay.h"
 time_t sys_time;
-#include "uart_handle.h"
 /**********************************************************************
   * @Name    sys_time_init
   * @declaration : init for the time_t structure

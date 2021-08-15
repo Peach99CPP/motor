@@ -1,5 +1,5 @@
 #include "chassis.h"
-
+#include "motor.h"
 #define TIME_PARAM 10
 #define CHASSIS_RADIUS 18.0
 #define MAX_SPEED 180.0
@@ -7,6 +7,7 @@ CHASSIS chassis;
 float motor_target[5];
 short time_count;
 extern pid_paramer_t motor_param;
+float control_val[5];
 /**********************************************************************
   * @Name    set_speed
   * @brief     直接修改器底盘的速度值
@@ -70,7 +71,7 @@ void chassis_synthetic_control(void)
     int i;
     float x, y, w, factor;
     double max_val;
-    if (chassis._switch == false) return;//如果底盘不被使能，则没有后续操作
+    if (chassis._switch == false || debug_motor_id == 0) return; //如果底盘不被使能，则没有后续操作
 
     if (++time_count == TIME_PARAM)
     {
@@ -117,19 +118,26 @@ void chassis_synthetic_control(void)
 
 //    }
 
-    for (i = 1; i <= 4; ++i)
-    {
-        /*
-        *对电机进行遍历
-        *首先获取转速期待值
-        *读取编码器参数
-        *传入PID计算函数得到计算值,以返回值形式传参
-        *由计算值控制电机
-        */
-        motor_data[i].expect = motor_target[i];
-        motor_data[i].feedback = read_encoder(i);
-        set_motor(i, pid_control(&motor_data[i], &motor_param));
-    }
+//    for (i = 1; i <= 4; ++i)
+//    {
+//        /*
+//        *对电机进行遍历
+//        *首先获取转速期待值
+//        *读取编码器参数
+//        *传入PID计算函数得到计算值,以返回值形式传参
+//        *由计算值控制电机
+//        */
+//        motor_data[i].expect = motor_target[i];
+//        motor_data[i].feedback = read_encoder(i);
+//        control_val[i] =  pid_incremental(&motor_data[i], &motor_param);
+//        set_motor(i, control_val[i]);
+//    }
 
+    //debug
 
+    motor_data[debug_motor_id].expect = motor_target[debug_motor_id];
+    motor_data[debug_motor_id].feedback = read_encoder(debug_motor_id);
+    control_val[debug_motor_id] =  pid_incremental(&motor_data[debug_motor_id], &motor_param);
+    set_motor(debug_motor_id, control_val[debug_motor_id]);
+    printf("%.2f     %.2f     %.2f\r\n",motor_data[debug_motor_id].expect,motor_data[debug_motor_id].feedback,motor_data[debug_motor_id].delta);
 }

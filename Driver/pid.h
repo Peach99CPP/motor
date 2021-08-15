@@ -30,8 +30,12 @@ typedef struct pid_data
     float err;
     //上次偏差
     float last_err;
+    //上上次偏差
+    float last2_err;
     //积分值
     float integrate;
+    //单次偏差
+    float delta;
     //偏差微分
     float dis_err;
     //控制器总输出
@@ -48,6 +52,7 @@ typedef struct pid_data
 
 typedef void (*pid_callback_t)(struct pid_data *, struct pid_paramer *);
 
+extern     float  Iout, Pout, Dout;
 float pid_control(pid_data_t *data, pid_paramer_t *para);
-
+float pid_incremental(pid_data_t *data, pid_paramer_t *para);
 #endif
