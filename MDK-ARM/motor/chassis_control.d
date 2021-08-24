@@ -46,7 +46,7 @@ motor\chassis_control.o: ..\Driver\uart_handle.h
 motor\chassis_control.o: ../Inc/usart.h
 motor\chassis_control.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\chassis_control.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-motor\chassis_control.o: ..\Driver\pid.h
+motor\chassis_control.o: ..\Math\pid.h
 motor\chassis_control.o: ../Inc/tim.h
 motor\chassis_control.o: ..\Driver\delay.h
 motor\chassis_control.o: ..\Control\chassis_control.h

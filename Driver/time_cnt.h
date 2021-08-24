@@ -23,6 +23,7 @@ typedef struct
 
 extern Time_t Time_Sys;
 
+void T6_IRQHandler(void);
 void Get_Time_Init(void);
 void Get_Time_Period(Testime *Time_Lab);
 #endif

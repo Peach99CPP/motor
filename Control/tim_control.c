@@ -25,7 +25,7 @@ extern TIM_HandleTypeDef htim5;
 *@param:定时器结构体
 *@return:无
 **********************/
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     static uint8_t i = 0;
     if(htim->Instance == TIM3)
@@ -55,10 +55,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             update_count[4] = 0;
             encoder_val[4] = 0;
         }
-    }
-    else   if (htim->Instance == TIM7)
-    {
-        HAL_IncTick();
     }
 
 }

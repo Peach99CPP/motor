@@ -35,3 +35,14 @@ motor\i2c.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 motor\i2c.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\i2c.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 motor\i2c.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
+motor\i2c.o: ..\Driver\iic.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+motor\i2c.o: ../Inc/FreeRTOSConfig.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1/portmacro.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+motor\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h

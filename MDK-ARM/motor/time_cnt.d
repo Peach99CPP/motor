@@ -46,7 +46,7 @@ motor\time_cnt.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 motor\time_cnt.o: ..\Driver\motor.h
 motor\time_cnt.o: ..\Driver\uart_handle.h
 motor\time_cnt.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\time_cnt.o: ..\Driver\pid.h
+motor\time_cnt.o: ..\Math\pid.h
 motor\time_cnt.o: ../Inc/tim.h
 motor\time_cnt.o: ..\Driver\delay.h
 motor\time_cnt.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

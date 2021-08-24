@@ -46,7 +46,7 @@ motor\chassis.o: ..\Driver\uart_handle.h
 motor\chassis.o: ../Inc/usart.h
 motor\chassis.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\chassis.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-motor\chassis.o: ..\Driver\pid.h
+motor\chassis.o: ..\Math\pid.h
 motor\chassis.o: ../Inc/tim.h
 motor\chassis.o: ..\Driver\delay.h
 motor\chassis.o: ..\Driver\track_bar_receive.h

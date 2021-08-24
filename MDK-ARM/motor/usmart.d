@@ -46,7 +46,7 @@ motor\usmart.o: ..\Driver\time_cnt.h
 motor\usmart.o: ..\Driver\motor.h
 motor\usmart.o: ..\Driver\uart_handle.h
 motor\usmart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\usmart.o: ..\Driver\pid.h
+motor\usmart.o: ..\Math\pid.h
 motor\usmart.o: ../Inc/tim.h
 motor\usmart.o: ..\Driver\delay.h
 motor\usmart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

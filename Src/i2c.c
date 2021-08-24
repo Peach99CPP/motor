@@ -21,7 +21,8 @@
 #include "i2c.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "iic.h"
+#include "queue.h"
 /* USER CODE END 0 */
 
 I2C_HandleTypeDef hi2c1;
@@ -63,7 +64,13 @@ void MX_I2C1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN I2C1_Init 2 */
-
+    hi2c1.MemRxCpltCallback = HAL_I2C1_MemRxCpltCallback;
+    hi2c1.MemTxCpltCallback = HAL_I2C1_MemTxCpltCallback;
+    hi2c1.ErrorCallback = HAL_I2C1_ErrorCallback;
+    hi2c1.MasterRxCpltCallback = HAL_I2C1_MasterRxCpltCallback;
+    hi2c1.MasterTxCpltCallback = HAL_I2C1_MasterTxCpltCallback;
+  
+  	i2c_queue = xQueueCreate(1, sizeof(uint8_t));
   /* USER CODE END I2C1_Init 2 */
 
 }
@@ -96,7 +103,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     /* I2C1 interrupt Init */
     HAL_NVIC_SetPriority(I2C1_EV_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-    HAL_NVIC_SetPriority(I2C1_ER_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(I2C1_ER_IRQn, 15, 0);
     HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
   /* USER CODE BEGIN I2C1_MspInit 1 */
 

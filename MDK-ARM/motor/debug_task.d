@@ -60,7 +60,7 @@ motor\debug_task.o: ..\Driver\uart_handle.h
 motor\debug_task.o: ../Inc/usart.h
 motor\debug_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\debug_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-motor\debug_task.o: ..\Driver\pid.h
+motor\debug_task.o: ..\Math\pid.h
 motor\debug_task.o: ../Inc/tim.h
 motor\debug_task.o: ..\Driver\delay.h
 motor\debug_task.o: ..\Control\chassis_control.h

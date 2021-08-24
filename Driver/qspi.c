@@ -1,8 +1,6 @@
 #include "qspi.h"
-#include "stm32f7xx_hal.h"
-#include "stm32f7xx_hal_qspi.h"
 
-static QSPI_HandleTypeDef hqspi;
+extern  QSPI_HandleTypeDef hqspi;
 
 /**********************************************************************************************************
 *º¯ Êý Ãû: qspi_send_cmd

@@ -48,9 +48,9 @@ int fputc(int ch, FILE *f)
     return ch;
 }
 #endif
-void tx_queue_init(void)
+void printf_init(void)
 {
-    tx_queue = xQueueCreate(200, sizeof(uint8_t));
+    tx_queue = xQueueCreate(MAX_SIZE, sizeof(uint8_t));
 }
 /**********************************************************************
   * @Name    USART1_IRQHandler
@@ -60,7 +60,7 @@ void tx_queue_init(void)
   * @author  peach99CPP
 ***********************************************************************/
 
-void USART1_IRQHandler(void)
+void U1_IRQHandler(void)
 {
     uint8_t rec;
     if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))

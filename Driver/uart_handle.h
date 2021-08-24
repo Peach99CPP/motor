@@ -23,8 +23,10 @@
 #include "motor.h"
 #include "string.h"
 #include <stdio.h>
+
+void U1_IRQHandler(void);
 void uart1_decode(void);
-void tx_queue_init(void);
+void printf_init(void);
 #endif
 
 

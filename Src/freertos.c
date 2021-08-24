@@ -50,10 +50,11 @@
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId debugtaskHandle;
-osThreadId printftaskHandle;
 osThreadId chassisHandle;
-osThreadId usmarttaskHandle;
 osThreadId track_taskHandle;
+osThreadId ahrs_imuHandle;
+osThreadId imu_tempHandle;
+osThreadId usmart_taskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -62,10 +63,11 @@ osThreadId track_taskHandle;
 
 void StartDefaultTask(void const * argument);
 void Startdebug(void const * argument);
-void printfqueue(void const * argument);
 void chassis_task(void const * argument);
-void usmartscan(void const * argument);
 void track_scan(void const * argument);
+void ahrs_imu_task_(void const * argument);
+void temp_imu_task(void const * argument);
+void usmartscan(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -120,21 +122,25 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(debugtask, Startdebug, osPriorityNormal, 0, 128);
   debugtaskHandle = osThreadCreate(osThread(debugtask), NULL);
 
-  /* definition and creation of printftask */
-  osThreadDef(printftask, printfqueue, osPriorityNormal, 0, 128);
-  printftaskHandle = osThreadCreate(osThread(printftask), NULL);
-
   /* definition and creation of chassis */
-  osThreadDef(chassis, chassis_task, osPriorityNormal, 0, 128);
+  osThreadDef(chassis, chassis_task, osPriorityNormal, 0, 512);
   chassisHandle = osThreadCreate(osThread(chassis), NULL);
-
-  /* definition and creation of usmarttask */
-  osThreadDef(usmarttask, usmartscan, osPriorityAboveNormal, 0, 128);
-  usmarttaskHandle = osThreadCreate(osThread(usmarttask), NULL);
 
   /* definition and creation of track_task */
   osThreadDef(track_task, track_scan, osPriorityHigh, 0, 128);
   track_taskHandle = osThreadCreate(osThread(track_task), NULL);
+
+  /* definition and creation of ahrs_imu */
+  osThreadDef(ahrs_imu, ahrs_imu_task_, osPriorityAboveNormal, 0, 512);
+  ahrs_imuHandle = osThreadCreate(osThread(ahrs_imu), NULL);
+
+  /* definition and creation of imu_temp */
+  osThreadDef(imu_temp, temp_imu_task, osPriorityLow, 0, 512);
+  imu_tempHandle = osThreadCreate(osThread(imu_temp), NULL);
+
+  /* definition and creation of usmart_task */
+  osThreadDef(usmart_task, usmartscan, osPriorityLow, 0, 256);
+  usmart_taskHandle = osThreadCreate(osThread(usmart_task), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -178,24 +184,6 @@ __weak void Startdebug(void const * argument)
   /* USER CODE END Startdebug */
 }
 
-/* USER CODE BEGIN Header_printfqueue */
-/**
-* @brief Function implementing the printftask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_printfqueue */
-__weak void printfqueue(void const * argument)
-{
-  /* USER CODE BEGIN printfqueue */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END printfqueue */
-}
-
 /* USER CODE BEGIN Header_chassis_task */
 /**
 * @brief Function implementing the chassis thread.
@@ -214,24 +202,6 @@ __weak void chassis_task(void const * argument)
   /* USER CODE END chassis_task */
 }
 
-/* USER CODE BEGIN Header_usmartscan */
-/**
-* @brief Function implementing the usmarttask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_usmartscan */
-__weak void usmartscan(void const * argument)
-{
-  /* USER CODE BEGIN usmartscan */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END usmartscan */
-}
-
 /* USER CODE BEGIN Header_track_scan */
 /**
 * @brief Function implementing the track_task thread.
@@ -248,6 +218,60 @@ __weak void track_scan(void const * argument)
     osDelay(1);
   }
   /* USER CODE END track_scan */
+}
+
+/* USER CODE BEGIN Header_ahrs_imu_task_ */
+/**
+* @brief Function implementing the ahrs_imu thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_ahrs_imu_task_ */
+__weak void ahrs_imu_task_(void const * argument)
+{
+  /* USER CODE BEGIN ahrs_imu_task_ */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END ahrs_imu_task_ */
+}
+
+/* USER CODE BEGIN Header_temp_imu_task */
+/**
+* @brief Function implementing the imu_temp thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_temp_imu_task */
+__weak void temp_imu_task(void const * argument)
+{
+  /* USER CODE BEGIN temp_imu_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END temp_imu_task */
+}
+
+/* USER CODE BEGIN Header_usmartscan */
+/**
+* @brief Function implementing the usmart_task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_usmartscan */
+__weak void usmartscan(void const * argument)
+{
+  /* USER CODE BEGIN usmartscan */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END usmartscan */
 }
 
 /* Private application code --------------------------------------------------*/

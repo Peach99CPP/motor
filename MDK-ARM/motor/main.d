@@ -61,7 +61,7 @@ motor\main.o: ..\Driver\time_cnt.h
 motor\main.o: ..\Driver\motor.h
 motor\main.o: ..\Control\tim_control.h
 motor\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\main.o: ..\Driver\pid.h
+motor\main.o: ..\Math\pid.h
 motor\main.o: ..\Driver\uart_handle.h
 motor\main.o: ..\Driver\motor.h
 motor\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

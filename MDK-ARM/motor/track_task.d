@@ -50,7 +50,7 @@ motor\track_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\track_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 motor\track_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
 motor\track_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\track_task.o: ..\Driver\pid.h
+motor\track_task.o: ..\Math\pid.h
 motor\track_task.o: ..\Driver\time_cnt.h
 motor\track_task.o: ..\Driver\time_cnt.h
 motor\track_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

@@ -1,0 +1,10 @@
+motor\ahrs.o: ..\module\ahrs.c
+motor\ahrs.o: ..\module\ahrs.h
+motor\ahrs.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+motor\ahrs.o: ..\module\vector3.h
+motor\ahrs.o: ..\Driver\time_cnt.h
+motor\ahrs.o: ..\Driver\time_cnt.h
+motor\ahrs.o: ..\module\imu.h
+motor\ahrs.o: ..\module\mpu6050.h
+motor\ahrs.o: ..\Math\Filter.h
+motor\ahrs.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

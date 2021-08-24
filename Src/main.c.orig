@@ -124,9 +124,9 @@ int main(void)
     Motor_PID_Init();
     change_switch_status(true);
     motor_init();
-    tx_queue_init();
+    printf_init();
     track_bar_init();
-    __HAL_UART_DISABLE_IT(&huart2,UART_IT_RXNE);
+    __HAL_UART_DISABLE_IT(&huart2, UART_IT_RXNE);
 //    set_speed(0,20,0);
   /* USER CODE END 2 */
 
@@ -227,10 +227,10 @@ void SystemClock_Config(void)
   * @param  htim : TIM handle
   * @retval None
   */
-__weak void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
-
+    MY_PeriodElapsedCallback(htim);
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM7) {
     HAL_IncTick();

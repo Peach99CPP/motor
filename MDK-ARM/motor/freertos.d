@@ -60,7 +60,7 @@ motor\freertos.o: ..\Driver\time_cnt.h
 motor\freertos.o: ..\Driver\motor.h
 motor\freertos.o: ..\Driver\uart_handle.h
 motor\freertos.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\freertos.o: ..\Driver\pid.h
+motor\freertos.o: ..\Math\pid.h
 motor\freertos.o: ../Inc/tim.h
 motor\freertos.o: ..\Driver\delay.h
 motor\freertos.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

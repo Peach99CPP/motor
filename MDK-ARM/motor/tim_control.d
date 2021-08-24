@@ -41,7 +41,7 @@ motor\tim_control.o: ..\Driver\time_cnt.h
 motor\tim_control.o: ..\Driver\motor.h
 motor\tim_control.o: ..\Control\tim_control.h
 motor\tim_control.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\tim_control.o: ..\Driver\pid.h
+motor\tim_control.o: ..\Math\pid.h
 motor\tim_control.o: ../Inc/tim.h
 motor\tim_control.o: ..\Driver\uart_handle.h
 motor\tim_control.o: ../Inc/usart.h

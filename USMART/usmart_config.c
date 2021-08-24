@@ -5,6 +5,7 @@
 #include "delay.h"
 #include "motor.h"
 #include "chassis.h"
+#include "imu.h"
 //函数名列表初始化(用户自己添加)
 //用户直接在这里输入要执行的函数名及其查找串
 struct _m_usmart_nametab usmart_nametab[] =
@@ -23,6 +24,8 @@ struct _m_usmart_nametab usmart_nametab[] =
     (void*)set_debug_motor, "void set_debug_motor(int status, int motor_id)",
     (void*)change_switch_status, "void change_switch_status(bool status))",
     (void*)clear_pid_param, "void clear_pid_param(void)",
+    (void*)gyro_calibration,"void gyro_calibration(void)",
+	(void*)accel_calibration,"void accel_calibration(uint8_t where)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

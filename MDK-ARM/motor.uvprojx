@@ -189,7 +189,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F750xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;       ../Drivers/STM32F7xx_HAL_Driver/Inc;       ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy;       ../Drivers/CMSIS/Device/ST/STM32F7xx/Include;       ../Drivers/CMSIS/Include;       ..\Driver;       ..\Control;       ..\USMART;       ../Middlewares/Third_Party/FreeRTOS/Source/include;       ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;       ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1;       ..\TASK</IncludePath>
+              <IncludePath>../Inc;   ../Drivers/STM32F7xx_HAL_Driver/Inc;   ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy;   ../Drivers/CMSIS/Device/ST/STM32F7xx/Include;   ../Drivers/CMSIS/Include;   ..\Driver;   ..\Control;   ..\USMART;   ../Middlewares/Third_Party/FreeRTOS/Source/include;   ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;   ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1;   ..\TASK;   ..\Module;   ..\Math</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1028,11 +1028,6 @@
               <FilePath>..\Driver\chassis.c</FilePath>
             </File>
             <File>
-              <FileName>pid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Driver\pid.c</FilePath>
-            </File>
-            <File>
               <FileName>motor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Driver\motor.c</FilePath>
@@ -1056,6 +1051,21 @@
               <FileName>track_bar_receive.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Driver\track_bar_receive.c</FilePath>
+            </File>
+            <File>
+              <FileName>iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Driver\iic.c</FilePath>
+            </File>
+            <File>
+              <FileName>qspi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Driver\qspi.c</FilePath>
+            </File>
+            <File>
+              <FileName>imu_pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Driver\imu_pid.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1732,11 +1742,6 @@
           <GroupName>task</GroupName>
           <Files>
             <File>
-              <FileName>printf_task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\TASK\printf_task.c</FilePath>
-            </File>
-            <File>
               <FileName>debug_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TASK\debug_task.c</FilePath>
@@ -1755,6 +1760,61 @@
               <FileName>track_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TASK\track_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>ahrs_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TASK\ahrs_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>imu_temp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TASK\imu_temp.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>module</GroupName>
+          <Files>
+            <File>
+              <FileName>ahrs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\ahrs.c</FilePath>
+            </File>
+            <File>
+              <FileName>imu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\imu.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>param_save.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\param_save.c</FilePath>
+            </File>
+            <File>
+              <FileName>w25q.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\w25q.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Math</GroupName>
+          <Files>
+            <File>
+              <FileName>filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Math\filter.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Math\pid.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -46,9 +46,12 @@ motor\usmart_config.o: ..\Driver\time_cnt.h
 motor\usmart_config.o: ..\Driver\motor.h
 motor\usmart_config.o: ..\Driver\uart_handle.h
 motor\usmart_config.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\usmart_config.o: ..\Driver\pid.h
+motor\usmart_config.o: ..\Math\pid.h
 motor\usmart_config.o: ../Inc/tim.h
 motor\usmart_config.o: ..\Driver\delay.h
 motor\usmart_config.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\usmart_config.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 motor\usmart_config.o: ..\Driver\chassis.h
+motor\usmart_config.o: ..\Module\imu.h
+motor\usmart_config.o: ..\Module\vector3.h
+motor\usmart_config.o: ..\Module\mpu6050.h

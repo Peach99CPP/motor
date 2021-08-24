@@ -45,7 +45,7 @@ motor\motor.o: ../Inc/usart.h
 motor\motor.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\motor.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 motor\motor.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\motor.o: ..\Driver\pid.h
+motor\motor.o: ..\Math\pid.h
 motor\motor.o: ../Inc/tim.h
 motor\motor.o: ..\Driver\delay.h
 motor\motor.o: ..\Driver\chassis.h

@@ -60,7 +60,7 @@ motor\usmart_task.o: ..\Driver\time_cnt.h
 motor\usmart_task.o: ..\Driver\motor.h
 motor\usmart_task.o: ..\Driver\uart_handle.h
 motor\usmart_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-motor\usmart_task.o: ..\Driver\pid.h
+motor\usmart_task.o: ..\Math\pid.h
 motor\usmart_task.o: ../Inc/tim.h
 motor\usmart_task.o: ..\Driver\delay.h
 motor\usmart_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

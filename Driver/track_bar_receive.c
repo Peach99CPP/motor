@@ -1,5 +1,6 @@
 #include "track_bar_receive.h "
 #include "usart.h"
+#include "uart_handle.h"
 #define START_BYTE  0xff
 #define END_BYTE    0x99
 #define MAX_LINE 6
