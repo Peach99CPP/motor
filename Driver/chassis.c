@@ -2,12 +2,46 @@
 #include "motor.h"
 #define TIME_PARAM 10
 #define CHASSIS_RADIUS 18.0
-#define MAX_SPEED 180.0
+#define MAX_SPEED 350.0
+#include "track_bar_receive.h"
 CHASSIS chassis;
+float Radius_[5] = {0, \
+                    30, \
+                    30, \
+                    30, \
+                    30
+                   };
 float motor_target[5];
 short time_count;
 extern pid_paramer_t motor_param;
 float control_val[5];
+
+
+/**********************************************************************
+  * @Name    get_chassis_speed
+  * @declaration : get dir speed
+  * @param   dir: [输入/出] direct char
+  * @retval   : specify direct speed
+  * @author  peach99CPP
+***********************************************************************/
+
+float get_chassis_speed(char dir)
+{
+    if(dir == 'x' || dir == 'X')
+    {
+        return chassis.x_speed;
+    }
+    else if(dir == 'y' || dir == 'Y')
+    {
+        return chassis.y_speed;
+    }
+    else if(dir == 'w' || dir == 'W')
+    {
+        return chassis.w_speed;
+    }
+    else return 0;
+
+}
 /**********************************************************************
   * @Name    set_speed
   * @brief     直接修改器底盘的速度值
@@ -18,7 +52,7 @@ float control_val[5];
   * @author  peach99CPP
   * @Data    2021-08-06
 ***********************************************************************/
-void set_speed(float x, float y, float w)
+void set_speed(int x, int y, int w)
 {
     if (chassis._switch)//只有当底盘的使能开关被打开时才允许进行操作
     {
@@ -68,40 +102,41 @@ void speed_variation(float x_var, float y_var, float w_var)
 **************************************************************/
 void chassis_synthetic_control(void)
 {
-    int i;
-    float x, y, w, factor;
-    double max_val;
+    static int i, x_error = 0, y_error = 0;
+    static float x, y, w, factor;
+    static double max_val;
     if (chassis._switch == false || debug_motor_id == 0) return; //如果底盘不被使能，则没有后续操作
 
-    if (++time_count == TIME_PARAM)
-    {
-        time_count = 0;
-        //在这里刷一些陀螺仪和寻迹的PID更新值.把修改值叠加在chassis的x y速度上
-    }
-    max_val = 0;//对最大值数据进行初始化
-    factor = 1;//倍率因子初始化
+//    if (++time_count == TIME_PARAM)
+//    {
+//        time_count = 0;
+//        y_error = track_pid_cal(&y_bar);
+//        x_error = track_pid_cal(&x_leftbar) + track_pid_cal(&x_rightbar);
+//    }
+//    max_val = 0;//对最大值数据进行初始化
+//    factor = 1;//倍率因子初始化
 
-    x = chassis.x_speed;
-    y = chassis.y_speed;
-    w = chassis.w_speed;
-    /***************************************
-    * motor1  左上角
-    * motor2  左下角
-    * motor3  右下角
-    * motor4  右上角
-    * 从左上角逆时针旋转一圈，就是4个电机 1 2 3 4
-    ****************************************/
-
-//    motor_target[1] = -0.707 * x - 0.707 * y + CHASSIS_RADIUS * w;
-//    motor_target[2] = 0.707 * x - 0.707 * y + CHASSIS_RADIUS * w;
-//    motor_target[3] = 0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
-//    motor_target[4] = -0.707 * x + 0.707 * y + CHASSIS_RADIUS * w;
+//    x = chassis.x_speed;
+//    y = chassis.y_speed;
+//    w = chassis.w_speed;
+//    /***************************************
+//            1*************2
+//             *************
+//             *************
+//             *************
+//             *************
+//            3*************4
+//    ****************************************/
+//    motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + y_error + x_error;
+//    motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + y_error + x_error;
+//    motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + y_error + x_error;
+//    motor_target[4] = 0.707 * y - 0.707 * x - Radius_[4] * w + y_error + x_error;
 
 //    //再来一个限幅操作，避免单边速度过高导致控制效果不理想
 //    //
-//
 
-//
+
+
 //    for (i = 1; i <= 4; ++i) //找出最大值
 //    {
 //        if (motor_target[i] > max_val)
@@ -137,7 +172,7 @@ void chassis_synthetic_control(void)
 
     motor_data[debug_motor_id].expect = motor_target[debug_motor_id];
     motor_data[debug_motor_id].feedback = read_encoder(debug_motor_id);
-    control_val[debug_motor_id] =  pid_incremental(&motor_data[debug_motor_id], &motor_param);
+    control_val[debug_motor_id] =  pid_control(&motor_data[debug_motor_id], &motor_param);
     set_motor(debug_motor_id, control_val[debug_motor_id]);
-    printf("%.2f     %.2f     %.2f\r\n",motor_data[debug_motor_id].expect,motor_data[debug_motor_id].feedback,motor_data[debug_motor_id].delta);
+    printf("%.2f     %.2f     %.2f\r\n",motor_data[debug_motor_id].feedback , motor_data[debug_motor_id].expect, motor_data[debug_motor_id].control_output);
 }

@@ -27,6 +27,8 @@ typedef struct pid_data
     //反馈值
     float feedback;
     //偏差
+    int stop_flag ;
+    int count_i;
     float err;
     //上次偏差
     float last_err;

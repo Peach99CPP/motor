@@ -46,17 +46,6 @@ void TIM6_DAC_IRQHandler(void)
 
     if (__HAL_TIM_GET_FLAG(&htim6, TIM_FLAG_UPDATE) != RESET)
     {
-
-        tim6_tick++;//10ms一个单位
-        if(tim6_tick % 10 == 0)
-        {
-            usmart_dev.scan();
-        }
-        if(tim6_tick > 65535) tim6_tick = 0;
-//        show_speed();
-        chassis_synthetic_control();
-
-
         //每10ms自加
         TIME_ISR_CNT++;
         Microsecond_Cnt += 10;
