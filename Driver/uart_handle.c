@@ -1,9 +1,16 @@
 #include "uart_handle.h"
+#include "FreeRTOS.h"
+#include "queue.h"
+
+extern uint32_t vPortGetIPSR(void);//使用该函数来查看是否在中断中
+
 #define MAX_BUFFER_SIZE 100
 #define MAX_SIZE 200
 uint16_t USART_RX_STA = 0;
 uint32_t rec_count = 0;
 uint8_t USART_RX_BUF[MAX_SIZE];
+
+QueueHandle_t tx_queue ;
 
 #if 1
 #pragma import(__use_no_semihosting)
@@ -20,15 +27,30 @@ void _sys_exit(int x)
 {
     x = x;
 }
-//重定义fputc函数
+//重定义fputc函数,使用队列来进行printf,此时要另外开一个task循环刷
 int fputc(int ch, FILE *f)
 {
-    while((USART1->ISR & 0X40) == 0); //循环发送,直到发送完毕
-    USART1->TDR = (uint8_t) ch;
+    if(tx_queue != NULL)
+    {
+        if(vPortGetIPSR())
+        {
+            BaseType_t if_higher_woken = pdFALSE;
+            while( xQueueSendFromISR(tx_queue, &ch, &if_higher_woken) != pdTRUE); //阻塞式。确保此时已经成功把消息放入队列
+            portYIELD_FROM_ISR(if_higher_woken);//判断是否需要进行任务调度
+        }
+        else
+        {
+            //此时并不是在中断中被调用，可以直接写入数据
+            xQueueSend(tx_queue, &ch, 1);
+        }
+    }
     return ch;
 }
 #endif
-
+void tx_queue_init(void)
+{
+    tx_queue = xQueueCreate(200, sizeof(uint8_t));
+}
 /**********************************************************************
   * @Name    USART1_IRQHandler
   * @功能说明 usrat1 handler

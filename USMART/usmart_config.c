@@ -18,7 +18,7 @@ struct _m_usmart_nametab usmart_nametab[] =
     (void*)set_motor_pid, "void set_motor_pid(int kp, int ki, int kd)",
     (void*)set_motor_maxparam, "void set_motor_maxparam(int integrate_max, int control_output_limit)",
     (void*)clear_all_speed, "void clear_all_speed(void)",
-    (void*)set_speed, "void set_speed(float x, float y, float w)",
+    (void*)set_speed, "void set_speed(int x, int y, int w)",
     (void*)set_debug_speed, "void set_debug_speed(int speed)",
     (void*)set_debug_motor, "void set_debug_motor(int status, int motor_id)",
     (void*)change_switch_status, "void change_switch_status(bool status))",

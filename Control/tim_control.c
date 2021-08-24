@@ -11,31 +11,54 @@ extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim5;
 
-#define  FORWARD    -1
-#define  BACKWARD   1
-#define SPEED_PARAM    10000
-#define TIM_COUNT_VAL  0xFFFF
+#define  FORWARD    1
+#define  BACKWARD   -1
+#define SPEED_PARAM    100000.0
+#define TIM_COUNT_VAL  10000
 #define FILTER 4.0
-#define THRESHOLD_ 5
+#define THRESHOLD_ 5.0
 
 
 /*******************
 *@name:HAL_TIM_PeriodElapsedCallback
-*@function:利用定时器来刷新任务,计算时长
+*@function:利用定时器来刷新任务,计算时长，只有不修改IRQHandler才能触发此函数
 *@param:定时器结构体
 *@return:无
 **********************/
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+    static uint8_t i = 0;
     if(htim->Instance == TIM3)
     {
         update_count[1]++;//
         update_count[2]++;//用于计算脉宽，处理捕获中途发生定时器更新事件的情况
+        if(++update_count[1] > 3)
+        {
+            update_count[1] = 0;
+            encoder_val[1] = 0;
+        }
+        if(++update_count[2] > 3)
+        {
+            update_count[2] = 0;
+            encoder_val[2] = 0;
+        }
     }
     else if(htim->Instance == TIM5)
     {
-        update_count[3]++;
-        update_count[4]++;
+        if(++update_count[3] > 3)
+        {
+            update_count[3] = 0;
+            encoder_val[3] = 0;
+        }
+        if(++update_count[4] > 3)
+        {
+            update_count[4] = 0;
+            encoder_val[4] = 0;
+        }
+    }
+    else   if (htim->Instance == TIM7)
+    {
+        HAL_IncTick();
     }
 
 }
@@ -58,7 +81,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             status_flag[1] = 1;//状态标志位置1，下次进中断是在下一步
             rising_val[1] = HAL_TIM_ReadCapturedValue(motor1.IC.Tim, motor1.IC.Channel);//读取此时上升沿的值
             update_count[1] = 0;//更新事件计数器 置0
-            __HAL_TIM_ENABLE_IT(motor1.IC.Tim, TIM_IT_UPDATE);
             //判断方向
             if(HAL_GPIO_ReadPin(motor1.Encoder_IO.Port, motor1.Encoder_IO.Pin) == GPIO_PIN_RESET)
             {
@@ -68,7 +90,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             {
                 direct_[1] = BACKWARD;
             }
-
+//            __HAL_TIM_ENABLE_IT(motor1.IC.Tim, TIM_IT_UPDATE);
             __HAL_TIM_SET_CAPTUREPOLARITY(motor1.IC.Tim, motor1.IC.Channel, TIM_ICPOLARITY_FALLING);//下一次是捕获下降沿
         }
         else//捕获到下降沿
@@ -77,7 +99,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             falling_val[1] = HAL_TIM_ReadCapturedValue(motor1.IC.Tim, motor1.IC.Channel);//读取下降沿的值
             cap_temp_val[1] += (SPEED_PARAM / (falling_val[1] - rising_val[1] + TIM_COUNT_VAL * update_count[1])) * direct_[1];//计算本次得到的脉宽。反映出转速的快慢，并累加
             cap_cnt[1]++;//采样次数累加
-            __HAL_TIM_DISABLE_IT(motor1.IC.Tim, TIM_IT_UPDATE);
             __HAL_TIM_SET_CAPTUREPOLARITY(motor1.IC.Tim, motor1.IC.Channel, TIM_ICPOLARITY_RISING);//准备对上升沿进行采样
             if(cap_cnt[1] == FILTER)//采样次数到达了
             {
@@ -95,6 +116,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                         encoder_val[1] /= 2.0;//均值滤波
                     }
                 }
+//                __HAL_TIM_DISABLE_IT(motor1.IC.Tim, TIM_IT_UPDATE);
                 //相关变量清0 ！记得清0！
                 temp_val = 0;
                 cap_cnt[1] = 0;
@@ -113,6 +135,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             status_flag[2] = 1;
             rising_val[2] = HAL_TIM_ReadCapturedValue(motor2.IC.Tim, motor2.IC.Channel);
             update_count[2] = 0;
+
             if(HAL_GPIO_ReadPin(motor2.Encoder_IO.Port, motor2.Encoder_IO.Pin) == GPIO_PIN_RESET)
             {
                 direct_[2] = FORWARD;
@@ -121,6 +144,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             {
                 direct_[2] = BACKWARD;
             }
+//            __HAL_TIM_ENABLE_IT(motor2.IC.Tim, TIM_IT_UPDATE);
             __HAL_TIM_SET_CAPTUREPOLARITY(motor2.IC.Tim, motor2.IC.Channel, TIM_ICPOLARITY_FALLING);
         }
         else
@@ -146,6 +170,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                         encoder_val[2] /= 2.0;
                     }
                 }
+//                __HAL_TIM_DISABLE_IT(motor2.IC.Tim, TIM_IT_UPDATE);
                 temp_val = 0;
                 cap_cnt[2] = 0;
                 cap_temp_val[2] = 0 ;
@@ -170,6 +195,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             {
                 direct_[3] = BACKWARD;
             }
+//            __HAL_TIM_ENABLE_IT(motor3.IC.Tim, TIM_IT_UPDATE);
             __HAL_TIM_SET_CAPTUREPOLARITY(motor3.IC.Tim, motor3.IC.Channel, TIM_ICPOLARITY_FALLING);
         }
         else
@@ -195,6 +221,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                         encoder_val[3] /= 2.0;
                     }
                 }
+//                __HAL_TIM_DISABLE_IT(motor3.IC.Tim, TIM_IT_UPDATE);
                 temp_val = 0;
                 cap_cnt[3] = 0;
                 cap_temp_val[3] = 0 ;
@@ -213,12 +240,13 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             update_count[4] = 0;
             if(HAL_GPIO_ReadPin(motor4.Encoder_IO.Port, motor4.Encoder_IO.Pin) == GPIO_PIN_RESET)
             {
-                direct_[4] = FORWARD;
+                direct_[4] =    BACKWARD;
             }
             else
             {
-                direct_[4] = BACKWARD;
+                direct_[4] = FORWARD;
             }
+//            __HAL_TIM_ENABLE_IT(motor4.IC.Tim, TIM_IT_UPDATE);
             __HAL_TIM_SET_CAPTUREPOLARITY(motor4.IC.Tim, motor4.IC.Channel, TIM_ICPOLARITY_FALLING);
         }
         else
@@ -244,6 +272,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                         encoder_val[4] /= 2.0;
                     }
                 }
+//                __HAL_TIM_DISABLE_IT(motor4.IC.Tim, TIM_IT_UPDATE);
                 temp_val = 0;
                 cap_cnt[4] = 0;
                 cap_temp_val[4] = 0 ;

@@ -24,7 +24,7 @@
 #include "string.h"
 #include <stdio.h>
 void uart1_decode(void);
-
+void tx_queue_init(void);
 #endif
 
 

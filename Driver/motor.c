@@ -1,16 +1,17 @@
 #include "motor.h"
 #include "chassis.h"
+#include "cmsis_os.h"
 #define MAX_VAL 7000
-#define DEBUG_MODE
+//#define DEBUG_MODE
 int debug_motor_id = 0, switch_status = 0;
 int debug_speed = 0;
 pid_data_t motor_data[5];
 pid_paramer_t motor_param;
 
 float param_[5] = {2000, \
-                   7000,
-                   30, \
-                   0, \
+                   9000,
+                   50, \
+                   40, \
                    0
                   };
 
@@ -46,6 +47,7 @@ void motor_init(void)
 
 
     HAL_TIM_IC_Start_IT(motor1.IC.Tim, motor1.IC.Channel); //IC捕获使能
+    __HAL_TIM_ENABLE_IT(motor1.IC.Tim, TIM_IT_UPDATE);
     set_motor(1, 0);
 
 
@@ -65,6 +67,7 @@ void motor_init(void)
     HAL_TIM_PWM_Start(motor2.PWM.Tim, motor2.PWM.Channel_B);//
 
     HAL_TIM_IC_Start_IT(motor2.IC.Tim, motor2.IC.Channel); //IC捕获使能
+    __HAL_TIM_ENABLE_IT(motor2.IC.Tim, TIM_IT_UPDATE);
     set_motor(2, 0);
 
     /*****************电机3*****************/
@@ -84,6 +87,7 @@ void motor_init(void)
 
 
     HAL_TIM_IC_Start_IT(motor3.IC.Tim, motor3.IC.Channel); //IC捕获使能
+    __HAL_TIM_ENABLE_IT(motor3.IC.Tim, TIM_IT_UPDATE);
     set_motor(3, 0);
 
 
@@ -96,13 +100,14 @@ void motor_init(void)
     motor4.IC.Channel  = TIM_CHANNEL_3;//
 
     motor4.PWM.Tim = &htim2;//PWM驱动的TIM
-    motor4.PWM.Channel_A = TIM_CHANNEL_1;//两个PWM通道
-    motor4.PWM.Channel_B = TIM_CHANNEL_2;//
+    motor4.PWM.Channel_A = TIM_CHANNEL_2;//两个PWM通道
+    motor4.PWM.Channel_B = TIM_CHANNEL_1;//
     HAL_TIM_PWM_Start(motor4.PWM.Tim, motor4.PWM.Channel_A);//PWM使能
     HAL_TIM_PWM_Start(motor4.PWM.Tim, motor4.PWM.Channel_B);//
 
 
     HAL_TIM_IC_Start_IT(motor4.IC.Tim, motor4.IC.Channel); //IC捕获使能
+    __HAL_TIM_ENABLE_IT(motor4.IC.Tim, TIM_IT_UPDATE);
     set_motor(4, 0);
 
 }
@@ -136,7 +141,7 @@ void Motor_PID_Init()
 float read_encoder(int motor_id)
 {
     double temp_num = encoder_val[motor_id] ;
-    encoder_val[motor_id] = 0;
+//    encoder_val[motor_id] = 0;
 #ifdef DEBUG_MODE
     printf("\r\nmotor%d sppeed =%d\r\n", motor_id, (int)temp_num);
 #endif
@@ -475,9 +480,9 @@ void motor_debug(void)
 {
     if(debug_motor_id == 0 || !switch_status ) return ;
     motor_target[debug_motor_id] =  debug_speed;
-    delay_ms(1000);
+    osDelay(1000);
     motor_target[debug_motor_id] =  0;
-    delay_ms(1000);
+    osDelay(1000);
 }
 
 

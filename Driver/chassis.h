@@ -27,9 +27,10 @@ typedef struct chassis_structure
 
 extern CHASSIS chassis;
 void speed_variation(float x_var, float y_var, float w_var);
-void set_speed (float x, float y, float w);
+void set_speed (int x, int y, int w);
 void change_switch_status(bool status);
 void chassis_synthetic_control(void);
+float get_chassis_speed(char dir);
 
 extern float motor_target[5];
 extern float control_val[5];
