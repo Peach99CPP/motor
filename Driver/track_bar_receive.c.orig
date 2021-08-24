@@ -1,0 +1,66 @@
+#include "track_bar_receive.h "
+#include "usart.h"
+#define START_BYTE  0xff
+#define END_BYTE    0x99
+#define MAX_LINE 10
+#define MAX_LEN 5
+float track_weight[8] = { -4, -3, -2, 0, \
+                          0, 2, 3, 4 \
+                        };
+uint8_t track_dma[MAX_LINE][MAX_LEN]={0},dma_trans_pos=0;
+trackbar_t y_bar,x_leftbar,x_rightbar;
+pid_paramer_t track_pid={ \
+     .integrate_max = 20,
+    .kp = 10,
+    .ki = 1,
+    .kd = 0,
+    .control_output_limit = 40
+};
+        
+
+
+void track_bar_init(void)
+{
+    y_bar.id = forward_bar;
+    y_bar.if_switch =true;
+    
+    x_leftbar.id =left_bar;
+    x_leftbar.if_switch = true;
+    
+    x_rightbar.id = right_bar;
+    x_rightbar.if_switch =true;
+    
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart2,(uint8_t*)track_dma,MAX_LEN);
+}
+uint8_t get_idle_pos(void)
+{
+    uint8_t i=0;
+    while( (i == dma_trans_pos )|| (track_dma[i][0]!= START_BYTE ) ||track_dma[i][4]!= END_BYTE)
+    {
+        i=  ((i+1)==MAX_LINE)? 0: i+1;
+    }
+    return i;
+}
+void track_decode(void)
+{
+    uint8_t pos= get_idle_pos();
+    float track_value =0;
+    if(track_dma[pos][0]+track_dma[pos][1]+track_dma[pos][2] == track_dma[pos][3])//ºÍÐ£Ñé
+    {
+        for(uint8_t i=0;i<8;++i)
+        {
+            track_value += (track_dma[pos][2]<< i) *track_weight[i];
+        }
+        switch (track_dma[pos][1])
+        {
+            case 1:
+                y_bar.retval = track_value;
+                break;
+            case 2:
+                x_leftbar.retval = track_value;
+            break;            case 3:
+                x_rightbar.retval= track_value;
+            break;
+        }
+    }
+}

@@ -44,6 +44,7 @@ int fputc(int ch, FILE *f)
             xQueueSend(tx_queue, &ch, 1);
         }
     }
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_TXE);
     return ch;
 }
 #endif
@@ -88,6 +89,17 @@ void USART1_IRQHandler(void)
         }
 
     }
+    else if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_TXE))
+    {
+        __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_TXE);
+        BaseType_t xTaskWokenByReceive = pdFALSE;
+		//发送队列中有数据需要发送
+		if (xQueueReceiveFromISR(tx_queue, (void *) &rec, &xTaskWokenByReceive) == pdPASS)
+			huart1.Instance->TDR = rec;
+		else
+			//无数据发送就关闭发送中断
+			__HAL_UART_DISABLE_IT(&huart1, UART_IT_TXE);
+	}
 
 }
 
