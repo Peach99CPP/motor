@@ -20,10 +20,17 @@
 #define __IMU_PID_H_
 #include "main.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "cmsis_os.h"
+
+#include "ahrs.h"
 #include "pid.h"
+#include "math.h"
 
-float turn_angle(float rt_angle);//相对角度
-
+void set_imu_status(void);
+void turn_angle(float rt_angle);//相对角度
+float  angle_limit(float  angle);
 #endif
 
 

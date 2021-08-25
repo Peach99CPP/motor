@@ -62,7 +62,7 @@
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
-
+ void USER_Init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -102,10 +102,9 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM5_Init();
-    MX_DMA_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
-
   MX_TIM6_Init();
   MX_I2C1_Init();
   MX_QUADSPI_Init();
@@ -115,19 +114,8 @@ int main(void)
   MX_UART8_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-    Get_Time_Init();
-    HAL_Delay(1);
-    HAL_TIM_Base_Start(&htim6);
-    usmart_dev.init(216);
-    __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
-    delay_init(&htim6, up_count);
-    Motor_PID_Init();
-    change_switch_status(true);
-    motor_init();
-    printf_init();
-    track_bar_init();
-    __HAL_UART_DISABLE_IT(&huart2, UART_IT_RXNE);
-//    set_speed(0,20,0);
+
+    USER_Init();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -216,7 +204,20 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+    void USER_Init(void)
+    {
+            Get_Time_Init();
+    HAL_Delay(1);
+    HAL_TIM_Base_Start(&htim6);
+    usmart_dev.init(216);
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+    delay_init(&htim6, up_count);
+    Motor_PID_Init();
+    change_switch_status(true);
+    motor_init();
+    printf_init();
+    track_bar_init();
+    }
 /* USER CODE END 4 */
 
 /**
