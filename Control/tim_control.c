@@ -32,12 +32,12 @@ void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
         update_count[1]++;//
         update_count[2]++;//用于计算脉宽，处理捕获中途发生定时器更新事件的情况
-        if(++update_count[1] > 3)
+        if(++update_count[1] >=3)
         {
             update_count[1] = 0;
             encoder_val[1] = 0;
         }
-        if(++update_count[2] > 3)
+        if(++update_count[2] >=3)
         {
             update_count[2] = 0;
             encoder_val[2] = 0;
@@ -45,12 +45,12 @@ void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     else if(htim->Instance == TIM5)
     {
-        if(++update_count[3] > 3)
+        if(++update_count[3] >=3)
         {
             update_count[3] = 0;
             encoder_val[3] = 0;
         }
-        if(++update_count[4] > 3)
+        if(++update_count[4] >=3)
         {
             update_count[4] = 0;
             encoder_val[4] = 0;

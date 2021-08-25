@@ -8,10 +8,10 @@ int debug_speed = 0;
 pid_data_t motor_data[5];
 pid_paramer_t motor_param;
 
-float param_[5] = {2000, \
-                   9000,
-                   50, \
-                   40, \
+float param_[5] = {1500, \
+                   9500,
+                   150, \
+                   15, \
                    0
                   };
 
@@ -478,11 +478,15 @@ void set_debug_motor(int status, int motor_id)
 
 void motor_debug(void)
 {
-    if(debug_motor_id == 0 || !switch_status ) return ;
-    motor_target[debug_motor_id] =  debug_speed;
+//    if(debug_motor_id == 0 || !switch_status ) return ;
+//    motor_target[debug_motor_id] =  debug_speed;
+//    osDelay(3000);
+//    motor_target[debug_motor_id] =  0;
+//    osDelay(3000);
+    set_speed(0,debug_speed,0);
     osDelay(1000);
-    motor_target[debug_motor_id] =  0;
-    osDelay(1000);
+    set_speed(0,0,0);
+     osDelay(3000);
 }
 
 
@@ -497,11 +501,12 @@ void motor_debug(void)
 
 void set_debug_speed(int speed)
 {
-    if(debug_motor_id == 0 || !switch_status )
-    {
-        printf("run set_debug_motor firstly\r\n");
-        return ;
-    }
+//    if(debug_motor_id == 0 || !switch_status )
+//    {
+//        printf("run set_debug_motor firstly\r\n");
+//        return ;
+////    }
+//    debug_speed = speed;
     debug_speed = speed;
 }
 

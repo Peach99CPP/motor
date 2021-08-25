@@ -105,74 +105,78 @@ void chassis_synthetic_control(void)
     static int i, x_error = 0, y_error = 0;
     static float x, y, w, factor;
     static double max_val;
-    if (chassis._switch == false || debug_motor_id == 0) return; //如果底盘不被使能，则没有后续操作
+    if (chassis._switch == false ) return; //如果底盘不被使能，则没有后续操作
 
-//    if (++time_count == TIME_PARAM)
-//    {
-//        time_count = 0;
-//        y_error = track_pid_cal(&y_bar);
-//        x_error = track_pid_cal(&x_leftbar) + track_pid_cal(&x_rightbar);
-//    }
-//    max_val = 0;//对最大值数据进行初始化
-//    factor = 1;//倍率因子初始化
+    if (++time_count == TIME_PARAM)
+    {
+        time_count = 0;
+        y_error = track_pid_cal(&y_bar);
+        x_error = track_pid_cal(&x_leftbar) + track_pid_cal(&x_rightbar);
+    }
+    max_val = 0;//对最大值数据进行初始化
+    factor = 1;//倍率因子初始化
 
-//    x = chassis.x_speed;
-//    y = chassis.y_speed;
-//    w = chassis.w_speed;
-//    /***************************************
-//            1*************2
-//             *************
-//             *************
-//             *************
-//             *************
-//            3*************4
-//    ****************************************/
-//    motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + y_error + x_error;
-//    motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + y_error + x_error;
-//    motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + y_error + x_error;
-//    motor_target[4] = 0.707 * y - 0.707 * x - Radius_[4] * w + y_error + x_error;
+    x = chassis.x_speed;
+    y = chassis.y_speed;
+    w = chassis.w_speed;
+    /***************************************
+            1*************2
+             *************
+             *************
+             *************
+             *************
+            3*************4
+    ****************************************/
+    motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + y_error + x_error;
+    motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + y_error + x_error;
+    motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + y_error + x_error;
+    motor_target[4] = 0.707 * y - 0.707 * x - Radius_[4] * w + y_error + x_error;
 
-//    //再来一个限幅操作，避免单边速度过高导致控制效果不理想
-//    //
+    //再来一个限幅操作，避免单边速度过高导致控制效果不理想
+    //
 
 
 
-//    for (i = 1; i <= 4; ++i) //找出最大值
-//    {
-//        if (motor_target[i] > max_val)
-//            max_val = motor_target[i];
-//    }
-//    factor = (max_val > MAX_SPEED) ? MAX_SPEED / max_val : 1;
-//    if (max_val > MAX_SPEED)//最大值是否超限制，进行操作，确保最大值仍在范围内且转速比例 不变
-//    {
-//        factor = MAX_SPEED / max_val;
-//        for (i = 1; i < 4; ++i)
-//        {
-//            motor_target[i] *= factor;
-//        }
+    for (i = 1; i <= 4; ++i) //找出最大值
+    {
+        if (motor_target[i] > max_val)
+            max_val = motor_target[i];
+    }
+    factor = (max_val > MAX_SPEED) ? MAX_SPEED / max_val : 1;
+    if (max_val > MAX_SPEED)//最大值是否超限制，进行操作，确保最大值仍在范围内且转速比例 不变
+    {
+        factor = MAX_SPEED / max_val;
+        for (i = 1; i < 4; ++i)
+        {
+            motor_target[i] *= factor;
+        }
 
-//    }
+    }
+    
+    for (i = 1; i <= 4; ++i)
+    {
+        /*
+        *对电机进行遍历
+        *首先获取转速期待值
+        *读取编码器参数
+        *传入PID计算函数得到计算值,以返回值形式传参
+        *由计算值控制电机
+        */
+        motor_data[i].expect = motor_target[i];
+        motor_data[i].feedback = read_encoder(i);
+        control_val[i] =  pid_control(&motor_data[i], &motor_param);
+        set_motor(i, control_val[i]);
+        if(motor_data[i].expect == motor_target[i] != 0)
+        
+        printf("%.2f",motor_data[i].feedback);
+    }
+    printf("\r\n");
+    
+//    //debug
 
-//    for (i = 1; i <= 4; ++i)
-//    {
-//        /*
-//        *对电机进行遍历
-//        *首先获取转速期待值
-//        *读取编码器参数
-//        *传入PID计算函数得到计算值,以返回值形式传参
-//        *由计算值控制电机
-//        */
-//        motor_data[i].expect = motor_target[i];
-//        motor_data[i].feedback = read_encoder(i);
-//        control_val[i] =  pid_incremental(&motor_data[i], &motor_param);
-//        set_motor(i, control_val[i]);
-//    }
-
-    //debug
-
-    motor_data[debug_motor_id].expect = motor_target[debug_motor_id];
-    motor_data[debug_motor_id].feedback = read_encoder(debug_motor_id);
-    control_val[debug_motor_id] =  pid_control(&motor_data[debug_motor_id], &motor_param);
-    set_motor(debug_motor_id, control_val[debug_motor_id]);
-    printf("%.2f     %.2f     %.2f\r\n",motor_data[debug_motor_id].feedback , motor_data[debug_motor_id].expect, motor_data[debug_motor_id].control_output);
+//    motor_data[debug_motor_id].expect = motor_target[debug_motor_id];
+//    motor_data[debug_motor_id].feedback = read_encoder(debug_motor_id);
+//    control_val[debug_motor_id] =  pid_control(&motor_data[debug_motor_id], &motor_param);
+//    set_motor(debug_motor_id, control_val[debug_motor_id]);
+//    printf("%.2f     %.2f     %.2f\r\n",motor_data[debug_motor_id].feedback , motor_data[debug_motor_id].expect, motor_data[debug_motor_id].control_output);
 }
