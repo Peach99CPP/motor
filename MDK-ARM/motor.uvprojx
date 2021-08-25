@@ -1067,6 +1067,11 @@
               <FileType>1</FileType>
               <FilePath>..\Driver\imu_pid.c</FilePath>
             </File>
+            <File>
+              <FileName>avoid_obs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Driver\avoid_obs.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
