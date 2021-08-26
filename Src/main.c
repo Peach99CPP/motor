@@ -36,6 +36,7 @@
 #include "usmart.h"
 #include "chassis.h"
 #include "track_bar_receive.h"
+#include "imu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -213,7 +214,7 @@ void USER_Init(void)
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
     delay_init(&htim6, up_count);
     Motor_PID_Init();
-    change_switch_status(true);
+    set_chassis_status(true);
     motor_init();
     printf_init();
     track_bar_init();

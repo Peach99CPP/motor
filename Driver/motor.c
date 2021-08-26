@@ -100,8 +100,8 @@ void motor_init(void)
     motor4.IC.Channel  = TIM_CHANNEL_3;//
 
     motor4.PWM.Tim = &htim2;//PWM驱动的TIM
-    motor4.PWM.Channel_A = TIM_CHANNEL_2;//两个PWM通道
-    motor4.PWM.Channel_B = TIM_CHANNEL_1;//
+    motor4.PWM.Channel_A = TIM_CHANNEL_1;//两个PWM通道
+    motor4.PWM.Channel_B = TIM_CHANNEL_2;//
     HAL_TIM_PWM_Start(motor4.PWM.Tim, motor4.PWM.Channel_A);//PWM使能
     HAL_TIM_PWM_Start(motor4.PWM.Tim, motor4.PWM.Channel_B);//
 

@@ -27,9 +27,9 @@
 #include "ahrs.h"
 #include "pid.h"
 #include "math.h"
-
-void set_imu_status(void);
-void turn_angle(float rt_angle);//相对角度
+void set_imu_param(int p,int i,int d);
+void set_imu_status(int status);
+void turn_angle(int rt_angle);//相对角度
 float  angle_limit(float  angle);
 #endif
 

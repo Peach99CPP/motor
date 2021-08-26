@@ -19,16 +19,17 @@ typedef struct chassis_structure
     double x_speed;//x方向底盘速度
     double  y_speed;//y方向底盘速度
     double  w_speed;//w方向底盘角速度
-} CHASSIS;
+} CHASSIS_t;
 
 
 
 
 
-extern CHASSIS chassis;
+extern CHASSIS_t chassis;
+void w_speed_set(float w_speed);
 void speed_variation(float x_var, float y_var, float w_var);
 void set_speed (int x, int y, int w);
-void change_switch_status(bool status);
+void set_chassis_status(bool status);
 void chassis_synthetic_control(void);
 float get_chassis_speed(char dir);
 

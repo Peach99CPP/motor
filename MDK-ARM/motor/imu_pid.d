@@ -66,3 +66,5 @@ motor\imu_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\imu_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 motor\imu_pid.o: ../Inc/tim.h
 motor\imu_pid.o: ..\Driver\delay.h
+motor\imu_pid.o: ..\Module\imu.h
+motor\imu_pid.o: ..\Module\mpu6050.h

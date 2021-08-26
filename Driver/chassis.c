@@ -1,21 +1,25 @@
 #include "chassis.h"
 #include "motor.h"
 #define TIME_PARAM 10
-#define CHASSIS_RADIUS 18.0
+#define CHASSIS_RADIUS 1.0
 #define MAX_SPEED 350.0
 #include "track_bar_receive.h"
-CHASSIS chassis;
+CHASSIS_t chassis;
 float Radius_[5] = {0, \
-                    30, \
-                    30, \
-                    30, \
-                    30
+                    1, \
+                    1, \
+                    1, \
+                    1
                    };
 float motor_target[5];
 short time_count;
 extern pid_paramer_t motor_param;
 float control_val[5];
 
+void w_speed_set(float w_speed)
+{
+    chassis.w_speed = w_speed;
+}
 
 /**********************************************************************
   * @Name    get_chassis_speed
@@ -63,12 +67,12 @@ void set_speed(int x, int y, int w)
 }
 
 /************************************************************
-*@name:change_switch_status
+*@name:set_chassis_status
 *@function:底盘使能开关
 *@param:状态，bool值
 *@return:无
 **************************************************************/
-void change_switch_status(bool status)
+void set_chassis_status(bool status)
 {
     chassis._switch = status;
 }
@@ -130,7 +134,7 @@ void chassis_synthetic_control(void)
     motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + y_error + x_error;
     motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + y_error + x_error;
     motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + y_error + x_error;
-    motor_target[4] = 0.707 * y - 0.707 * x - Radius_[4] * w + y_error + x_error;
+    motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w + y_error + x_error;
 
     //再来一个限幅操作，避免单边速度过高导致控制效果不理想
     //
@@ -166,11 +170,11 @@ void chassis_synthetic_control(void)
         motor_data[i].feedback = read_encoder(i);
         control_val[i] =  pid_control(&motor_data[i], &motor_param);
         set_motor(i, control_val[i]);
-        if(motor_data[i].expect == motor_target[i] != 0)
-        
-        printf("%.2f",motor_data[i].feedback);
+//        if(motor_data[i].expect == motor_target[i] != 0)
+//        
+//        printf("%.2f  ",motor_data[i].feedback);
     }
-    printf("\r\n");
+//    printf("\r\n");
     
 //    //debug
 

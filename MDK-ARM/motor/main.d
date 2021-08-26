@@ -71,3 +71,6 @@ motor\main.o: ..\USMART\usmart.h
 motor\main.o: ..\USMART\usmart_str.h
 motor\main.o: ..\Driver\chassis.h
 motor\main.o: ..\Driver\track_bar_receive.h
+motor\main.o: ..\Module\imu.h
+motor\main.o: ..\Module\vector3.h
+motor\main.o: ..\Module\mpu6050.h

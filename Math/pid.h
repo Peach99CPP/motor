@@ -27,8 +27,6 @@ typedef struct pid_data
     //反馈值
     float feedback;
     //偏差
-    int stop_flag ;
-    int count_i;
     float err;
     //上次偏差
     float last_err;
@@ -56,5 +54,6 @@ typedef void (*pid_callback_t)(struct pid_data *, struct pid_paramer *);
 
 extern     float  Iout, Pout, Dout;
 float pid_control(pid_data_t *data, pid_paramer_t *para);
-float pid_incremental(pid_data_t *data, pid_paramer_t *para);
+float imu_pid_cal(pid_data_t *data, pid_paramer_t *para);
+
 #endif

@@ -23,7 +23,6 @@ float pid_control(pid_data_t *data, pid_paramer_t *para)
     //第一次计算间隔时间将出现间隔时间很大的情况
     if (controller_dt < 0.001f)
         return 0;
-        data->stop_flag = 0;
         //保存上次偏差
         data->last_err = data->err;
         //期望减去反馈得到偏差
@@ -58,55 +57,26 @@ float pid_control(pid_data_t *data, pid_paramer_t *para)
         return data->control_output;
     
 }
-
-
-/**********************************************************************
-  * @Name    pid_incremental
-  * @declaration :
-  * @param   data: [输入/出]
-**			 para: [输入/出]
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
-
-float pid_incremental(pid_data_t *data, pid_paramer_t *para)
+float imu_pid_cal(pid_data_t *data, pid_paramer_t *para)
 {
-
-    float controller_dt;
-    //短路直接输出期待值
-    if (data->short_circuit_flag)
-    {
-        data->control_output = data->expect;
-        return data->control_output;
-    }
-    //获取dt
-    Get_Time_Period(&data->pid_controller_dt);
-    controller_dt = data->pid_controller_dt.Time_Delta / 1000000.0;
-    //第一次计算间隔时间将出现间隔时间很大的情况
-    if (controller_dt < 0.001f)
-        return 0;
-    //开始进行增量式计算
-    data->last2_err = data->last_err;
     data->last_err = data->err;
-    data->err =  data->expect - data->feedback;
-
-    Pout = para->kp * (data->err - data->last_err);
-    Iout = para->ki * data->err;
-    Dout = para->kd * (data->err - 2.0f * data->last_err + data->last2_err);
-
-    data->delta = Pout + Iout + Dout;
-    data->control_output += data->delta;
-
-
-    if (para->control_output_limit)
-    {
-        if (data->control_output >= para->control_output_limit)
-            data->control_output = para->control_output_limit;
-        if (data->control_output <= -para->control_output_limit)
-            data->control_output = -para->control_output_limit;
-    }
-    //返回总输出
-
-
-    return data->control_output;
+    data->err = data->expect - data->feedback;
+    data ->integrate += data->err * para->ki;
+            //积分限幅
+        if (para->integrate_max)
+        {
+            if (data->integrate >= para->integrate_max)
+                data->integrate = para->integrate_max;
+            if (data->integrate <= -para->integrate_max)
+                data->integrate = -para->integrate_max;
+        }
+        data->control_output = para->kp*data->err+ data ->integrate +para->kd *(data->last_err -data->last_err);
+                if (para->control_output_limit)
+        {
+            if (data->control_output >= para->control_output_limit)
+                data->control_output = para->control_output_limit;
+            if (data->control_output <= -para->control_output_limit)
+                data->control_output = -para->control_output_limit;
+        }
+        return data->control_output;
 }

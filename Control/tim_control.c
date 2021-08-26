@@ -15,8 +15,8 @@ extern TIM_HandleTypeDef htim5;
 #define  BACKWARD   -1
 #define SPEED_PARAM    100000.0
 #define TIM_COUNT_VAL  10000
-#define FILTER 4.0
-#define THRESHOLD_ 5.0
+#define FILTER 10.0
+#define THRESHOLD_ 20.0
 
 
 /*******************
@@ -236,11 +236,11 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             update_count[4] = 0;
             if(HAL_GPIO_ReadPin(motor4.Encoder_IO.Port, motor4.Encoder_IO.Pin) == GPIO_PIN_RESET)
             {
-                direct_[4] =    BACKWARD;
+                direct_[4] =  FORWARD  ;
             }
             else
             {
-                direct_[4] = FORWARD;
+                direct_[4] = BACKWARD;
             }
 //            __HAL_TIM_ENABLE_IT(motor4.IC.Tim, TIM_IT_UPDATE);
             __HAL_TIM_SET_CAPTUREPOLARITY(motor4.IC.Tim, motor4.IC.Channel, TIM_ICPOLARITY_FALLING);

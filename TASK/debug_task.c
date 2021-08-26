@@ -8,7 +8,7 @@ void Startdebug(void const * argument)
 {
     while(1)
     {
-        motor_debug();
+//        motor_debug();
         osDelay(1);
 ////        set_speed(0,20,0);
 ////        osDelay(3000);
