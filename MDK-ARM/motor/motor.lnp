@@ -69,7 +69,7 @@
 "motor\stm32f7xx_hal_uart.o"
 "motor\stm32f7xx_hal_uart_ex.o"
 "motor\startup_stm32f750xx.o"
---library_type=microlib --strict --scatter "motor\motor.sct"
+--strict --scatter "motor\motor.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "motor.map" -o motor\motor.axf

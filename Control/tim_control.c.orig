@@ -1,11 +1,16 @@
 #include "tim_control.h"
 double encoder_val[5];//默认为0
 short status_flag[5];//
-double encoder_sum, temp_sum;
-int rising_val[5], falling_val[5], direct_[5], update_count[5];
+
+double encoder_sum, temp_sum;//编码器计数相关的变量
+
+int rising_val[5], falling_val[5], direct_[5], update_count[5];//电机转速相关变量
+
 double   cap_temp_val[5];
 short cap_cnt[5];
 int first_flag[5];
+
+//要用到的定时器句柄
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
@@ -13,10 +18,10 @@ extern TIM_HandleTypeDef htim5;
 
 #define  FORWARD    1
 #define  BACKWARD   -1
-#define SPEED_PARAM    10000
+#define SPEED_PARAM    100000.0
 #define TIM_COUNT_VAL  10000
-#define FILTER 4.0
-#define THRESHOLD_ 5.0
+#define FILTER 10.0
+#define THRESHOLD_ 20.0
 
 
 /*******************
@@ -25,19 +30,17 @@ extern TIM_HandleTypeDef htim5;
 *@param:定时器结构体
 *@return:无
 **********************/
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    static uint8_t i = 0;
     if(htim->Instance == TIM3)
     {
-        update_count[1]++;//
-        update_count[2]++;//用于计算脉宽，处理捕获中途发生定时器更新事件的情况
-        if(++update_count[1] == 3)
+        //用于计算脉宽，处理捕获中途发生定时器更新事件的情况
+        if(++update_count[1] >=3)//当更新中断事件发生太多，说明此时的电机处于不转的状态，故电机转速置0
         {
             update_count[1] = 0;
             encoder_val[1] = 0;
         }
-        if(++update_count[2] == 3)
+        if(++update_count[2] >=3)
         {
             update_count[2] = 0;
             encoder_val[2] = 0;
@@ -45,20 +48,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     else if(htim->Instance == TIM5)
     {
-        if(++update_count[3] == 3)
+        if(++update_count[3] >=3)
         {
             update_count[3] = 0;
             encoder_val[3] = 0;
         }
-                if(++update_count[4] == 3)
+        if(++update_count[4] >=3)
         {
             update_count[4] = 0;
             encoder_val[4] = 0;
         }
-    }
-    else   if (htim->Instance == TIM10)
-    {
-        HAL_IncTick();
     }
 
 }
@@ -73,7 +72,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
     double temp_val = 0;
-    uint32_t  flag = 0;
     if(htim == motor1.IC.Tim && htim->Channel == motor1.IC.Active_Channel)
     {
         if(!status_flag[1])//第一次捕获到上升沿
@@ -240,11 +238,11 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             update_count[4] = 0;
             if(HAL_GPIO_ReadPin(motor4.Encoder_IO.Port, motor4.Encoder_IO.Pin) == GPIO_PIN_RESET)
             {
-                direct_[4] =    BACKWARD;
+                direct_[4] =  FORWARD  ;
             }
             else
             {
-                direct_[4] = FORWARD;
+                direct_[4] = BACKWARD;
             }
 //            __HAL_TIM_ENABLE_IT(motor4.IC.Tim, TIM_IT_UPDATE);
             __HAL_TIM_SET_CAPTUREPOLARITY(motor4.IC.Tim, motor4.IC.Channel, TIM_ICPOLARITY_FALLING);
