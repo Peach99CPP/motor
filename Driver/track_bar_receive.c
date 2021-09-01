@@ -13,7 +13,7 @@ uint8_t track_dma[MAX_LINE][BUFF_SIZE] = {0}, dma_trans_pos = 0;
 trackbar_t y_bar, x_leftbar, x_rightbar;
 pid_paramer_t track_pid_param = { \
                                   .integrate_max = 50,
-                                  .kp = 10,
+                                  .kp = 15,
                                   .ki = 0,
                                   .kd = 0,
                                   .control_output_limit = 200

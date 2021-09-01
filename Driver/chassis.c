@@ -5,6 +5,7 @@
 #define MAX_SPEED 350.0
 #include "track_bar_receive.h"
 int i, x_error = 0, y_error = 0;
+float speed_factor=0,min_val;
 CHASSIS_t chassis;
 float Radius_[5] = {0, \
                     1, \
@@ -123,6 +124,10 @@ void chassis_synthetic_control(void)
     x = chassis.x_speed;
     y = chassis.y_speed;
     w = chassis.w_speed;
+    min_val = x;
+    if(min_val>y) min_val = y;
+    if(min_val>w) min_val=w;
+    
     /***************************************
             1*************2
              *************
@@ -131,10 +136,15 @@ void chassis_synthetic_control(void)
              *************
             3*************4
     ****************************************/
-    motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w - y_error -x_error;
-    motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w -y_error -x_error;
-    motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w - y_error - x_error;
-    motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w - y_error - x_error;
+    if(min_val>50)
+    {
+        speed_factor = min_val /100.0;
+    }
+    else speed_factor =1;
+    motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w - speed_factor*(y_error +x_error);
+    motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w -speed_factor*(y_error +x_error);
+    motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w - speed_factor*(y_error +x_error);
+    motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w - speed_factor*(y_error +x_error);
 
     //再来一个限幅操作，避免单边速度过高导致控制效果不理想
     //
