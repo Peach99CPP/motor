@@ -50,3 +50,4 @@ motor\stm32f7xx_it.o: ../Inc/tim.h
 motor\stm32f7xx_it.o: ..\Driver\delay.h
 motor\stm32f7xx_it.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\stm32f7xx_it.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+motor\stm32f7xx_it.o: ..\Driver\avoid_obs.h

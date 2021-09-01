@@ -24,6 +24,9 @@ int  imu_switch = 1, init_ = 0, last_finished = 1;
 
 volatile float delta, init_angle, angle, target_angle;
 uint32_t old_time;
+bool  first_ = 1;
+
+
 
 void turn_rtangle(void const * argument);//函数声明
 
@@ -39,9 +42,9 @@ limit_label:
 void set_imu_param(int p, int i, int d)
 {
     //USMART调试设置参数
-    imu_para.kp = (p/10.0);
-    imu_para.ki = (i/100.0);
-    imu_para.kd = (d/10.0);
+    imu_para.kp = (p / 10.0);
+    imu_para.ki = (i / 100.0);
+    imu_para.kd = (d / 10.0);
 }
 void set_imu_status(int status)
 {
@@ -54,7 +57,6 @@ void turn_angle(int rt_angle)
     if(imu_switch && last_finished )//使能了并且此时上一个任务运行完毕
     {
         target_angle = angle_limit(rt_angle + Yaw);//计算当前角度加上转的相对角度后需要转到的目标角度，转到正负180范围
-
         osThreadDef(imuturn_task, turn_rtangle, osPriorityHigh, 0, 256);//任务结构体的声明，有可能引起错误
         turn_taskHandle = osThreadCreate(osThread(imuturn_task), NULL);//CMSIS包装下的任务创建，兼容静态和动态
     }
@@ -63,21 +65,23 @@ void turn_rtangle(void const * argument)//任务实现函数
 {
     last_finished = 0;//任务开始
     angle = target_angle;//获取目标角度
+
     imu_data.err = imu_data.last_err = imu_data.control_output = imu_data.integrate = 0;//初始化data结构体
     imu_data.expect = angle;//目标值
+
     old_time = TIME_ISR_CNT;//获取当前时间
     while(1)
     {
-        if(TIME_ISR_CNT - old_time >MAX_CNT) //超时处理
+        if(TIME_ISR_CNT - old_time > MAX_CNT) //超时处理
             goto EXIT_TASK;
-        
+
         init_angle = Yaw;//获取陀螺仪角度
         //对陀螺仪角度进行处理，把转弯幅度限制在180以内
         if((init_angle - angle) > 180 )  init_angle -= 360;
         if( (init_angle - angle) < -180) init_angle += 360;
         if( fabs(init_angle - angle) <= ERROR_THRESHOLD)//最终状态
         {
-            
+
             int old_time = TIME_ISR_CNT;
             while(1)
             {

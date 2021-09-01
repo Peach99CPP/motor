@@ -55,6 +55,7 @@ osThreadId track_taskHandle;
 osThreadId ahrs_imuHandle;
 osThreadId imu_tempHandle;
 osThreadId usmart_taskHandle;
+osThreadId avoid_obsHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -68,6 +69,7 @@ void track_scan(void const * argument);
 void ahrs_imu_task_(void const * argument);
 void temp_imu_task(void const * argument);
 void usmartscan(void const * argument);
+void avoid_task(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -141,6 +143,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of usmart_task */
   osThreadDef(usmart_task, usmartscan, osPriorityLow, 0, 256);
   usmart_taskHandle = osThreadCreate(osThread(usmart_task), NULL);
+
+  /* definition and creation of avoid_obs */
+  osThreadDef(avoid_obs, avoid_task, osPriorityBelowNormal, 0, 128);
+  avoid_obsHandle = osThreadCreate(osThread(avoid_obs), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -272,6 +278,24 @@ __weak void usmartscan(void const * argument)
     osDelay(1);
   }
   /* USER CODE END usmartscan */
+}
+
+/* USER CODE BEGIN Header_avoid_task */
+/**
+* @brief Function implementing the avoid_obs thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_avoid_task */
+__weak void avoid_task(void const * argument)
+{
+  /* USER CODE BEGIN avoid_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END avoid_task */
 }
 
 /* Private application code --------------------------------------------------*/

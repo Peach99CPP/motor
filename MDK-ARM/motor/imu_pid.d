@@ -55,8 +55,8 @@ motor\imu_pid.o: ..\Math\pid.h
 motor\imu_pid.o: ..\Driver\time_cnt.h
 motor\imu_pid.o: ..\Driver\time_cnt.h
 motor\imu_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
-motor\imu_pid.o: ..\Driver\chassis.h
 motor\imu_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+motor\imu_pid.o: ..\Driver\chassis.h
 motor\imu_pid.o: ..\Driver\motor.h
 motor\imu_pid.o: ..\Control\tim_control.h
 motor\imu_pid.o: ..\Driver\motor.h

@@ -33,6 +33,7 @@
 "motor\track_task.o"
 "motor\ahrs_task.o"
 "motor\imu_temp.o"
+"motor\avoid_obs_func.o"
 "motor\filter.o"
 "motor\pid.o"
 "motor\usmart_config.o"

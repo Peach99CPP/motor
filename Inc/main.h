@@ -66,6 +66,11 @@ void Error_Handler(void);
 #define MOTOR3_ENCODER_GPIO_Port GPIOA
 #define MOTOR4_ENCODER_Pin GPIO_PIN_1
 #define MOTOR4_ENCODER_GPIO_Port GPIOB
+#define US_SEND_Pin GPIO_PIN_12
+#define US_SEND_GPIO_Port GPIOB
+#define US_RECEIVE_Pin GPIO_PIN_13
+#define US_RECEIVE_GPIO_Port GPIOB
+#define US_RECEIVE_EXTI_IRQn EXTI15_10_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

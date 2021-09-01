@@ -21,17 +21,6 @@
 
 #include "main.h"
 
-#ifndef TRIG_GPIO_Port
-#define TRIG_GPIO_Port GPIOA
-#define TRIG_PIN GPIO_PIN_9
-
-#endif
-
-#ifndef SR04_GPIO_Port
-#define SR04_GPIO_Port  GPIOA
-#define SR04_PIN  GPIO_PIN_6
-#endif
-
 void avoid_init(void);
 uint16_t distance_convert(uint16_t raw_data);
 void avoid_callback(void);
