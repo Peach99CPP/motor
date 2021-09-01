@@ -4,6 +4,7 @@
 #define CHASSIS_RADIUS 1.0
 #define MAX_SPEED 350.0
 #include "track_bar_receive.h"
+int i, x_error = 0, y_error = 0;
 CHASSIS_t chassis;
 float Radius_[5] = {0, \
                     1, \
@@ -106,7 +107,6 @@ void speed_variation(float x_var, float y_var, float w_var)
 **************************************************************/
 void chassis_synthetic_control(void)
 {
-    static int i, x_error = 0, y_error = 0;
     static float x, y, w, factor;
     static double max_val;
     if (chassis._switch == false ) return; //如果底盘不被使能，则没有后续操作
@@ -131,10 +131,10 @@ void chassis_synthetic_control(void)
              *************
             3*************4
     ****************************************/
-    motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + y_error + x_error;
-    motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + y_error + x_error;
-    motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + y_error + x_error;
-    motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w + y_error + x_error;
+    motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w - y_error -x_error;
+    motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w -y_error -x_error;
+    motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w - y_error - x_error;
+    motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w - y_error - x_error;
 
     //再来一个限幅操作，避免单边速度过高导致控制效果不理想
     //

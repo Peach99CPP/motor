@@ -42,6 +42,7 @@ void track_bar_init(void);
 void track_decode(void);
 
 uint8_t get_idle_pos(void);
+void set_track_pid(int kp,int ki,int kd);
 extern trackbar_t y_bar,x_leftbar,x_rightbar;
 extern int dma_count;
 float track_pid_cal(trackbar_t * bar);

@@ -54,6 +54,6 @@ typedef void (*pid_callback_t)(struct pid_data *, struct pid_paramer *);
 
 extern     float  Iout, Pout, Dout;
 float pid_control(pid_data_t *data, pid_paramer_t *para);
-float imu_pid_cal(pid_data_t *data, pid_paramer_t *para);
+float pos_pid_cal(pid_data_t *data, pid_paramer_t *para);
 
 #endif

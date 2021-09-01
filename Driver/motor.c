@@ -10,9 +10,9 @@ pid_paramer_t motor_param;
 
 float param_[5] = {1500, \
                    9500,
-                   150, \
-                   15, \
-                   0
+                   80, \
+                   10, \
+                   10
                   };
 
 
@@ -185,16 +185,18 @@ void set_motor(int motor_id, int control_val)
 
     ChannelA_ptr = get_motor_channelA_ptr(motor_id);
     ChannelB_ptr = get_motor_channelB_ptr(motor_id);
-
-    if(pos_flag)
+    if(ChannelA_ptr != NULL && ChannelB_ptr != NULL)//±‹√‚÷∏’Î¥ÌŒÛ≤Ÿ◊˜
     {
-        *ChannelA_ptr = control_val;
-        *ChannelB_ptr = 0;
-    }
-    else
-    {
-        *ChannelB_ptr = control_val;
-        *ChannelA_ptr = 0;
+        if(pos_flag)
+        {
+            *ChannelA_ptr = control_val;
+            *ChannelB_ptr = 0;
+        }
+        else
+        {
+            *ChannelB_ptr = control_val;
+            *ChannelA_ptr = 0;
+        }
     }
 }
 
@@ -483,10 +485,10 @@ void motor_debug(void)
 //    osDelay(3000);
 //    motor_target[debug_motor_id] =  0;
 //    osDelay(3000);
-    set_speed(0,debug_speed,0);
+    set_speed(0, debug_speed, 0);
     osDelay(1000);
-    set_speed(0,0,0);
-     osDelay(3000);
+    set_speed(0, 0, 0);
+    osDelay(3000);
 }
 
 

@@ -91,7 +91,7 @@ void turn_rtangle(void const * argument)//任务实现函数
         }
         //pid计算值
         imu_data.feedback = init_angle;
-        delta = imu_pid_cal(&imu_data, &imu_para);
+        delta = pos_pid_cal(&imu_data, &imu_para);
         w_speed_set(delta);
         vTaskDelay(10);
     }
