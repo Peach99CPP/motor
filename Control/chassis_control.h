@@ -27,6 +27,7 @@ typedef enum
 } direct_t;
 #include "tim_control.h"
 void move_by_encoder(direct_t direct, int val);
+void move_slantly(int dir,int speed,uint16_t delay);
 void direct_move(direct_t direct, int line_num);
 void turn_angle(int target_angle);
 #endif

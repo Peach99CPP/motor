@@ -8,6 +8,7 @@
 #include "imu.h"
 #include "imu_pid.h"
 #include "track_bar_receive.h"
+#include "chassis_control.h"
 //函数名列表初始化(用户自己添加)
 //用户直接在这里输入要执行的函数名及其查找串
 struct _m_usmart_nametab usmart_nametab[] =
@@ -27,6 +28,7 @@ struct _m_usmart_nametab usmart_nametab[] =
     (void*)accel_calibration, "void accel_calibration(uint8_t where)",
     (void*)set_imu_param, "void set_imu_param(int p,int i,int d)",
     (void*)set_track_pid, "void set_track_pid(int kp,int ki,int kd)",
+    (void*)move_slantly,"void move_slantly(int dir, int speed, uint16_t delay)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

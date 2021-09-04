@@ -57,7 +57,7 @@ void turn_angle(int rt_angle)
     if(imu_switch && last_finished )//使能了并且此时上一个任务运行完毕
     {
         target_angle = angle_limit(rt_angle + Yaw);//计算当前角度加上转的相对角度后需要转到的目标角度，转到正负180范围
-        osThreadDef(imuturn_task, turn_rtangle, osPriorityHigh, 0, 256);//任务结构体的声明，有可能引起错误
+        osThreadDef(imuturn_task, turn_rtangle, osPriorityHigh, 0, 256);//任务结构体的声明，因为只是局部变量，并不会因为重复定义而报错
         turn_taskHandle = osThreadCreate(osThread(imuturn_task), NULL);//CMSIS包装下的任务创建，兼容静态和动态
     }
 }

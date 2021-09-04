@@ -1,9 +1,56 @@
 
 #include "chassis.h"
+#include "cmsis_os.h"
 #include "chassis_control.h"
+#include "uart_handle.h"
+
 int x_line, y_line;
 #define LINE_FACTOR 0.5
 #define ENCODER_FACTOR 0.5
+#define MAX_SET_SPEED 250
+
+
+
+/**********************************************************************
+  * @Name    move_slantly
+  * @declaration : 倾斜起步
+  * @param   dir: [输入/出]  方向 笛卡尔坐标系4大象限
+**			 speed: [输入/出] 目标速度
+**			 delay: [输入/出] 延迟的时间，用于飘逸到线上
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+
+void move_slantly(int dir, int speed, uint16_t delay)
+{
+    int x_factor, y_factor;
+    if(speed>MAX_SET_SPEED)
+    {
+        printf("over speed\r\n");
+        return ;
+    }
+    switch(dir)
+    {
+    case 1:
+        x_factor = 1, y_factor = 1;
+        break;
+    case 2:
+        x_factor = -1, y_factor = 1;
+        break;
+    case 3:
+        x_factor = -1, y_factor = -1;
+        break;
+    case 4:
+        x_factor = 1, y_factor = -1;
+        break;
+    default:
+        x_factor = 0, y_factor = 0;
+    }
+    set_speed(x_factor * speed, y_factor * speed, 0);
+    osDelay(delay);
+    set_speed(0, 0, 0);
+
+}
 /**********************************************************************
   * @Name    direct_move
   * @brief   通过循迹数线直线行进
