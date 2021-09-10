@@ -1,0 +1,108 @@
+/* USER CODE BEGIN Header_Startdebug */
+/**
+* @brief Function implementing the debugtask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Startdebug */
+__weak void Startdebug(void const * argument)
+{
+#t/* USER CODE BEGIN Startdebug */
+#t/* Infinite loop */
+#tfor(;;)
+#t{
+#t#tosDelay(1);
+#t}
+#t/* USER CODE END Startdebug */
+}
+#n
+/* USER CODE BEGIN Header_chassis_task */
+/**
+* @brief Function implementing the chassis thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_chassis_task */
+__weak void chassis_task(void const * argument)
+{
+#t/* USER CODE BEGIN chassis_task */
+#t/* Infinite loop */
+#tfor(;;)
+#t{
+#t#tosDelay(1);
+#t}
+#t/* USER CODE END chassis_task */
+}
+#n
+/* USER CODE BEGIN Header_track_scan */
+/**
+* @brief Function implementing the track_task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_track_scan */
+__weak void track_scan(void const * argument)
+{
+#t/* USER CODE BEGIN track_scan */
+#t/* Infinite loop */
+#tfor(;;)
+#t{
+#t#tosDelay(1);
+#t}
+#t/* USER CODE END track_scan */
+}
+#n
+/* USER CODE BEGIN Header_usmartscan */
+/**
+* @brief Function implementing the usmart_task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_usmartscan */
+__weak void usmartscan(void const * argument)
+{
+#t/* USER CODE BEGIN usmartscan */
+#t/* Infinite loop */
+#tfor(;;)
+#t{
+#t#tosDelay(1);
+#t}
+#t/* USER CODE END usmartscan */
+}
+#n
+/* USER CODE BEGIN Header_avoid_task */
+/**
+* @brief Function implementing the avoid_obs thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_avoid_task */
+__weak void avoid_task(void const * argument)
+{
+#t/* USER CODE BEGIN avoid_task */
+#t/* Infinite loop */
+#tfor(;;)
+#t{
+#t#tosDelay(1);
+#t}
+#t/* USER CODE END avoid_task */
+}
+#n
+/* USER CODE BEGIN Header_IMU_decode */
+/**
+* @brief Function implementing the imu_angle thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_IMU_decode */
+__weak void IMU_decode(void const * argument)
+{
+#t/* USER CODE BEGIN IMU_decode */
+#t/* Infinite loop */
+#tfor(;;)
+#t{
+#t#tosDelay(1);
+#t}
+#t/* USER CODE END IMU_decode */
+}
+#n

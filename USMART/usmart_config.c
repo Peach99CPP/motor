@@ -5,9 +5,12 @@
 #include "delay.h"
 #include "motor.h"
 #include "chassis.h"
-#include "imu.h"
 #include "imu_pid.h"
 #include "track_bar_receive.h"
+#include "chassis_control.h"
+#include "openmv.h"
+#include "servo.h"
+
 //函数名列表初始化(用户自己添加)
 //用户直接在这里输入要执行的函数名及其查找串
 struct _m_usmart_nametab usmart_nametab[] =
@@ -16,17 +19,15 @@ struct _m_usmart_nametab usmart_nametab[] =
     (void*)read_addr, "u32 read_addr(u32 addr)",
     (void*)write_addr, "void write_addr(u32 addr,u32 val)",
 #endif
-    (void*)read_encoder, "float read_encoder(int motor_id)",
-    (void*)set_motor_pid, "void set_motor_pid(int kp, int ki, int kd)",
-    (void*)set_motor_maxparam, "void set_motor_maxparam(int integrate_max, int control_output_limit)",
-    (void*)set_motor, "void set_motor(int motor_id, int control_val)",
-    (void*)turn_angle, "void turn_angle(int rt_angle)",
     (void*)set_speed, "void set_speed(int x, int y, int w)",
-    (void*)clear_pid_param, "void clear_pid_param(void)",
-    (void*)gyro_calibration, "void gyro_calibration(void)",
-    (void*)accel_calibration, "void accel_calibration(uint8_t where)",
+    (void*)set_debug_motor,  "void set_debug_motor(int status, int motor_id)",
+    (void*)move_by_encoder, "void move_by_encoder(int  direct, int val)",
+    (void*)direct_move,  "void direct_move(int direct, int line_num,int edge_if)",
+    (void*)set_track_pid,  "void set_track_pid(int kp, int ki, int kd)",
+    (void*)track_status, "void track_status(int id, int status)",
     (void*)set_imu_param, "void set_imu_param(int p,int i,int d)",
-    (void*)set_track_pid, "void set_track_pid(int kp,int ki,int kd)",
+    (void*)set_imu_angle, "void set_imu_angle(int  angle)",
+    (void*)set_imu_status, "void set_imu_status(int status)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

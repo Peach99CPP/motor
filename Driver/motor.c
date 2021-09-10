@@ -10,7 +10,7 @@ pid_paramer_t motor_param;
 
 float param_[5] = {1500, \
                    9500,
-                   80, \
+                   130, \
                    10, \
                    10
                   };
@@ -465,6 +465,7 @@ void clear_all_speed(void)
 
 void set_debug_motor(int status, int motor_id)
 {
+   
     switch_status = status;
     debug_motor_id = motor_id;
 }
@@ -480,15 +481,10 @@ void set_debug_motor(int status, int motor_id)
 
 void motor_debug(void)
 {
-//    if(debug_motor_id == 0 || !switch_status ) return ;
-//    motor_target[debug_motor_id] =  debug_speed;
-//    osDelay(3000);
-//    motor_target[debug_motor_id] =  0;
-//    osDelay(3000);
     set_speed(0, debug_speed, 0);
     osDelay(1000);
     set_speed(0, 0, 0);
-    osDelay(3000);
+    osDelay(1000);
 }
 
 
@@ -503,12 +499,7 @@ void motor_debug(void)
 
 void set_debug_speed(int speed)
 {
-//    if(debug_motor_id == 0 || !switch_status )
-//    {
-//        printf("run set_debug_motor firstly\r\n");
-//        return ;
-////    }
-//    debug_speed = speed;
+    chassis._switch  = true;
     debug_speed = speed;
 }
 
@@ -525,7 +516,6 @@ void clear_pid_param(void)
 {
     for(uint8_t i = 1; i <= 4; ++i)
     {
-        motor_data[i].last2_err = 0;
         motor_data[i].last_err = 0;
         motor_data[i].err = 0;
         motor_data[i].control_output = 0;

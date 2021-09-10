@@ -4,8 +4,11 @@
 
 extern uint32_t vPortGetIPSR(void);//使用该函数来查看是否在中断中
 
+#define USE_BLE
+#define USE_ATK
+
 #define MAX_BUFFER_SIZE 100
-#define MAX_SIZE 50
+#define MAX_SIZE 200
 uint16_t USART_RX_STA = 0;
 uint32_t rec_count = 0;
 uint8_t USART_RX_BUF[MAX_SIZE];
@@ -32,24 +35,25 @@ int fputc(int ch, FILE *f)
 {
     if(tx_queue != NULL)
     {
-    if(vPortGetIPSR())
-    {
-        BaseType_t if_higher_woken = pdFALSE;
-       while( xQueueSendFromISR(tx_queue,&ch,&if_higher_woken) != pdTRUE);//阻塞式。确保此时已经成功把消息放入队列
-        portYIELD_FROM_ISR(if_higher_woken);//判断是否需要进行任务调度
+        if(vPortGetIPSR())
+        {
+            BaseType_t if_higher_woken = pdFALSE;
+            while( xQueueSendFromISR(tx_queue, &ch, &if_higher_woken) != pdTRUE); //阻塞式。确保此时已经成功把消息放入队列
+            portYIELD_FROM_ISR(if_higher_woken);//判断是否需要进行任务调度
+        }
+        else
+        {
+            //此时并不是在中断中被调用，可以直接写入数据
+            xQueueSend(tx_queue, &ch, 1);
+        }
     }
-    else
-    {
-        //此时并不是在中断中被调用，可以直接写入数据
-        xQueueSend(tx_queue,&ch,1);
-    }
-}
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_TXE);
     return ch;
 }
 #endif
-void tx_queue_init(void)
+void printf_init(void)
 {
-    tx_queue = xQueueCreate(MAX_SIZE,sizeof(uint8_t));
+    tx_queue = xQueueCreate(MAX_SIZE, sizeof(uint8_t));
 }
 /**********************************************************************
   * @Name    USART1_IRQHandler
@@ -59,7 +63,7 @@ void tx_queue_init(void)
   * @author  peach99CPP
 ***********************************************************************/
 
-void USART1_IRQHandler(void)
+void U1_IRQHandler(void)
 {
     uint8_t rec;
     if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
@@ -68,25 +72,48 @@ void USART1_IRQHandler(void)
         rec =  huart1.Instance->RDR;
         if(!(USART_RX_STA & 0x8000))//接收未完成
         {
-
-            if((USART_RX_STA & 0X4000) )
-            {
+       #ifdef USE_BLE
                 if(rec == 0x0a)
                 {
                     USART_RX_STA |= 0x8000;
                     return ;
                 }
-                else USART_RX_STA = 0;
-            }
-            if(rec == 0x0d) USART_RX_STA |= 0x4000;
-            else
-            {
-                USART_RX_BUF[USART_RX_STA & 0x3fff] = rec;
-                USART_RX_STA++;
-            }
-
+                else
+                {
+                    USART_RX_BUF[USART_RX_STA & 0x3fff] = rec;
+                    USART_RX_STA++;
+                    if(USART_RX_STA & USART_RX_STA & 0x3fff == MAX_SIZE) USART_RX_STA = 0;
+                }
+        #endif
+       #ifdef USE_ATK
+                if(rec == 0x0d) 
+                {
+                USART_RX_STA |= 0x4000;
+                    return;
+                }
+                if( USART_RX_STA &0x4000 && rec == 0x0a) {USART_RX_STA |= 0x8000; return;}
+                else
+                {
+                     USART_RX_BUF[USART_RX_STA & 0x3fff] = rec;
+                    USART_RX_STA++;
+                    if(USART_RX_STA & USART_RX_STA & 0x3fff == MAX_SIZE) USART_RX_STA = 0;
+                }
+                
+                #endif
         }
 
+
+    }
+    else if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_TXE))
+    {
+        __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_TXE);
+        BaseType_t xTaskWokenByReceive = pdFALSE;
+        //发送队列中有数据需要发送
+        if (xQueueReceiveFromISR(tx_queue, (void *) &rec, &xTaskWokenByReceive) == pdPASS)
+            huart1.Instance->TDR = rec;
+        else
+            //无数据发送就关闭发送中断
+            __HAL_UART_DISABLE_IT(&huart1, UART_IT_TXE);
     }
 
 }

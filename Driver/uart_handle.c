@@ -4,12 +4,15 @@
 
 extern uint32_t vPortGetIPSR(void);//使用该函数来查看是否在中断中
 
+//根据使用的调试器类型进行选择
+#define USE_BLE
+//#define USE_ATK
+
 #define MAX_BUFFER_SIZE 100
 #define MAX_SIZE 200
 uint16_t USART_RX_STA = 0;
 uint32_t rec_count = 0;
 uint8_t USART_RX_BUF[MAX_SIZE];
-
 QueueHandle_t tx_queue ;
 
 #if 1
@@ -69,38 +72,62 @@ void U1_IRQHandler(void)
         rec =  huart1.Instance->RDR;
         if(!(USART_RX_STA & 0x8000))//接收未完成
         {
-
-            if((USART_RX_STA & 0X4000) )
+#ifdef USE_BLE
+            if(rec == 0x0a || rec == 0x21)
+                
             {
-                if(rec == 0x0a)
-                {
-                    USART_RX_STA |= 0x8000;
-                    return ;
-                }
-                else USART_RX_STA = 0;
+                USART_RX_STA |= 0x8000;
+                return ;
             }
-            if(rec == 0x0d) USART_RX_STA |= 0x4000;
+            if( rec == 0x0d ) return ;
             else
             {
                 USART_RX_BUF[USART_RX_STA & 0x3fff] = rec;
                 USART_RX_STA++;
+                if(USART_RX_STA & USART_RX_STA & 0x3fff == MAX_SIZE) USART_RX_STA = 0;
+            }
+#endif
+#ifdef USE_ATK
+            if(rec == 0x0d)
+            {
+                USART_RX_STA |= 0x4000;
+                return;
+            }
+            if( USART_RX_STA & 0x4000 && rec == 0x0a)
+            {
+                USART_RX_STA |= 0x8000;
+                return;
+            }
+            else
+            {
+                USART_RX_BUF[USART_RX_STA & 0x3fff] = rec;
+                USART_RX_STA++;
+                if(USART_RX_STA & USART_RX_STA & 0x3fff == MAX_SIZE) USART_RX_STA = 0;
             }
 
+#endif
         }
+
 
     }
     else if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_TXE))
     {
         __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_TXE);
         BaseType_t xTaskWokenByReceive = pdFALSE;
-		//发送队列中有数据需要发送
-		if (xQueueReceiveFromISR(tx_queue, (void *) &rec, &xTaskWokenByReceive) == pdPASS)
-			huart1.Instance->TDR = rec;
-		else
-			//无数据发送就关闭发送中断
-			__HAL_UART_DISABLE_IT(&huart1, UART_IT_TXE);
-	}
-
+        //发送队列中有数据需要发送
+        if (xQueueReceiveFromISR(tx_queue, (void*)&rec, &xTaskWokenByReceive) == pdPASS)
+            huart1.Instance->TDR = rec;
+        else
+            //无数据发送就关闭发送中断
+            __HAL_UART_DISABLE_IT(&huart1, UART_IT_TXE);
+    }
+    else if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE))
+    {
+        uint8_t tmp;
+        __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_ORE);
+        tmp = USART1->ISR;
+        tmp= USART1->RDR;
+    }
 }
 
 

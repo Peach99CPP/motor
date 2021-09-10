@@ -26,9 +26,13 @@ typedef enum
     ver //vertically
 } direct_t;
 #include "tim_control.h"
-void move_by_encoder(direct_t direct, int val);
-void direct_move(direct_t direct, int line_num);
+void edge_move(int direct, int line_num);
+void move_by_encoder(int direct, int val);
+void move_slantly(int dir,int speed,uint16_t delay);
+void direct_move(int direct, int line_num,int edge_if);
 void turn_angle(int target_angle);
+void car_shaking(int direct);
+extern int edge_status[3];
 #endif
 
 

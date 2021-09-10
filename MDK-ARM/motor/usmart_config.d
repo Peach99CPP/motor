@@ -31,7 +31,6 @@ motor\usmart_config.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c.h
 motor\usmart_config.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c_ex.h
 motor\usmart_config.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h
 motor\usmart_config.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h
-motor\usmart_config.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_qspi.h
 motor\usmart_config.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 motor\usmart_config.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\usmart_config.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
@@ -52,9 +51,6 @@ motor\usmart_config.o: ..\Driver\delay.h
 motor\usmart_config.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\usmart_config.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 motor\usmart_config.o: ..\Driver\chassis.h
-motor\usmart_config.o: ..\Module\imu.h
-motor\usmart_config.o: ..\Module\vector3.h
-motor\usmart_config.o: ..\Module\mpu6050.h
 motor\usmart_config.o: ..\Driver\imu_pid.h
 motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 motor\usmart_config.o: ../Inc/FreeRTOSConfig.h
@@ -70,5 +66,7 @@ motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers
 motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
-motor\usmart_config.o: ..\Module\ahrs.h
 motor\usmart_config.o: ..\Driver\track_bar_receive.h
+motor\usmart_config.o: ..\Control\chassis_control.h
+motor\usmart_config.o: ..\Module\openmv.h
+motor\usmart_config.o: ..\Module\servo.h

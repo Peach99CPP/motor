@@ -30,7 +30,6 @@ motor\track_bar_receive.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c
 motor\track_bar_receive.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c_ex.h
 motor\track_bar_receive.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h
 motor\track_bar_receive.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h
-motor\track_bar_receive.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_qspi.h
 motor\track_bar_receive.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 motor\track_bar_receive.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\track_bar_receive.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
@@ -59,3 +58,9 @@ motor\track_bar_receive.o: ..\Driver\uart_handle.h
 motor\track_bar_receive.o: ../Inc/tim.h
 motor\track_bar_receive.o: ..\Driver\delay.h
 motor\track_bar_receive.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+motor\track_bar_receive.o: ..\Module\atk_imu.h
+motor\track_bar_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+motor\track_bar_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+motor\track_bar_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+motor\track_bar_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
+motor\track_bar_receive.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h

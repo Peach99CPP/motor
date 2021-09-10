@@ -65,26 +65,26 @@ void temp_imu_task(void const * argument)
     imu_temp_pid_data_init();
     while(1)
     {
-        //温度PID控制
-        if (count == 100)
-        {
-            imu_temp_pid_data.feedback = tempDataFilter;
-            imu_temp_pid_data.expect = 50;
-            pid_control(&imu_temp_pid_data, &imu_temp_pid_data_para);
-        }
+//        //温度PID控制
+//        if (count == 100)
+//        {
+//            imu_temp_pid_data.feedback = tempDataFilter;
+//            imu_temp_pid_data.expect = 50;
+//            pid_control(&imu_temp_pid_data, &imu_temp_pid_data_para);
+//        }
 
-        //模拟PWM输出
-        if (count == 100)
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
-        else if (count >= imu_temp_pid_data.control_output)
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
+//        //模拟PWM输出
+//        if (count == 100)
+//            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+//        else if (count >= imu_temp_pid_data.control_output)
+//            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
 
-        if (count == 100)
-            count = 0;
-        else
-            count++;
+//        if (count == 100)
+//            count = 0;
+//        else
+//            count++;
 
-        //睡眠1ms
+//        //睡眠1ms
         vTaskDelay(1);
     }
 }

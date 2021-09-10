@@ -24,14 +24,16 @@
 #include "task.h"
 #include "cmsis_os.h"
 
-#include "ahrs.h"
 #include "pid.h"
 #include "math.h"
 #include <stdbool.h>
 
+
+float  imu_correct_val(void);
+
+void set_imu_angle(int angle);
 void set_imu_param(int p,int i,int d);
 void set_imu_status(int status);
-void turn_angle(int rt_angle);//相对角度
 float  angle_limit(float  angle);
 #endif
 

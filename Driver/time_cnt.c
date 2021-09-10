@@ -2,6 +2,7 @@
 #include "stm32f7xx_hal.h"
 #include "usmart.h"
 #include "chassis.h"
+#include "imu_pid.h"
 static TIM_HandleTypeDef htim6;
 volatile uint32_t TIME_ISR_CNT;
 //系统时间

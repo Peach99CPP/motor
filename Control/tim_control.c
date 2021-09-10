@@ -2,8 +2,8 @@
 double encoder_val[5];//默认为0
 short status_flag[5];//
 
-double encoder_sum, temp_sum;//编码器计数相关的变量
-
+double encoder_sum = 0, temp_sum = 0;//编码器计数相关的变量
+int count_ = 0 ;
 int rising_val[5], falling_val[5], direct_[5], update_count[5];//电机转速相关变量
 
 double   cap_temp_val[5];
@@ -96,9 +96,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             falling_val[1] = HAL_TIM_ReadCapturedValue(motor1.IC.Tim, motor1.IC.Channel);//读取下降沿的值
             cap_temp_val[1] += (SPEED_PARAM / (falling_val[1] - rising_val[1] + TIM_COUNT_VAL * update_count[1])) * direct_[1];//计算本次得到的脉宽。反映出转速的快慢，并累加
             cap_cnt[1]++;//采样次数累加，根据采样次数和滤波次数求均值
-            
+
             __HAL_TIM_SET_CAPTUREPOLARITY(motor1.IC.Tim, motor1.IC.Channel, TIM_ICPOLARITY_RISING);//本采样循环完成，回到初始状态，准备对上升沿进行采样
-            
+
             if(cap_cnt[1] == FILTER)//采样次数到达了
             {
                 if(!first_flag[1])//第一次的时候，因为没有上一次的值，需要进行特殊处理
@@ -113,8 +113,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                     if(!(fabs(temp_val + encoder_val[1]) < THRESHOLD_)) //没有因为毛刺发生方向跳变，有的话直接舍弃本次获得的值
                     {
                         //均值滤波
-                        temp_val +=encoder_val[1];
-                        encoder_val[1] = temp_val/(2.0);
+                        temp_val += encoder_val[1];
+                        encoder_val[1] = temp_val / (2.0);
                         /*舍弃下面方法原因在于\
                         有概率在第一第二句执行间隙时间内，编码器值被读取
                         此时编码器的值加上了临时值会异常的大
@@ -122,7 +122,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                         故舍弃。
                         encoder_val[1] += temp_val;
                         encoder_val[1] /= 2.0;//均值滤波
-                        
+
                         */
                     }
                 }
@@ -174,8 +174,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                     temp_val = cap_temp_val[2] / FILTER;
                     if(!(fabs(temp_val + encoder_val[2]) < THRESHOLD_)) //没有因为毛刺发生方向跳变
                     {
-                        temp_val +=encoder_val[2];
-                        encoder_val[2] = temp_val/(2.0);
+                        temp_val += encoder_val[2];
+                        encoder_val[2] = temp_val / (2.0);
                     }
                 }
                 temp_val = 0;
@@ -224,8 +224,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                     temp_val = cap_temp_val[3] / FILTER;
                     if(!(fabs(temp_val + encoder_val[3]) < THRESHOLD_)) //没有因为毛刺发生方向跳变
                     {
-                      temp_val +=encoder_val[3];
-                        encoder_val[3] = temp_val/(2.0);
+                        temp_val += encoder_val[3];
+                        encoder_val[3] = temp_val / (2.0);
                     }
                 }
                 temp_val = 0;
@@ -273,8 +273,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                     temp_val = cap_temp_val[4] / FILTER;
                     if(!(fabs(temp_val + encoder_val[4]) < THRESHOLD_)) //没有因为毛刺发生方向跳变
                     {
-                       temp_val +=encoder_val[4];
-                        encoder_val[4] = temp_val/(2.0);
+                        temp_val += encoder_val[4];
+                        encoder_val[4] = temp_val / (2.0);
                     }
                 }
                 temp_val = 0;
@@ -285,6 +285,16 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
         }
 
 
+    }
+    count_++;
+    if(count_ == 400)
+    {
+        count_ = 0;
+        for(uint8_t t = 1; t <= 4; ++t)
+        {
+            temp_sum += fabs(encoder_val[t]);
+        }
+        encoder_sum += (temp_sum / 4.0);
     }
 }
 

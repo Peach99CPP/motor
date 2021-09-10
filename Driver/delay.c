@@ -15,6 +15,7 @@ void delay_init(TIM_HandleTypeDef * cnt_tim, count_mode mode)
     sys_time.cnt_tim  = cnt_tim;
     sys_time.mode = mode;
     sys_time.period_val = sys_time.cnt_tim ->Init.Period;
+    HAL_TIM_Base_Start(cnt_tim);
 }
 
 /**********************************************************************

@@ -21,8 +21,6 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "dma.h"
-#include "i2c.h"
-#include "quadspi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -36,7 +34,9 @@
 #include "usmart.h"
 #include "chassis.h"
 #include "track_bar_receive.h"
-#include "imu.h"
+#include "imu_pid.h"
+#include "atk_imu.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -107,8 +107,6 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_TIM6_Init();
-  MX_I2C1_Init();
-  MX_QUADSPI_Init();
   MX_UART4_Init();
   MX_UART5_Init();
   MX_UART7_Init();
@@ -190,8 +188,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
                               |RCC_PERIPHCLK_USART3|RCC_PERIPHCLK_USART6
                               |RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_UART5
-                              |RCC_PERIPHCLK_UART7|RCC_PERIPHCLK_UART8
-                              |RCC_PERIPHCLK_I2C1;
+                              |RCC_PERIPHCLK_UART7|RCC_PERIPHCLK_UART8;
   PeriphClkInitStruct.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInitStruct.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInitStruct.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
@@ -200,7 +197,6 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.Usart6ClockSelection = RCC_USART6CLKSOURCE_PCLK2;
   PeriphClkInitStruct.Uart7ClockSelection = RCC_UART7CLKSOURCE_PCLK1;
   PeriphClkInitStruct.Uart8ClockSelection = RCC_UART8CLKSOURCE_PCLK1;
-  PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -210,17 +206,24 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void USER_Init(void)
 {
-    Get_Time_Init();
-    HAL_Delay(1);
-    HAL_TIM_Base_Start(&htim6);
-    usmart_dev.init(216);
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+    __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
+        __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
+    Get_Time_Init();
+    ATK_IMU_Init();
     delay_init(&htim6, up_count);
+    delay_ms(1000);
+    usmart_dev.init(216);
     Motor_PID_Init();
-    set_chassis_status(true);
+    set_chassis_status(1);//底盘使能
     motor_init();
     printf_init();
+//    HAL_Delay(2000);
+//    __HAL_UART_ENABLE(&huart2);
     track_bar_init();
+    /*****一写外部模块的初始化***/
+    /*   track_status(1,0); 调试电机需要关闭循迹时才使用这个
+    track_status(2,0);*/
 }
 /* USER CODE END 4 */
 

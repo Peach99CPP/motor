@@ -29,7 +29,6 @@ motor\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c.h
 motor\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c_ex.h
 motor\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h
 motor\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h
-motor\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_qspi.h
 motor\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 motor\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
@@ -49,8 +48,6 @@ motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 motor\main.o: ../Inc/dma.h
-motor\main.o: ../Inc/i2c.h
-motor\main.o: ../Inc/quadspi.h
 motor\main.o: ../Inc/tim.h
 motor\main.o: ../Inc/usart.h
 motor\main.o: ../Inc/gpio.h
@@ -71,6 +68,7 @@ motor\main.o: ..\USMART\usmart.h
 motor\main.o: ..\USMART\usmart_str.h
 motor\main.o: ..\Driver\chassis.h
 motor\main.o: ..\Driver\track_bar_receive.h
-motor\main.o: ..\Module\imu.h
-motor\main.o: ..\Module\vector3.h
-motor\main.o: ..\Module\mpu6050.h
+motor\main.o: ..\Driver\imu_pid.h
+motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+motor\main.o: ..\Module\atk_imu.h
+motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h

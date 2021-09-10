@@ -30,7 +30,6 @@ motor\time_cnt.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c.h
 motor\time_cnt.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c_ex.h
 motor\time_cnt.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h
 motor\time_cnt.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h
-motor\time_cnt.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_qspi.h
 motor\time_cnt.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 motor\time_cnt.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\time_cnt.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
@@ -52,3 +51,18 @@ motor\time_cnt.o: ..\Driver\delay.h
 motor\time_cnt.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\time_cnt.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 motor\time_cnt.o: ..\Driver\chassis.h
+motor\time_cnt.o: ..\Driver\imu_pid.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+motor\time_cnt.o: ../Inc/FreeRTOSConfig.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1/portmacro.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
+motor\time_cnt.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h

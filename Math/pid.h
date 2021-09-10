@@ -30,8 +30,6 @@ typedef struct pid_data
     float err;
     //上次偏差
     float last_err;
-    //上上次偏差
-    float last2_err;
     //积分值
     float integrate;
     //单次偏差

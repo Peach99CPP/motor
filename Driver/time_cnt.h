@@ -22,7 +22,7 @@ typedef struct
 } Time_t;
 
 extern Time_t Time_Sys;
-
+extern volatile uint32_t TIME_ISR_CNT;
 void T6_IRQHandler(void);
 void Get_Time_Init(void);
 void Get_Time_Period(Testime *Time_Lab);
