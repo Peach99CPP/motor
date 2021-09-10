@@ -66,4 +66,4 @@ motor\stm32f7xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.
 motor\stm32f7xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 motor\stm32f7xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\stm32f7xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
-motor\stm32f7xx_it.o: ..\Module\openmv.h
+motor\stm32f7xx_it.o: ..\Driver\openmv.h

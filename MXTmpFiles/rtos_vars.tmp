@@ -1,8 +1,0 @@
-osThreadId defaultTaskHandle;
-osThreadId debugtaskHandle;
-osThreadId chassisHandle;
-osThreadId track_taskHandle;
-osThreadId usmart_taskHandle;
-osThreadId avoid_obsHandle;
-osThreadId imu_angleHandle;
-osMessageQId IMU_QueueHandle;

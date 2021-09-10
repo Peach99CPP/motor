@@ -68,5 +68,5 @@ motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr
 motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 motor\usmart_config.o: ..\Driver\track_bar_receive.h
 motor\usmart_config.o: ..\Control\chassis_control.h
-motor\usmart_config.o: ..\Module\openmv.h
+motor\usmart_config.o: ..\Driver\openmv.h
 motor\usmart_config.o: ..\Module\servo.h

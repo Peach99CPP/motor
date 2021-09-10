@@ -54,8 +54,6 @@ osThreadId chassisHandle;
 osThreadId track_taskHandle;
 osThreadId usmart_taskHandle;
 osThreadId avoid_obsHandle;
-osThreadId imu_angleHandle;
-osMessageQId IMU_QueueHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -68,7 +66,6 @@ void chassis_task(void const * argument);
 void track_scan(void const * argument);
 void usmartscan(void const * argument);
 void avoid_task(void const * argument);
-void IMU_decode(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -110,11 +107,6 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
-  /* Create the queue(s) */
-  /* definition and creation of IMU_Queue */
-  osMessageQDef(IMU_Queue, 20, uint8_t);
-  IMU_QueueHandle = osMessageCreate(osMessageQ(IMU_Queue), NULL);
-
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -143,10 +135,6 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of avoid_obs */
   osThreadDef(avoid_obs, avoid_task, osPriorityBelowNormal, 0, 128);
   avoid_obsHandle = osThreadCreate(osThread(avoid_obs), NULL);
-
-  /* definition and creation of imu_angle */
-  osThreadDef(imu_angle, IMU_decode, osPriorityAboveNormal, 0, 256);
-  imu_angleHandle = osThreadCreate(osThread(imu_angle), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -260,24 +248,6 @@ __weak void avoid_task(void const * argument)
     osDelay(1);
   }
   /* USER CODE END avoid_task */
-}
-
-/* USER CODE BEGIN Header_IMU_decode */
-/**
-* @brief Function implementing the imu_data thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_IMU_decode */
-__weak void IMU_decode(void const * argument)
-{
-  /* USER CODE BEGIN IMU_decode */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END IMU_decode */
 }
 
 /* Private application code --------------------------------------------------*/

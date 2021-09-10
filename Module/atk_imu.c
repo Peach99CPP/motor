@@ -6,6 +6,7 @@ attitude_t		attitude;		/*!< 姿态角 */
 quaternion_t	quaternion;
 gyroAcc_t 		gyroAccData;
 ioStatus_t		iostatus;
+
 #ifdef IMU901
 mag_t			magData;
 baro_t			baroData;
@@ -359,65 +360,111 @@ void imu901_init(void)
 }
 
 /***********************自行编写的函数*************************************/
-ATK_IMU_t  imu =
-{
-    .imu_uart = &huart6,
-    .yaw_ptr = &(attitude.yaw),
-    .target_angle = 0,
-    .init_angle = 0,
-    .switch_ = 1,
-    .get_angle = Get_Yaw
-};
 
-extern osMessageQId IMU_QueueHandle;
+ATK_IMU_t  imu =
+{   
+    ///移植时只需要修改以下结构体变量即可
+    .imu_uart = &huart6,//串口号
+    .yaw_ptr = &(attitude.yaw),//解析出来的原始数据
+    .target_angle = 0,//pid的目标角度
+    .init_angle = 0,//初始化角度，补偿上电时的初始角度
+    .switch_ = 1,//使能开关
+    .get_angle = Get_Yaw//函数指针，返回经过限幅和相对0的角度
+};
 
 #define ERROR_THRESHILD 0.1
 #define INIT_TIMES 100
 
 #define BUFFER_SIZE 11
 uint8_t imu_cmd[12];
+
+
+
+/**********************************************************************
+  * @Name    IMU_IRQ
+  * @declaration :陀螺仪的中断处理函数，处理DMA收到的数据
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+
 void IMU_IRQ(void)
 {
 
-    uint8_t index = 0;
-    for(uint8_t i = 0; i < BUFFER_SIZE; ++i)
+    uint8_t index = 0;//初始化下标
+    for(uint8_t i = 0; i < BUFFER_SIZE; ++i)//开始遍历DMA接收到的数据
     {
-        if(imu901_unpack(imu_cmd[i]))
-            atkpParsing(&rxPacket);
+        if(imu901_unpack(imu_cmd[i]))//接收完成
+            atkpParsing(&rxPacket);//开始解码，得到姿态角
     }
 
-    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE);
+    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE);//再次开启DMA
 
 }
+
+
+/**********************************************************************
+  * @Name    ATK_IMU_Init
+  * @declaration : 初始化陀螺仪，开启传输，获取补偿角
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+
 void ATK_IMU_Init(void)
 {
-    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE);
-    Get_InitYaw();
-   
+    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE);//开启DMA
+    Get_InitYaw();//获取初始化角度，用于补偿上电时的角度
 }
+
+
+/**********************************************************************
+  * @Name    Get_InitYaw
+  * @declaration : 获取补偿角，补偿每次复位后的陀螺仪角度，将其修正为0
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+
 void Get_InitYaw(void)
 {
      float last_yaw, current_yaw;
     int init_times = 0;
-    current_yaw = last_yaw = * imu.yaw_ptr;
-    while(init_times < INIT_TIMES)
+    current_yaw = last_yaw = * imu.yaw_ptr;//获取当前原生数据
+    while(init_times < INIT_TIMES)//陀螺仪未达到稳定
     {
-        if(fabs( current_yaw - last_yaw) < ERROR_THRESHILD)
+        if(fabs( current_yaw - last_yaw) < ERROR_THRESHILD)//偏移很小
             init_times ++;
-        else init_times = 0;
+        else init_times = 0;//清0，重置
+        //更新数值
         last_yaw = current_yaw;
         current_yaw = * imu.yaw_ptr;
+        //10ms一次查询
         HAL_Delay(10);
     }
+    //陀螺仪稳定，开始获取数据
     if(current_yaw > 180 ) current_yaw -= 360;
     if(current_yaw < -180 ) current_yaw += 360;
+    //得到初始化的补偿角
     imu.init_angle =  - current_yaw;
 }
+
+
+/**********************************************************************
+  * @Name    Get_Yaw
+  * @declaration :获取经过限幅的相对于上电位置的Yaw角
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+
 float Get_Yaw(void)
 {
-    float  angle = *(imu.yaw_ptr) + imu.init_angle ;
+    float  angle = *(imu.yaw_ptr) + imu.init_angle ;//获取当前原生数据加上补偿角
+    //限幅
     while(angle > 180 ) angle -= 360;
     while(angle <= -180) angle+= 360;
+    //返回角度值
     return angle;
 }
 /*******************************END OF FILE************************************/
