@@ -202,10 +202,12 @@ typedef struct{
 }ATK_IMU_t;
 
 extern ATK_IMU_t  imu;
+
 void IMU_IRQ(void);
 void ATK_IMU_Init(void);
-void Get_InitYaw(void);
+void Set_InitYaw(int target);
 float Get_Yaw(void);
+float angle_limit(float  angle);
 
 #endif
 

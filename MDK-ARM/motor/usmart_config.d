@@ -70,3 +70,5 @@ motor\usmart_config.o: ..\Driver\track_bar_receive.h
 motor\usmart_config.o: ..\Control\chassis_control.h
 motor\usmart_config.o: ..\Driver\openmv.h
 motor\usmart_config.o: ..\Module\servo.h
+motor\usmart_config.o: ..\Module\atk_imu.h
+motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h

@@ -8,10 +8,10 @@
 
 uint32_t time;
 int x_line, y_line;
-#define LINE_FACTOR 120
+#define LINE_FACTOR 170
 #define ENCODER_FACTOR 2
 #define ENCODE_THRESHOLD 20
-#define MAX_SPEED 400
+#define MAX_SPEED 600
 #define MIN_SPEED 100
 #define LINE_ERROR_ENCODER 150
 static int dir, lines;

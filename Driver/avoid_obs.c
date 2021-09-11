@@ -63,6 +63,6 @@ void start_avoid(void)
     HAL_GPIO_WritePin(US_SEND_GPIO_Port, US_SEND_Pin, GPIO_PIN_SET);
     delay_us(15);
     HAL_GPIO_WritePin(US_SEND_GPIO_Port, US_SEND_Pin, GPIO_PIN_RESET);
-    while(distance == 0);
+    while(distance == 0);//×èÈûÊ½
     return ;
 }

@@ -333,13 +333,14 @@ uint8_t atkpReadReg(enum regTable reg, int16_t *data)
   */
 void imu901_init(void)
 {
-    int16_t data;
+    ;
     /**
       *	 写入寄存器参数（测试）
       *	 这里提供写入引用例子，用户可以在这写入一些默认参数，
       *  如陀螺仪加速度量程、带宽、回传速率、PWM输出等。
       */
 #ifdef REG_Action
+    int16_t data;
     atkpWriteReg(REG_GYROFSR, 3, 1);
     atkpWriteReg(REG_ACCFSR, 1, 1);
     atkpWriteReg(REG_SAVE, 0, 1); 	/* 发送保存参数至模块内部Flash，否则模块掉电不保存 */
@@ -360,16 +361,20 @@ void imu901_init(void)
 }
 
 /***********************自行编写的函数*************************************/
+#include "imu_pid.h"
+
+#define ABS(X)  (((X) > 0)? (X) : -(X))
 
 ATK_IMU_t  imu =
-{   
-    ///移植时只需要修改以下结构体变量即可
-    .imu_uart = &huart6,//串口号
-    .yaw_ptr = &(attitude.yaw),//解析出来的原始数据
-    .target_angle = 0,//pid的目标角度
-    .init_angle = 0,//初始化角度，补偿上电时的初始角度
-    .switch_ = 1,//使能开关
-    .get_angle = Get_Yaw//函数指针，返回经过限幅和相对0的角度
+{
+    /*移植时只需要修改以下结构体变量即可*/
+    
+    .imu_uart = &huart6,             //串口号
+    .yaw_ptr = &(attitude.yaw),     //解析出来的原始数据的指针
+    .target_angle = 0,              //pid的目标角度
+    .init_angle = 0,                //初始化角度，补偿上电时的初始角度
+    .switch_ = 1,                   //使能开关
+    .get_angle = Get_Yaw             //函数指针，返回经过限幅和相对0的角度
 };
 
 #define ERROR_THRESHILD 0.1
@@ -391,7 +396,6 @@ uint8_t imu_cmd[12];
 void IMU_IRQ(void)
 {
 
-    uint8_t index = 0;//初始化下标
     for(uint8_t i = 0; i < BUFFER_SIZE; ++i)//开始遍历DMA接收到的数据
     {
         if(imu901_unpack(imu_cmd[i]))//接收完成
@@ -414,39 +418,44 @@ void IMU_IRQ(void)
 void ATK_IMU_Init(void)
 {
     HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE);//开启DMA
-    Get_InitYaw();//获取初始化角度，用于补偿上电时的角度
+    Set_InitYaw(0);//获取初始化角度，用于补偿上电时的角度,并设置当前角度为0度
 }
 
 
+
+
 /**********************************************************************
-  * @Name    Get_InitYaw
-  * @declaration : 获取补偿角，补偿每次复位后的陀螺仪角度，将其修正为0
-  * @param   None
-  * @retval   : 无
+  * @Name    Set_InitYaw
+  * @declaration : 设置当前角度为xx度
+  * @param   target: [输入/出]  想设置的角度值
+  * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
-
-void Get_InitYaw(void)
+void Set_InitYaw(int target)
 {
-     float last_yaw, current_yaw;
+    imu.switch_ = 0;//先把陀螺仪关掉，否则容易在修改过程中异常
+    
+    imu.target_angle = angle_limit(target);//同步修改
+    
+    float last_yaw, current_yaw;
     int init_times = 0;
+    
     current_yaw = last_yaw = * imu.yaw_ptr;//获取当前原生数据
     while(init_times < INIT_TIMES)//陀螺仪未达到稳定
     {
         if(fabs( current_yaw - last_yaw) < ERROR_THRESHILD)//偏移很小
             init_times ++;
-        else init_times = 0;//清0，重置
+        else init_times = 0;//飘了，清0，重置
         //更新数值
         last_yaw = current_yaw;
         current_yaw = * imu.yaw_ptr;
-        //10ms一次查询
+        //10ms一次查询,阻塞式
         HAL_Delay(10);
     }
     //陀螺仪稳定，开始获取数据
-    if(current_yaw > 180 ) current_yaw -= 360;
-    if(current_yaw < -180 ) current_yaw += 360;
-    //得到初始化的补偿角
-    imu.init_angle =  - current_yaw;
+    imu.init_angle = - angle_limit(current_yaw) + angle_limit(target);
+    //恢复陀螺仪的使能状态
+    imu.switch_ = 1;
 }
 
 
@@ -461,10 +470,27 @@ void Get_InitYaw(void)
 float Get_Yaw(void)
 {
     float  angle = *(imu.yaw_ptr) + imu.init_angle ;//获取当前原生数据加上补偿角
-    //限幅
-    while(angle > 180 ) angle -= 360;
-    while(angle <= -180) angle+= 360;
-    //返回角度值
+    return angle_limit(angle);
+}
+
+
+
+/**********************************************************************
+  * @Name    angle_limit
+  * @declaration :
+  * @param   angle: [输入/出]
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+
+float  angle_limit(float  angle)
+{
+    //把传进来的角度限制在正负180范围
+limit_label:
+    while(angle > 180) angle -= 360;
+    while(angle <= -180) angle += 360;
+    if(ABS(angle) > 180) goto limit_label;//意义不大，但是避免出错
     return angle;
 }
+
 /*******************************END OF FILE************************************/

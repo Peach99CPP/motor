@@ -131,22 +131,3 @@ void U1_IRQHandler(void)
 }
 
 
-/**********************************************************************
-  * @Name    uart1_decode
-  * @功能说明 对串口 1收到的数据进行解码
-  * @param   None
-  * @返回值  void
-  * @author  peach99CPP
-  * @debug  abandoned use usmart
-***********************************************************************/
-
-//void uart1_decode(void)
-//{
-//    // change th value of motor_pid_param
-//    set_motor_pid(uart1_rxbuffer[0] + uart1_rxbuffer[1], \
-//                  uart1_rxbuffer[2], \
-//                  uart1_rxbuffer[3]);
-//    rec_flag = 0;//clear rec flag to enable rec data handle
-//    memset(uart1_rxbuffer, 0, rec_count * sizeof(rec_count)); // claer the buffer
-//    printf("setting param completed\r\n");
-//}

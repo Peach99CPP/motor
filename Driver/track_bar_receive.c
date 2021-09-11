@@ -100,14 +100,14 @@ void track_decode(void)
         case 1:
             y_bar.data.feedback = track_value;
             y_bar.num = led_num;
-            if(edge_status[0] && y_bar.num >= 5 )
+            if(edge_status[0] && y_bar.num >= 3 )
                 y_bar.data.feedback = 0;
-            if(y_bar.num  >= NUM_THRESHOLD || (edge_status[0] && y_bar.num >= 5 ))
+            if(y_bar.num  >= NUM_THRESHOLD || (edge_status[0] && y_bar.num >= 3 ))
             {
                 y_time = TIME_ISR_CNT;
                 y_bar.line_flag  = 1;
             }
-            if(y_bar.line_flag && y_bar.num <= MIN_NUM && (TIME_ISR_CNT - y_time) > LINE_DELAY )
+            if(y_bar.line_flag && y_bar.num <= MIN_NUM )
             {
                 y_time = TIME_ISR_CNT;
                 y_bar.line_flag = 0;

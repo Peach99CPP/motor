@@ -6,10 +6,11 @@ attitude_t		attitude;		/*!< 姿态角 */
 quaternion_t	quaternion;
 gyroAcc_t 		gyroAccData;
 ioStatus_t		iostatus;
+
 #ifdef IMU901
 mag_t			magData;
 baro_t			baroData;
-#endif 
+#endif
 
 /* 模块寄存器参数值 */
 regValue_t  	imu901Param;
@@ -53,81 +54,81 @@ uint8_t imu901_unpack(uint8_t ch)
 
     switch (rxState)
     {
-        case waitForStartByte1:
-            if (ch == UP_BYTE1)
-            {
-                rxState = waitForStartByte2;
-                rxPacket.startByte1 = ch;
-            }
+    case waitForStartByte1:
+        if (ch == UP_BYTE1)
+        {
+            rxState = waitForStartByte2;
+            rxPacket.startByte1 = ch;
+        }
 
-            cksum = ch;
-            break;
+        cksum = ch;
+        break;
 
-        case waitForStartByte2:
-            if (ch == UP_BYTE2 || ch == UP_BYTE2_ACK)
-            {
-                rxState = waitForMsgID;
-                rxPacket.startByte2 = ch;
-            }
-            else
-            {
-                rxState = waitForStartByte1;
-            }
-
-            cksum += ch;
-            break;
-
-        case waitForMsgID:
-            rxPacket.msgID = ch;
-            rxState = waitForDataLength;
-            cksum += ch;
-            break;
-
-        case waitForDataLength:
-            if (ch <= ATKP_MAX_DATA_SIZE)
-            {
-                rxPacket.dataLen = ch;
-                dataIndex = 0;
-                rxState = (ch > 0) ? waitForData : waitForChksum1;	/*ch=0,数据长度为0，校验1*/
-                cksum += ch;
-            }
-            else
-            {
-                rxState = waitForStartByte1;
-            }
-
-            break;
-
-        case waitForData:
-            rxPacket.data[dataIndex] = ch;
-            dataIndex++;
-            cksum += ch;
-
-            if (dataIndex == rxPacket.dataLen)
-            {
-                rxState = waitForChksum1;
-            }
-
-            break;
-
-        case waitForChksum1:
-            if (cksum == ch)	/*!< 校准正确返回1 */
-            {
-                rxPacket.checkSum = cksum;
-
-                return 1;
-            }
-            else	/*!< 校验错误 */
-            {
-                rxState = waitForStartByte1;
-            }
-
+    case waitForStartByte2:
+        if (ch == UP_BYTE2 || ch == UP_BYTE2_ACK)
+        {
+            rxState = waitForMsgID;
+            rxPacket.startByte2 = ch;
+        }
+        else
+        {
             rxState = waitForStartByte1;
-            break;
+        }
 
-        default:
+        cksum += ch;
+        break;
+
+    case waitForMsgID:
+        rxPacket.msgID = ch;
+        rxState = waitForDataLength;
+        cksum += ch;
+        break;
+
+    case waitForDataLength:
+        if (ch <= ATKP_MAX_DATA_SIZE)
+        {
+            rxPacket.dataLen = ch;
+            dataIndex = 0;
+            rxState = (ch > 0) ? waitForData : waitForChksum1;	/*ch=0,数据长度为0，校验1*/
+            cksum += ch;
+        }
+        else
+        {
             rxState = waitForStartByte1;
-            break;
+        }
+
+        break;
+
+    case waitForData:
+        rxPacket.data[dataIndex] = ch;
+        dataIndex++;
+        cksum += ch;
+
+        if (dataIndex == rxPacket.dataLen)
+        {
+            rxState = waitForChksum1;
+        }
+
+        break;
+
+    case waitForChksum1:
+        if (cksum == ch)	/*!< 校准正确返回1 */
+        {
+            rxPacket.checkSum = cksum;
+
+            return 1;
+        }
+        else	/*!< 校验错误 */
+        {
+            rxState = waitForStartByte1;
+        }
+
+        rxState = waitForStartByte1;
+        break;
+
+    default:
+        rxState = waitForStartByte1;
+        break;
     }
 
     return 0;
@@ -190,7 +191,7 @@ void atkpParsing(atkp_t *packet)
         gyroAccData.fgyroD[1] = (float)gyroAccData.gyro[1] / 32768 * gyroFsrTable[imu901Param.gyroFsr];
         gyroAccData.fgyroD[2] = (float)gyroAccData.gyro[2] / 32768 * gyroFsrTable[imu901Param.gyroFsr];
     }
-    #ifdef IMU901
+#ifdef IMU901
     /* 磁场数据 */
     else if (packet->msgID == UP_MAGDATA)
     {
@@ -214,7 +215,7 @@ void atkpParsing(atkp_t *packet)
         int16_t data = (int16_t) (packet->data[9] << 8) | packet->data[8];
         baroData.temp = (float) data / 100;
     }
-    #endif
+#endif
 
     /* 端口状态数据 */
     else if (packet->msgID == UP_D03DATA)
@@ -332,16 +333,17 @@ uint8_t atkpReadReg(enum regTable reg, int16_t *data)
   */
 void imu901_init(void)
 {
-    int16_t data;
+    ;
     /**
       *	 写入寄存器参数（测试）
       *	 这里提供写入引用例子，用户可以在这写入一些默认参数，
       *  如陀螺仪加速度量程、带宽、回传速率、PWM输出等。
       */
-    #ifdef REG_Action
+#ifdef REG_Action
+    int16_t data;
     atkpWriteReg(REG_GYROFSR, 3, 1);
     atkpWriteReg(REG_ACCFSR, 1, 1);
-	atkpWriteReg(REG_SAVE, 0, 1); 	/* 发送保存参数至模块内部Flash，否则模块掉电不保存 */
+    atkpWriteReg(REG_SAVE, 0, 1); 	/* 发送保存参数至模块内部Flash，否则模块掉电不保存 */
 
     /* 读出寄存器参数（测试） */
     atkpReadReg(REG_GYROFSR, &data);
@@ -355,59 +357,124 @@ void imu901_init(void)
 
     atkpReadReg(REG_ACCBW, &data);
     imu901Param.accBW = data;
-    #endif
+#endif
 }
 
 /***********************自行编写的函数*************************************/
-ATK_IMU_t  imu ={
-    .imu_uart = &huart6,
-    .yaw_ptr = &(attitude.yaw),
-    .init_angle=0,
-    .switch_ =1
+#include "imu_pid.h"
+#define ABS(X)  (((X) > 0)? (X) : -(X))
+
+ATK_IMU_t  imu =
+{   
+    ///移植时只需要修改以下结构体变量即可
+    .imu_uart = &huart6,//串口号
+    .yaw_ptr = &(attitude.yaw),//解析出来的原始数据
+    .target_angle = 0,//pid的目标角度
+    .init_angle = 0,//初始化角度，补偿上电时的初始角度
+    .switch_ = 1,//使能开关
+    .get_angle = Get_Yaw//函数指针，返回经过限幅和相对0的角度
 };
 
-extern osMessageQId IMU_QueueHandle;
-
-#define ERROR_THRESHILD 0.5
+#define ERROR_THRESHILD 0.1
 #define INIT_TIMES 100
 
 #define BUFFER_SIZE 11
 uint8_t imu_cmd[12];
+
+
+
+/**********************************************************************
+  * @Name    IMU_IRQ
+  * @declaration :陀螺仪的中断处理函数，处理DMA收到的数据
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+
 void IMU_IRQ(void)
 {
-    
-    uint8_t index=0;
-    for(uint8_t i=0;i<BUFFER_SIZE;++i)
+
+    for(uint8_t i = 0; i < BUFFER_SIZE; ++i)//开始遍历DMA接收到的数据
     {
-        if(imu901_unpack(imu_cmd[i]))
-             atkpParsing(&rxPacket);
+        if(imu901_unpack(imu_cmd[i]))//接收完成
+            atkpParsing(&rxPacket);//开始解码，得到姿态角
     }
-    
-    HAL_UART_Receive_DMA(imu.imu_uart,imu_cmd,BUFFER_SIZE);
-    
+
+    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE);//再次开启DMA
+
 }
+
+
+/**********************************************************************
+  * @Name    ATK_IMU_Init
+  * @declaration : 初始化陀螺仪，开启传输，获取补偿角
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+
 void ATK_IMU_Init(void)
 {
-        HAL_UART_Receive_DMA(imu.imu_uart,imu_cmd,BUFFER_SIZE);
-    float last_yaw,current_yaw;
-    int init_times=0;
-    current_yaw=last_yaw= * imu.yaw_ptr;
-    while(init_times <INIT_TIMES)
+    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE);//开启DMA
+    Set_InitYaw(0);//获取初始化角度，用于补偿上电时的角度,参数为想设定的初始角度
+}
+
+
+void Set_InitYaw(int target)
+{
+     imu.switch_ =0;
+     imu.target_angle = angle_limit(target);
+     float last_yaw, current_yaw;
+    int init_times = 0;
+    current_yaw = last_yaw = * imu.yaw_ptr;//获取当前原生数据
+    while(init_times < INIT_TIMES)//陀螺仪未达到稳定
     {
-        if(fabs( current_yaw - last_yaw)<ERROR_THRESHILD)
+        if(fabs( current_yaw - last_yaw) < ERROR_THRESHILD)//偏移很小
             init_times ++;
-          else init_times =0;
+        else init_times = 0;//清0，重置
+        //更新数值
         last_yaw = current_yaw;
         current_yaw = * imu.yaw_ptr;
+        //10ms一次查询
         HAL_Delay(10);
     }
-    if(current_yaw > 180 ) current_yaw -=360;
-    if(current_yaw < -180 ) current_yaw+=360;
-    imu.init_angle =  - current_yaw;
+    //陀螺仪稳定，开始获取数据
+    imu.init_angle = angle_limit(current_yaw) + angle_limit(target);
 }
+
+
+/**********************************************************************
+  * @Name    Get_Yaw
+  * @declaration :获取经过限幅的相对于上电位置的Yaw角
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
 
 float Get_Yaw(void)
 {
-    return *(imu.yaw_ptr)+imu.init_angle ;
+    float  angle = *(imu.yaw_ptr) + imu.init_angle ;//获取当前原生数据加上补偿角
+    return angle_limit(angle);
 }
+
+
+
+/**********************************************************************
+  * @Name    angle_limit
+  * @declaration :
+  * @param   angle: [输入/出]
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+
+float  angle_limit(float  angle)
+{
+    //把传进来的角度限制在正负180范围
+limit_label:
+    while(angle > 180) angle -= 360;
+    while(angle <= -180) angle += 360;
+    if(ABS(angle) > 180) goto limit_label;//意义不大，但是避免出错
+    return angle;
+}
+
 /*******************************END OF FILE************************************/

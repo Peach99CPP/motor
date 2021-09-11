@@ -53,3 +53,8 @@ motor\atk_imu.o: ../Inc/usart.h
 motor\atk_imu.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 motor\atk_imu.o: ..\Driver\delay.h
 motor\atk_imu.o: ../Inc/tim.h
+motor\atk_imu.o: ..\Driver\imu_pid.h
+motor\atk_imu.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+motor\atk_imu.o: ..\Math\pid.h
+motor\atk_imu.o: ..\Driver\time_cnt.h
+motor\atk_imu.o: ..\Driver\time_cnt.h
