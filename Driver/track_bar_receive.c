@@ -91,42 +91,41 @@ void track_decode(void)
     {
         for(uint8_t i = 0; i < 8; ++i)
         {
-            temp_val = (bool)(((track_dma[pos][2] << i) & 0x80)) * track_weight[i];
-            if( temp_val != 0) led_num++;
+            temp_val = (bool)(((track_dma[pos][2] << i) & 0x80)) * track_weight[i];//根据灯亮与否及其权重得到反馈值
+            if( temp_val != 0) led_num++;//计算亮的灯数量
             track_value += temp_val;
         }
         switch (track_dma[pos][1])//判断寻迹板ID
         {
         case 1:
-            y_bar.data.feedback = track_value;
-            y_bar.num = led_num;
-            if(edge_status[0] && y_bar.num >= 3 )
+            y_bar.data.feedback = track_value;//赋值
+            y_bar.num = led_num;//得到灯的数量
+            if(edge_status[0] && y_bar.num >= 3 )//边缘数线的情况下，特殊处理
                 y_bar.data.feedback = 0;
             if(y_bar.num  >= NUM_THRESHOLD || (edge_status[0] && y_bar.num >= 3 ))
             {
-                y_time = TIME_ISR_CNT;
-                y_bar.line_flag  = 1;
+                y_bar.line_flag  = 1;//此时到线上
+                return;//节约时间，避免出错，直接返回
             }
             if(y_bar.line_flag && y_bar.num <= MIN_NUM )
             {
-                y_time = TIME_ISR_CNT;
-                y_bar.line_flag = 0;
-                y_bar.line_num ++;
+                //使用此机制为了避免因停留在线上而导致线的数量一直重复计数
+                y_bar.line_flag = 0;//数线完成
+                y_bar.line_num ++;//线数目加一
             }
             break;
         case 2:
             x_leftbar.data.feedback = track_value;
             x_leftbar.num = led_num;
-            if(edge_status[0] && x_leftbar.num >= 5)
+            if(edge_status[0] && x_leftbar.num >= 3)
                 x_leftbar.data.feedback = 0;
-            if(x_leftbar.num >= NUM_THRESHOLD || (edge_status[0] && x_leftbar.num >= 5))
+            if(x_leftbar.num >= NUM_THRESHOLD || (edge_status[0] && x_leftbar.num >= 3))
             {
-                x_lefttime = TIME_ISR_CNT;
                 x_leftbar.line_flag  = 1; //标记到了线上
+                return;
             }
-            if(x_leftbar.line_flag && x_leftbar.num <= MIN_NUM && TIME_ISR_CNT - x_lefttime > LINE_DELAY ) //避免因为在线上停留而导致的重复计数问题
+            if(x_leftbar.line_flag && x_leftbar.num <= MIN_NUM ) //避免因为在线上停留而导致的重复计数问题
             {
-                x_lefttime = TIME_ISR_CNT;
                 x_leftbar.line_flag = 0;
                 x_leftbar.line_num ++;
             }
@@ -136,14 +135,12 @@ void track_decode(void)
             x_rightbar.num = led_num;
             if(edge_status[0] && x_rightbar.num >= 5 )
                 x_rightbar.data.feedback = 0;
-            if( x_rightbar.num >= NUM_THRESHOLD || (edge_status[0] && x_rightbar.num >= 5 ))
+            if( x_rightbar.num >= NUM_THRESHOLD || (edge_status[0] && x_rightbar.num >= 3 ))
             {
-                x_righttime = TIME_ISR_CNT;
                 x_rightbar.line_flag  = 1;
             }
-            if(x_rightbar.line_flag && x_rightbar.num <= MIN_NUM && TIME_ISR_CNT - x_righttime > LINE_DELAY )
+            if(x_rightbar.line_flag && x_rightbar.num <= MIN_NUM )
             {
-                x_righttime = TIME_ISR_CNT;
                 x_rightbar.line_flag = 0;
                 x_rightbar.line_num ++;
             }
@@ -167,7 +164,7 @@ void track_IT_handle(void)
     //否则就在原缓冲区继续接收
     else 
     {
-        memset(memset(track_dma,0,sizeof(track_dma)),0,sizeof(memset(track_dma,0,sizeof(track_dma))));
+        memset(memset(track_dma,0,sizeof(track_dma)),0,sizeof(memset(track_dma,0,sizeof(track_dma))));//清空掉，作用不大，习惯为止
         HAL_UART_Receive_DMA(&TRACK_UART, (uint8_t*)track_dma[dma_trans_pos], BUFF_SIZE);
         
     }
@@ -181,7 +178,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
     else if(huart ==  imu.imu_uart) 
     {
-        IMU_IRQ();
+        IMU_IRQ();//陀螺仪的解析函数
     }
     
 }
@@ -195,9 +192,9 @@ float track_pid_cal(trackbar_t * bar)
 }
 void track_status(int id, int status)
 {
-    if(id == 1 )
+    if(id == 1 ) //y方向
         y_bar.if_switch = status;
-    else if(id == 2)
+    else if(id == 2)//x方向
     {
         x_leftbar.if_switch = status;
         x_rightbar.if_switch = status;

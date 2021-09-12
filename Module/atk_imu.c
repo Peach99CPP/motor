@@ -368,7 +368,7 @@ void imu901_init(void)
 ATK_IMU_t  imu =
 {
     /*移植时只需要修改以下结构体变量即可*/
-    
+
     .imu_uart = &huart6,             //串口号
     .yaw_ptr = &(attitude.yaw),     //解析出来的原始数据的指针
     .target_angle = 0,              //pid的目标角度
@@ -434,12 +434,12 @@ void ATK_IMU_Init(void)
 void Set_InitYaw(int target)
 {
     imu.switch_ = 0;//先把陀螺仪关掉，否则容易在修改过程中异常
-    
+
     imu.target_angle = angle_limit(target);//同步修改
-    
+
     float last_yaw, current_yaw;
     int init_times = 0;
-    
+
     current_yaw = last_yaw = * imu.yaw_ptr;//获取当前原生数据
     while(init_times < INIT_TIMES)//陀螺仪未达到稳定
     {
@@ -453,7 +453,7 @@ void Set_InitYaw(int target)
         HAL_Delay(10);
     }
     //陀螺仪稳定，开始获取数据
-    imu.init_angle = - angle_limit(current_yaw) + angle_limit(target);
+    imu.init_angle = angle_limit(- angle_limit(current_yaw) + angle_limit(target));
     //恢复陀螺仪的使能状态
     imu.switch_ = 1;
 }
@@ -492,5 +492,4 @@ limit_label:
     if(ABS(angle) > 180) goto limit_label;//意义不大，但是避免出错
     return angle;
 }
-
 /*******************************END OF FILE************************************/

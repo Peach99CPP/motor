@@ -25,13 +25,20 @@ typedef enum
     hor = 0, //horizontal
     ver //vertically
 } direct_t;
+
 #include "tim_control.h"
+
 void edge_move(int direct, int line_num);
 void move_by_encoder(int direct, int val);
 void move_slantly(int dir,int speed,uint16_t delay);
 void direct_move(int direct, int line_num,int edge_if);
 void car_shaking(int direct);
+
+int get_count_line_status(void);
+int get_enocdermove_status(void);
+
 extern int edge_status[3];
+
 #endif
 
 

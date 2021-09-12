@@ -55,6 +55,7 @@ osThreadId track_taskHandle;
 osThreadId usmart_taskHandle;
 osThreadId avoid_obsHandle;
 
+
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
@@ -66,6 +67,7 @@ void chassis_task(void const * argument);
 void track_scan(void const * argument);
 void usmartscan(void const * argument);
 void avoid_task(void const * argument);
+void Read_Swicth(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -135,6 +137,8 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of avoid_obs */
   osThreadDef(avoid_obs, avoid_task, osPriorityBelowNormal, 0, 128);
   avoid_obsHandle = osThreadCreate(osThread(avoid_obs), NULL);
+
+
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -248,6 +252,24 @@ __weak void avoid_task(void const * argument)
     osDelay(1);
   }
   /* USER CODE END avoid_task */
+}
+
+/* USER CODE BEGIN Header_Read_Swicth */
+/**
+* @brief Function implementing the Read_Swicth_tas thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Read_Swicth */
+__weak void Read_Swicth(void const * argument)
+{
+  /* USER CODE BEGIN Read_Swicth */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Read_Swicth */
 }
 
 /* Private application code --------------------------------------------------*/

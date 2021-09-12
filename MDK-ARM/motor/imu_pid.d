@@ -56,3 +56,5 @@ motor\imu_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\imu_pid.o: ..\Module\atk_imu.h
 motor\imu_pid.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 motor\imu_pid.o: ../Inc/usart.h
+motor\imu_pid.o: ..\Driver\track_bar_receive.h 
+motor\imu_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

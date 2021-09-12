@@ -27,6 +27,7 @@
 "motor\chassis_task.o"
 "motor\track_task.o"
 "motor\avoid_obs_func.o"
+"motor\read_status_task.o"
 "motor\filter.o"
 "motor\pid.o"
 "motor\usmart_config.o"

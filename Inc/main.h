@@ -71,6 +71,22 @@ void Error_Handler(void);
 #define US_RECEIVE_Pin GPIO_PIN_13
 #define US_RECEIVE_GPIO_Port GPIOB
 #define US_RECEIVE_EXTI_IRQn EXTI15_10_IRQn
+#define SW_1_Pin GPIO_PIN_14
+#define SW_1_GPIO_Port GPIOB
+#define SW_2_Pin GPIO_PIN_15
+#define SW_2_GPIO_Port GPIOB
+#define SW_3_Pin GPIO_PIN_10
+#define SW_3_GPIO_Port GPIOD
+#define SW_4_Pin GPIO_PIN_14
+#define SW_4_GPIO_Port GPIOD
+#define SW_5_Pin GPIO_PIN_15
+#define SW_5_GPIO_Port GPIOD
+#define SW_6_Pin GPIO_PIN_8
+#define SW_6_GPIO_Port GPIOC
+#define SW_7_Pin GPIO_PIN_9
+#define SW_7_GPIO_Port GPIOC
+#define SW_8_Pin GPIO_PIN_8
+#define SW_8_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

@@ -39,6 +39,7 @@ void turn_angle(int mode ,int angle);
 void set_imu_angle(int angle);
 void set_imu_param(int p,int i,int d);
 void set_imu_status(int status);
+int get_turn_status(void);
 #endif
 
 

@@ -206,23 +206,23 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void USER_Init(void)
 {
-    track_bar_init();
+    track_bar_init();//循迹版的使能
+    //开启外设用到的串口，后续移入到对应的函数
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
     __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
     __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
-    Get_Time_Init();
-        ATK_IMU_Init();
-    delay_init(&htim6, up_count);
-    usmart_dev.init(216);
-    Motor_PID_Init();
+    Get_Time_Init();//系统时间
+    ATK_IMU_Init();//陀螺仪初始化
+    delay_init(&htim6, up_count);//使能delay
+    usmart_dev.init(216);//开启USMART
+    Motor_PID_Init();//赋值电机PID
     set_chassis_status(1);//底盘使能
-    motor_init();
+    motor_init();//电机变量的赋值
+    //队列初始化
     printf_init();
+    //关闭循迹版
     track_status(1, 0);
     track_status(2, 0);
-    /*****一写外部模块的初始化***/
-    /*   track_status(1,0); 调试电机需要关闭循迹时才使用这个
-    track_status(2,0);*/
 }
 /* USER CODE END 4 */
 

@@ -2,7 +2,9 @@
 #include "motor.h"
 #define TIME_PARAM 10
 #define CHASSIS_RADIUS 1.0
-#define MAX_SPEED 350.0
+#define MAX_CHASSIS_SPEED 500
+#define MAX_SPEED 370.0
+#define MAX_CONTROL_VAL 9500
 #include "track_bar_receive.h"
 #include "imu_pid.h"
 
@@ -184,6 +186,8 @@ void chassis_synthetic_control(void)
         motor_data[i].expect = motor_target[i];
         motor_data[i].feedback = read_encoder(i);
         control_val[i] =  pid_control(&motor_data[i], &motor_param);
+        if(control_val[i]> MAX_CONTROL_VAL )  control_val[i] = MAX_CONTROL_VAL;
+        if(control_val[i]<- MAX_CONTROL_VAL )  control_val[i] = - MAX_CONTROL_VAL;
         set_motor(i, control_val[i]);
 
 

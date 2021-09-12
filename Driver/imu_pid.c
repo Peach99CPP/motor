@@ -1,15 +1,16 @@
 /* ************************************************************
-  *    
-  * FileName   : imu_pid.c   
-  * Version    : v1.0		
-  * Author     : peach99CPP		
-  * Date       : 2021-09-11         
+  *
+  * FileName   : imu_pid.c
+  * Version    : v1.0
+  * Author     : peach99CPP
+  * Date       : 2021-09-11
   * Description:  陀螺仪应用API
   ******************************************************************************
  */
 
 #include "imu_pid.h"
 #include "atk_imu.h"
+#include "track_bar_receive.h "
 
 #define ABS(X)  (((X) > 0)? (X) : -(X))
 
@@ -25,7 +26,7 @@ pid_paramer_t imu_para =
 
 extern ATK_IMU_t  imu;
 static float delta;
-
+static int if_completed;
 
 
 
@@ -40,6 +41,10 @@ static float delta;
 float imu_correct_val(void)
 {
     static float now_angle;//过程变量，为避免重复声明，使用静态变量
+    //判断此时转弯的状态
+    if(fabs(imu.get_angle() - imu.target_angle) < 2.0) if_completed = 1;
+    else if_completed = 1 ;
+
     if(! imu.switch_ ) return 0; //未使能则直接返回0，不做修改
     else
     {
@@ -61,7 +66,7 @@ float imu_correct_val(void)
 /**********************************************************************
   * @Name    set_imu_angle
   * @declaration :
-  * @param   angle: [输入/出] 
+  * @param   angle: [输入/出]
   * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
@@ -76,9 +81,9 @@ void set_imu_angle(int  angle)
 /**********************************************************************
   * @Name    set_imu_param
   * @declaration :
-  * @param   p: [输入/出] 
-**			 i: [输入/出] 
-**			 d: [输入/出] 
+  * @param   p: [输入/出]
+**			 i: [输入/出]
+**			 d: [输入/出]
   * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
@@ -93,7 +98,7 @@ void set_imu_param(int p, int i, int d)
 /**********************************************************************
   * @Name    set_imu_status
   * @declaration :
-  * @param   status: [输入/出] 
+  * @param   status: [输入/出]
   * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
@@ -116,7 +121,7 @@ void set_imu_status(int status)
   * @retval   : 无
   * @author  peach99CPP
 ***********************************************************************/
-void turn_angle(int mode ,int angle)
+void turn_angle(int mode, int angle)
 {
     if(imu.switch_)
     {
@@ -124,10 +129,23 @@ void turn_angle(int mode ,int angle)
         angle = angle_limit(angle);
         //相对角度模式
         if(mode == relative)
-            imu.target_angle = angle_limit(imu.get_angle()+ angle);
+            imu.target_angle = angle_limit(imu.get_angle() + angle);
         //绝对角度模式
         else if( mode == absolute )
-            imu.target_angle = angle; 
-    }        
-    
+            imu.target_angle = angle;
+        while(!get_turn_status()) osDelay(10);
+        x_leftbar.if_switch  = true;
+        x_rightbar.if_switch = true;
+        y_bar.if_switch = true;
+        osDelay(2000);
+        x_leftbar.if_switch  = false;
+        x_rightbar.if_switch = false;
+        y_bar.if_switch = false;
+
+    }
+
+}
+int get_turn_status(void)
+{
+    return if_completed;
 }
