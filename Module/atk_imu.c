@@ -387,7 +387,7 @@ uint8_t imu_cmd[12];
 
 /**********************************************************************
   * @Name    IMU_IRQ
-  * @declaration :陀螺仪的中断处理函数，处理DMA收到的数据
+  * @declaration :陀螺仪的中断处理函数，处理DMA收到的数据,在DMA 开启的情况下，放在HAL_UART_RxCpltCallback中
   * @param   None
   * @retval   : 无
   * @author  peach99CPP

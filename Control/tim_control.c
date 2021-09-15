@@ -37,11 +37,17 @@ void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         //用于计算脉宽，处理捕获中途发生定时器更新事件的情况
         if(++update_count[1] >= 3) //当更新中断事件发生太多，说明此时的电机处于不转的状态，故电机转速置0
         {
+            cap_cnt[2] = 0;
+            cap_temp_val[2] = 0 ;
+            status_flag[1] = 0;
             update_count[1] = 0;
             encoder_val[1] = 0;
         }
         if(++update_count[2] >= 3)
         {
+            cap_cnt[3] = 0;
+            cap_temp_val[3] = 0 ;
+            status_flag[2] = 0;
             update_count[2] = 0;
             encoder_val[2] = 0;
         }
@@ -50,11 +56,17 @@ void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
         if(++update_count[3] >= 3)
         {
+            cap_cnt[3] = 0;
+            cap_temp_val[3] = 0 ;
+            status_flag[3] = 0;
             update_count[3] = 0;
             encoder_val[3] = 0;
         }
         if(++update_count[4] >= 3)
         {
+            cap_cnt[4] = 0;
+            cap_temp_val[4] = 0 ;
+            status_flag[4] = 0;
             update_count[4] = 0;
             encoder_val[4] = 0;
         }
@@ -202,7 +214,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             {
                 direct_[3] = BACKWARD;
             }
-//            __HAL_TIM_ENABLE_IT(motor3.IC.Tim, TIM_IT_UPDATE);
             __HAL_TIM_SET_CAPTUREPOLARITY(motor3.IC.Tim, motor3.IC.Channel, TIM_ICPOLARITY_FALLING);
         }
         else
@@ -289,6 +300,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     count_++;
     if(count_ == 400)
     {
+        temp_sum = 0;
         count_ = 0;
         for(uint8_t t = 1; t <= 4; ++t)
         {

@@ -10,14 +10,13 @@ pid_paramer_t motor_param;
 
 float param_[5] = {1500, \
                    9500,
-                   100, \
-                   15, \
-                   0
+                   130, \
+                   10, \
+                   10
                   };
 
 
 motor_t motor1, motor2, motor3, motor4;
-
 
 /**********************************************************************
   * @Name    motor_init
@@ -185,9 +184,9 @@ void set_motor(int motor_id, int control_val)
 
     ChannelA_ptr = get_motor_channelA_ptr(motor_id);
     ChannelB_ptr = get_motor_channelB_ptr(motor_id);
-    if(ChannelA_ptr != NULL && ChannelB_ptr != NULL)
-{
-    if(pos_flag)
+    if(ChannelA_ptr != NULL && ChannelB_ptr != NULL)//±‹√‚÷∏’Î¥ÌŒÛ≤Ÿ◊˜
+    {
+        if(pos_flag)
         {
             *ChannelA_ptr = control_val;
             *ChannelB_ptr = 0;
@@ -437,22 +436,6 @@ void show_speed(void)
 }
 
 
-/**********************************************************************
-  * @Name    clear_all_speed
-  * @declaration : clear all motor id
-  * @param   None
-  * @retval   : void
-  * @author  peach99CPP
-***********************************************************************/
-
-void clear_all_speed(void)
-{
-    for(uint8_t i = 1; i <= 4; i++)
-    {
-        encoder_val[i] = 0;
-    }
-}
-
 
 /**********************************************************************
   * @Name    set_debug_motor
@@ -465,6 +448,7 @@ void clear_all_speed(void)
 
 void set_debug_motor(int status, int motor_id)
 {
+   
     switch_status = status;
     debug_motor_id = motor_id;
 }
@@ -480,15 +464,10 @@ void set_debug_motor(int status, int motor_id)
 
 void motor_debug(void)
 {
-//    if(debug_motor_id == 0 || !switch_status ) return ;
-//    motor_target[debug_motor_id] =  debug_speed;
-//    osDelay(3000);
-//    motor_target[debug_motor_id] =  0;
-//    osDelay(3000);
     set_speed(0, debug_speed, 0);
     osDelay(1000);
     set_speed(0, 0, 0);
-    osDelay(3000);
+    osDelay(1000);
 }
 
 
@@ -503,32 +482,31 @@ void motor_debug(void)
 
 void set_debug_speed(int speed)
 {
-//    if(debug_motor_id == 0 || !switch_status )
-//    {
-//        printf("run set_debug_motor firstly\r\n");
-//        return ;
-////    }
-//    debug_speed = speed;
+    chassis._switch  = true;
     debug_speed = speed;
 }
 
 
 /**********************************************************************
-  * @Name    clear_pid_param
+  * @Name    clear_motor_data
   * @declaration : clear pid output for increment pid
   * @param   None
   * @retval   :void
   * @author  peach99CPP
 ***********************************************************************/
 
-void clear_pid_param(void)
+void clear_motor_data(void)
 {
     for(uint8_t i = 1; i <= 4; ++i)
     {
-        motor_data[i].last2_err = 0;
-        motor_data[i].last_err = 0;
-        motor_data[i].err = 0;
-        motor_data[i].control_output = 0;
+        pid_clear(&motor_data[i]);
+        encoder_val[i] = 0;
+        set_motor(i,0);
     }
+     __HAL_TIM_SET_CAPTUREPOLARITY(motor1.IC.Tim, motor1.IC.Channel, TIM_ICPOLARITY_RISING);
+    __HAL_TIM_SET_CAPTUREPOLARITY(motor2.IC.Tim, motor2.IC.Channel, TIM_ICPOLARITY_RISING);
+    __HAL_TIM_SET_CAPTUREPOLARITY(motor3.IC.Tim, motor3.IC.Channel, TIM_ICPOLARITY_RISING);
+    __HAL_TIM_SET_CAPTUREPOLARITY(motor4.IC.Tim, motor4.IC.Channel, TIM_ICPOLARITY_RISING);
+    encoder_sum = 0;
 
 }

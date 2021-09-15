@@ -1,27 +1,29 @@
-﻿
+
 #include "chassis.h"
 #include "cmsis_os.h"
 #include "chassis_control.h"
 #include "time_cnt.h"
 #include "track_bar_receive.h"
 #include "imu_pid.h"
-
+#include "motor.h"
 uint32_t time;
 
-#define LINE_FACTOR 170
-#define ENCODER_FACTOR 2
-#define ENCODE_THRESHOLD 20
+#define LINE_FACTOR 200
 
-#define MAX_SPEED 600
-#define MIN_SPEED 100
+#define MAX_SPEED 500
+#define MIN_SPEED 150
 #define LINE_ERROR_ENCODER 150
 
-static int dir, lines;
-static int count_line_status, encodermove_status;
+static int dir, lines, en_dir, en_val;
+static int count_line_status = 1, encodermove_status = 1;
 int edge_status[3] = {0};
+double bias = 0, variation;//变量声明
 
 osThreadId Line_Handle = NULL; //声明数线的任务句柄
 void LineTask(void const * argument); //声明对应的变量
+
+osThreadId Encoder_Handle = NULL; //声明数线的任务句柄
+void EncoderTask(void const * argument);
 
 /**********************************************************************
   * @Name    move_slantly
@@ -70,23 +72,36 @@ void move_slantly(int dir, int speed, uint16_t delay)
 
 void direct_move(int direct, int line_num, int edge_if)
 {
-    //使用任务创建的形式执行该函数
-    if(direct == 1)
+    static int delay_time;
+    if(count_line_status)//确保上一个任务完成的情况下，再执行下一个任务
     {
-        if(edge_if) edge_status[1] = edge_status[2] = 1;
-        else        edge_status[1] = edge_status[2] = 0;
-    }
-    else if(direct == 2)
-    {
-        if(edge_if) edge_status[0] = 1;
-        else     edge_status[0] = 0;
-    }
-    count_line_status = 0; //外部获知任务完成与否的依据
+        START_TASK:
+        //使用任务创建的形式执行该函数
+        if(direct == 1)
+        {
+            if(edge_if) edge_status[1] = edge_status[2] = 1;
+            else        edge_status[1] = edge_status[2] = 0;
+        }
+        else if(direct == 2)
+        {
+            if(edge_if) edge_status[0] = 1;
+            else     edge_status[0] = 0;
+        }
+        count_line_status = 0; //外部获知任务完成与否的依据
 
-    dir = direct;
-    lines = line_num;
-    osThreadDef(line_task, LineTask, osPriorityRealtime, 0, 128);
-    Line_Handle = osThreadCreate(osThread(line_task), NULL);
+        dir = direct;
+        lines = line_num;
+        osThreadDef(line_task, LineTask, osPriorityRealtime, 0, 128);
+        Line_Handle = osThreadCreate(osThread(line_task), NULL);
+    }
+    else 
+    {
+        delay_time = 0;
+       while(!count_line_status) { delay_time++;osDelay(100);
+       if(delay_time >20 ) return;
+       }
+       goto START_TASK;
+    }
 }
 void LineTask(void const * argument)
 {
@@ -190,81 +205,103 @@ EXIT_TASK:
   * @返回值
   * @author  peach99CPP
 ***********************************************************************/
-
+/*9.14修改记录，将函数运行方式改为进程模式，尝试解决相同移动数值的问题*/
 void move_by_encoder(int  direct, int val)
+
 {
+    if(encodermove_status)//上一个任务运行结束，才可以开始运行下一个任务，避免出错
+    {
+        en_dir = direct;//将参数传递给全局变量值
+        en_val = val;
+
+        encoder_sum = 0;//将编码器累加值置0
+        //开启任务
+        osThreadDef(encodermove, EncoderTask, osPriorityRealtime, 0, 128);//任务优先级给到最高，确保及时响应
+        Encoder_Handle = osThreadCreate(osThread(encodermove), NULL);
+        //任务结束标志
+        encodermove_status = 0;
+    }
+
+}
+void EncoderTask(void const * argument)
+{
+#define  ENOCDER_DIVIDE_FACTOR 100
+#define ENCODE_THRESHOLD 2
+#define ENCODER_FACTOR 15
+    clear_motor_data();
     time = TIME_ISR_CNT;//获取系统时间
-    double bias = 0, variation;//变量声明
-    encoder_sum = 0;//将编码器累加值置0
-    encodermove_status = 0;
-    if(direct == 1)
+    if(en_dir == 1)
     {
         y_bar.if_switch  = false;//关闭一侧的寻迹板
         x_leftbar.if_switch  = true;
         x_rightbar.if_switch = true;
 
-        if(val < 0)//向左
+        if(en_val < 0)//向左
         {
-            while(ABS(val) > (encoder_sum / 1000))//未到达目标，除以1000是因为原生值过大
+            while(1)//未到达目标
             {
-                if( (TIME_ISR_CNT - time > 50) && ABS((val - (encoder_sum / 1000)) < ENCODE_THRESHOLD))goto EXIT_FUNC;//超时处理，避免卡死
-                bias =  -(ABS(val) - (encoder_sum / 1000));//得到差值
+                if( (TIME_ISR_CNT - time > 50) && ABS((en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)) < ENCODE_THRESHOLD))goto Encoder_Exit;//超时处理，避免卡死
+                bias =  -(ABS(en_val) - (encoder_sum / ENOCDER_DIVIDE_FACTOR));//得到差值
                 variation = bias * ENCODER_FACTOR;//计算得出输出值。P环
                 variation = variation < - MAX_SPEED ? -MAX_SPEED : variation;//限幅
+                variation = variation < MIN_SPEED ? MIN_SPEED : variation;//分配最低速度，避免卡死
                 set_speed(variation, 0, 0);//分配速度
-                osDelay(1);//给任务调度内核切换的机会
+
+                osDelay(5);//给任务调度内核切换的机会
             }
         }
         else
         {
-            val *= -1;
-            while(val > (encoder_sum / 1000))
+            en_val *= -1;
+            while(1)
             {
-                if( (TIME_ISR_CNT - time > 50) && (val - (encoder_sum / 1000) < ENCODE_THRESHOLD))goto EXIT_FUNC;
-                bias = ABS(val - (encoder_sum / 1000));
+                if( (TIME_ISR_CNT - time > 50) && ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR) < ENCODE_THRESHOLD)) goto Encoder_Exit;
+                bias = ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR));
                 variation = bias * ENCODER_FACTOR;
                 variation = variation > MAX_SPEED ? MAX_SPEED : variation;
+                variation = variation < MIN_SPEED ? MIN_SPEED : variation;
                 set_speed(-variation, 0, 0);
-                osDelay(1);
-
+                osDelay(5);
             }
         }
     }
-    else if(direct == 2)
+    else if(en_dir == 2)
     {
         static int pn;
         y_bar.if_switch  = true;//关闭单侧的寻迹板
         x_leftbar.if_switch  = false;
         x_rightbar.if_switch = false;
-        if(val < 0)
+        if(en_val < 0)
         {
             pn = -1; //标记其为负数
-            val *= -1; //绝对值化
+            en_val *= -1; //绝对值化
         }
-        else val = 1;
-        while(val > (encoder_sum / 1000))//同上
+        else pn = 1;
+        while(1)//同上
         {
-            if( (TIME_ISR_CNT - time > 50) && (val - (encoder_sum / 1000) < ENCODE_THRESHOLD))
-                goto EXIT_FUNC;
-            bias = fabs(ABS(val) - (encoder_sum / 1000));
+            if( (TIME_ISR_CNT - time > 50) && ABS((en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR) < ENCODE_THRESHOLD)))
+                goto Encoder_Exit;
+            bias = fabs(ABS(en_val) - (encoder_sum / ENOCDER_DIVIDE_FACTOR));
             variation = bias * ENCODER_FACTOR;
             variation = variation > MAX_SPEED ? MAX_SPEED : variation;
+            variation = variation < MIN_SPEED ? MIN_SPEED : variation;
             set_speed(0, variation * pn, 0);
-            osDelay(1);
+            osDelay(5);
 
         }
     }
-EXIT_FUNC:
+Encoder_Exit:
     set_speed(0, 0, 0);//停车
     encodermove_status = 1; //标记结束了
+    vTaskDelete(Encoder_Handle);//从任务列表中将其移出
+    Encoder_Handle = NULL;//将指针指向空
 }
-
 
 
 /**********************************************************************
   * @Name    car_shaking
-  * @declaration :
-  * @param   direct: [输入/出]
+  * @declaration : 一个试验性的测试功能，可能用于卸货时确保货物被甩下来
+  * @param   direct: [输入/出] 往哪一个方向进行摇摆
   * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
@@ -281,18 +318,24 @@ void car_shaking(int direct)
 }
 
 
-
 /**********************************************************************
   * @Name    get_count_line_status
-  * @declaration :
+  * @declaration : 外部获知数线运行的完成情况的接口
   * @param   None
-  * @retval   :
+  * @retval   : 是否运行完成
   * @author  peach99CPP
 ***********************************************************************/
 int get_count_line_status(void)
 {
     return count_line_status;
 }
+/**********************************************************************
+  * @Name    get_enocdermove_status
+  * @declaration : 外部获知靠编码器运行的完成情况的接口
+  * @param   None
+  * @retval   :  是否运行结束
+  * @author  peach99CPP
+***********************************************************************/
 int get_enocdermove_status(void)
 {
     return encodermove_status;
