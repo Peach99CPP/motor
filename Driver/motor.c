@@ -18,7 +18,6 @@ float param_[5] = {1500, \
 
 motor_t motor1, motor2, motor3, motor4;
 
-
 /**********************************************************************
   * @Name    motor_init
   * @功能说明 init for motor_t
@@ -437,22 +436,6 @@ void show_speed(void)
 }
 
 
-/**********************************************************************
-  * @Name    clear_all_speed
-  * @declaration : clear all motor id
-  * @param   None
-  * @retval   : void
-  * @author  peach99CPP
-***********************************************************************/
-
-void clear_all_speed(void)
-{
-    for(uint8_t i = 1; i <= 4; i++)
-    {
-        encoder_val[i] = 0;
-    }
-}
-
 
 /**********************************************************************
   * @Name    set_debug_motor
@@ -465,7 +448,7 @@ void clear_all_speed(void)
 
 void set_debug_motor(int status, int motor_id)
 {
-   
+
     switch_status = status;
     debug_motor_id = motor_id;
 }
@@ -505,20 +488,29 @@ void set_debug_speed(int speed)
 
 
 /**********************************************************************
-  * @Name    clear_pid_param
+  * @Name    clear_motor_data
   * @declaration : clear pid output for increment pid
   * @param   None
   * @retval   :void
   * @author  peach99CPP
 ***********************************************************************/
 
-void clear_pid_param(void)
+void clear_motor_data(void)
 {
+    //清除PID积分值,恢复捕获计数值
     for(uint8_t i = 1; i <= 4; ++i)
     {
-        motor_data[i].last_err = 0;
-        motor_data[i].err = 0;
-        motor_data[i].control_output = 0;
+        pid_clear(&motor_data[i]);
+        encoder_val[i] = 0;
+        set_motor(i, 0);
+        status_flag[i] = 0;
     }
+    //重新设置捕获上升沿
+    __HAL_TIM_SET_CAPTUREPOLARITY(motor1.IC.Tim, motor1.IC.Channel, TIM_ICPOLARITY_RISING);
+    __HAL_TIM_SET_CAPTUREPOLARITY(motor2.IC.Tim, motor2.IC.Channel, TIM_ICPOLARITY_RISING);
+    __HAL_TIM_SET_CAPTUREPOLARITY(motor3.IC.Tim, motor3.IC.Channel, TIM_ICPOLARITY_RISING);
+    __HAL_TIM_SET_CAPTUREPOLARITY(motor4.IC.Tim, motor4.IC.Channel, TIM_ICPOLARITY_RISING);
+    
+    encoder_sum = 0;
 
 }

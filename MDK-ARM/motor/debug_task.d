@@ -65,3 +65,5 @@ motor\debug_task.o: ..\Driver\delay.h
 motor\debug_task.o: ..\Control\chassis_control.h
 motor\debug_task.o: ..\Driver\imu_pid.h
 motor\debug_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+motor\debug_task.o: ..\TASK\read_status.h 
+motor\debug_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h

@@ -195,27 +195,37 @@
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>x_leftbar</ItemText>
+          <ItemText>times_counts</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>times_counts</ItemText>
+          <ItemText>y_bar.num</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>imu.init_angle</ItemText>
+          <ItemText>swicth_status</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>2</WinNumber>
-          <ItemText>edge_status[0]</ItemText>
+          <ItemText>bias</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>2</WinNumber>
-          <ItemText>y_bar.num</ItemText>
+          <ItemText>encoder_sum</ItemText>
+        </Ww>
+        <Ww>
+          <count>7</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>variation</ItemText>
+        </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>y_bar</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

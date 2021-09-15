@@ -48,13 +48,11 @@ float read_encoder(int motor_id);
 void set_motor(int motor_id, int control_val);
 void set_motor_pid(int kp, int ki, int kd);
 void set_motor_maxparam(int integrate_max, int control_output_limit);
-void pid_param_init(pid_paramer_t *controler, float params[]); //此函数后期移动回去pid.c中
 void set_debug_motor(int status, int motor_id);
 void motor_debug(void);
 void set_debug_speed(int speed);
 void show_speed(void);
-void clear_all_speed(void);
-void clear_pid_param(void);
+void clear_motor_data(void);
 
 extern int debug_motor_id, switch_status, debug_speed ;
 extern pid_data_t motor_data[5];

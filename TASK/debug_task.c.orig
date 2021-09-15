@@ -4,12 +4,12 @@
 #include "chassis.h"
 #include "chassis_control.h"
 #include "motor.h"
-#include "param_save.h"
+#include "imu_pid.h"
+#include "read_status.h "
 
 void Startdebug(void const * argument)
 {
-        imu_correct_init();
-    read_save_paramer();
+        Start_Read_Switch();
     while(1)
     {
 //        motor_debug();

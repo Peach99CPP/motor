@@ -73,8 +73,8 @@ void U1_IRQHandler(void)
         if(!(USART_RX_STA & 0x8000))//接收未完成
         {
 #ifdef USE_BLE
-            if(rec == 0x0a || rec == 0x21)
-                
+            if(rec == 0x0a || rec == 0x21)//兼容非电脑设备的串口发送 以！为结尾
+
             {
                 USART_RX_STA |= 0x8000;
                 return ;
@@ -121,12 +121,12 @@ void U1_IRQHandler(void)
             //无数据发送就关闭发送中断
             __HAL_UART_DISABLE_IT(&huart1, UART_IT_TXE);
     }
-    else if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE))
+    else if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE))//处理ORE错误导致卡死在中断里
     {
         uint8_t tmp;
-        __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_ORE);
         tmp = USART1->ISR;
-        tmp= USART1->RDR;
+        tmp = USART1->RDR;
+        __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_ORE);
     }
 }
 

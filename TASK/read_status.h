@@ -19,9 +19,9 @@
 #include "main.h"
 typedef enum
 {
-    off = 0,
+    off = 1,
     on
-} switch_status;
+} status_;
 
 int Get_Switch_Status(int id);
 void Start_Read_Switch(void);

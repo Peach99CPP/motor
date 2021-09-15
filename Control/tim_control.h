@@ -9,6 +9,7 @@
 #define ABS(x) ( (x)>0?(x):-(x) )
 void All_Tim_Init(void);
 extern double encoder_val[5], encoder_sum;
+extern short status_flag[5];
 void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 #endif
 

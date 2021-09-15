@@ -43,7 +43,7 @@ void Read_Swicth(void const * argument)
         else
             SWITCH(2) = off;
 
-        if(HAL_GPIO_ReadPin(SW_3_GPIO_Port, SW_4_Pin) == GPIO_PIN_SET)
+        if(HAL_GPIO_ReadPin(SW_3_GPIO_Port, SW_3_Pin) == GPIO_PIN_SET)
             SWITCH(3) = on;
         else
             SWITCH(3) = off;

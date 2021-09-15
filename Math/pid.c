@@ -80,3 +80,10 @@ float pos_pid_cal(pid_data_t *data, pid_paramer_t *para)
     }
     return data->control_output;
 }
+//清空PID输出值的API
+void pid_clear(pid_data_t *data)
+{
+    data->control_output = 0;
+    data->integrate = 0;
+    data->err = data->dis_err = data->last_err = 0;
+}
