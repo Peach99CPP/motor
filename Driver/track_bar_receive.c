@@ -93,6 +93,7 @@ void track_decode(void)
 #define NUM_THRESHOLD 6  //非边缘线计算下，判断到达线的数量
 #define MIN_NUM 3        //在压线之后，过线了才会计算一根线，根据灯的数量进行计数
 #define EDGE_VAL 7      //边缘数线状态下的循迹读回来的值
+    
     times_counts++;//总的处理次数，查看此 数据可以判断是否卡DMA
     dma_count--;//待处理数-1
     uint8_t pos = get_idle_pos();//获取可用index
@@ -149,13 +150,11 @@ void track_decode(void)
         case 3:
             x_rightbar.data.feedback = track_value;
             x_rightbar.num = led_num;
-            if(edge_status[2] && x_rightbar.num >= EDGE_THRESHOLD && ABS(x_rightbar.data.feedback) >= EDGE_VAL )
-                x_rightbar.data.feedback = 0;
             if( x_rightbar.num >= NUM_THRESHOLD || (edge_status[2] && x_rightbar.num >= EDGE_THRESHOLD && ABS(x_rightbar.data.feedback) >= EDGE_VAL ))
             {
                 x_rightbar.line_flag  = 1;
             }
-            if(edge_status[1] && x_rightbar.num >= EDGE_THRESHOLD && ABS(x_rightbar.data.feedback) >= EDGE_VAL)
+            if(edge_status[2] && x_rightbar.num >= EDGE_THRESHOLD && ABS(x_rightbar.data.feedback) >= EDGE_VAL)
                 x_leftbar.data.feedback = 0;
             if(x_rightbar.line_flag && x_rightbar.num <= MIN_NUM )
             {
