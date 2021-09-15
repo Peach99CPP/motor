@@ -31,7 +31,7 @@ void Start_Read_Switch(void)
 
 void Read_Swicth(void const * argument)
 {
-    while(!read_task_exit)
+    while(1)
     {
         if(HAL_GPIO_ReadPin(SW_1_GPIO_Port, SW_1_Pin) == GPIO_PIN_SET)
             SWITCH(1) = on;
@@ -87,4 +87,6 @@ int Get_Switch_Status(int id)
 void Exit_Swicth_Redad(void)
 {
     read_task_exit = 1;
+    vTaskDelete(Read_Swicth_tasHandle);
+    Read_Swicth_tasHandle = NULL;
 }

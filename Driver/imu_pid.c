@@ -133,7 +133,8 @@ void turn_angle(int mode, int angle)
         //绝对角度模式
         else if( mode == absolute )
             imu.target_angle = angle;
-        while(!get_turn_status()) osDelay(10);
+        while(!get_turn_status()) osDelay(10);//转动结束再退出该函数
+        //开两秒循迹后关闭
         x_leftbar.if_switch  = true;
         x_rightbar.if_switch = true;
         y_bar.if_switch = true;

@@ -116,7 +116,7 @@ uint8_t get_avaiable_pos(void)
 
 /**********************************************************************
   * @Name    track_decode
-  * @declaration :对DMA收到的数据进行解码计算，实现循迹各项功能的	核心代码
+  * @declaration :对DMA收到的数据进行解码计算，实现循迹各项功能的核心代码
   * @param   None
   * @retval   : 无
   * @author  peach99CPP
@@ -158,7 +158,7 @@ void track_decode(void)
                 y_bar.line_flag  = 1;//此时到线上
             }
             if(edge_status[0] && y_bar.num >= EDGE_THRESHOLD && ABS(y_bar.data.feedback) >= EDGE_VAL ) //边缘数线的情况下，特殊处理
-                y_bar.data.feedback = 0;//防止此时发生偏移
+                y_bar.data.feedback = 0;//要放在对线的判断之后；置0是为了防止此时发生偏移
             if(y_bar.line_flag && y_bar.num <= MIN_NUM )
             {
                 //使用此机制为了避免因停留在线上而导致线的数量一直重复计数

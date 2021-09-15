@@ -211,7 +211,6 @@ void USER_Init(void)
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
     __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
     __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
-    osDelay(2000);
     Get_Time_Init();//系统时间
     ATK_IMU_Init();//陀螺仪初始化
     delay_init(&htim6, up_count);//使能delay
