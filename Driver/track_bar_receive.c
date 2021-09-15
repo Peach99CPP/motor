@@ -21,8 +21,11 @@ uint32_t y_time = 0, x_lefttime = 0, x_righttime = 0;
 float track_weight[8] = { 4, 3, 2, 1, \
                           -1, -2, -3, -4 \
                           };
-uint8_t track_dma[MAX_LINE][BUFF_SIZE] = {0}, dma_trans_pos = 0;
-trackbar_t y_bar, x_leftbar, x_rightbar;
+
+uint8_t track_dma[MAX_LINE][BUFF_SIZE] = {0}, dma_trans_pos = 0;//DMA接收的数组
+
+trackbar_t y_bar, x_leftbar, x_rightbar;//三个寻迹板
+//初始化PID参数
 pid_paramer_t track_pid_param = { \
                                   .integrate_max = 50,
                                   .kp = 10,
@@ -30,15 +33,18 @@ pid_paramer_t track_pid_param = { \
                                   .kd = 0,
                                   .control_output_limit = 300
                                 };
-int my_abs(int num)
-{
-    if(num > 0 )
-    {
-        return num;
-    }
-    else
-        return -num;
-}
+
+
+
+/**********************************************************************
+  * @Name    set_track_pid
+  * @declaration : 调试寻迹板的PID参数API
+  * @param   kp: [输入/出] 放大10倍的p
+**			 ki: [输入/出] 放大10倍的i
+**			 kd: [输入/出] 放大10倍的d
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void set_track_pid(int kp, int ki, int kd)
 {
     track_pid_param.kp =  kp / 10.0;
@@ -46,6 +52,15 @@ void set_track_pid(int kp, int ki, int kd)
     track_pid_param.kd =  kd / 10.0;
 }
 
+
+
+/**********************************************************************
+  * @Name    track_bar_init
+  * @declaration : 对寻迹板需要的相关变量进行初始化的设置
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
 void track_bar_init(void)//相关的初始化函数
 {
     dma_count = 0;
@@ -74,7 +89,17 @@ void track_bar_init(void)//相关的初始化函数
     //开启DMA接收，此处应确保main中DMA初始化函数在串口初始化前运行
     HAL_UART_Receive_DMA(&TRACK_UART, (uint8_t*)track_dma, BUFF_SIZE);
 }
-uint8_t get_idle_pos(void)
+
+
+
+/**********************************************************************
+  * @Name    get_avaiable_pos
+  * @declaration : 获取可用的数组下标
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+uint8_t get_avaiable_pos(void)
 {
     //获取此时有数据的数组index
     for(uint8_t i = 0; i < MAX_LINE; ++i) //遍历数组index
@@ -86,6 +111,16 @@ uint8_t get_idle_pos(void)
     }
     return 0XFF;//一个都找不到，返回特殊值，在调用时判断返回值非错误值可以减少出错的可能
 }
+
+
+
+/**********************************************************************
+  * @Name    track_decode
+  * @declaration :对DMA收到的数据进行解码计算，实现循迹各项功能的	核心代码
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
 void track_decode(void)
 {
     /***相关宏定义****/
@@ -96,10 +131,10 @@ void track_decode(void)
     
     times_counts++;//总的处理次数，查看此 数据可以判断是否卡DMA
     dma_count--;//待处理数-1
-    uint8_t pos = get_idle_pos();//获取可用index
+    uint8_t pos = get_avaiable_pos();//获取可用index
     uint8_t led_num = 0;
     float track_value = 0, temp_val; //相关的变量声明
-    edge_status[0] = 1;
+    
     //下面的和检验看情况开启
     if((uint8_t)( track_dma[pos][1] + track_dma[pos][2] ) == track_dma[pos][3]) //和校验
     {
@@ -169,9 +204,19 @@ void track_decode(void)
     }
 
 }
+
+
+
+/**********************************************************************
+  * @Name    track_IT_handle
+  * @declaration : 接收完成中断
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
 void track_IT_handle(void)
 {
-    uint8_t pos = get_idle_pos();//通过获取这个检查是否有被填充进去
+    uint8_t pos = get_avaiable_pos();//通过获取这个检查是否有被填充进去
     if(pos != 0xff)
     {
         dma_count++;
@@ -187,6 +232,16 @@ void track_IT_handle(void)
     }
 
 }
+
+
+
+/**********************************************************************
+  * @Name    HAL_UART_RxCpltCallback
+  * @declaration : 自行修改的接收完成中断函数
+  * @param   huart: [输入/出]  触发响应的串口
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if(huart == &huart2)//寻迹板对应的串口，为了移植性，后续会用结构体
@@ -195,10 +250,19 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
     else if(huart ==  imu.imu_uart)
     {
-        IMU_IRQ();//陀螺仪的解析函数
+        IMU_IRQ();//陀螺仪的DMA解析函数
     }
 
 }
+
+
+/**********************************************************************
+  * @Name    track_pid_cal
+  * @declaration : 寻迹板pid计算函数
+  * @param   bar: [输入/出] 哪一个寻迹板
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 float track_pid_cal(trackbar_t * bar)
 {
     if(bar->if_switch == true)//使能，计算pid值并进行返回
@@ -207,6 +271,17 @@ float track_pid_cal(trackbar_t * bar)
     }
     return 0;//未使能，不做改变
 }
+
+
+
+/**********************************************************************
+  * @Name    track_status
+  * @declaration :设置寻迹板状态
+  * @param   id: [输入/出]  方向。1为垂直 ，2为水平
+**			 status: [输入/出]  开启或关闭
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void track_status(int id, int status)
 {
     if(id == 1 ) //y方向
