@@ -72,3 +72,5 @@ motor\usmart_config.o: ..\Driver\openmv.h
 motor\usmart_config.o: ..\Module\servo.h
 motor\usmart_config.o: ..\Module\atk_imu.h
 motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+motor\usmart_config.o: ..\TASK\read_status.h
+motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h

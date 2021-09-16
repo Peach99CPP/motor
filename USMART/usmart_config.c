@@ -11,6 +11,8 @@
 #include "openmv.h"
 #include "servo.h"
 #include "atk_imu.h"
+#include "read_status.h"
+
 //函数名列表初始化(用户自己添加)
 //用户直接在这里输入要执行的函数名及其查找串
 struct _m_usmart_nametab usmart_nametab[] =
@@ -29,6 +31,7 @@ struct _m_usmart_nametab usmart_nametab[] =
     (void*)set_imu_status, "void set_imu_status(int status)",
     (void*)Set_InitYaw, "void Set_InitYaw(int target)",
     (void*)turn_angle, "void turn_angle(int mode ,int angle)",
+    (void*)Wait_Switches, "void Wait_Switches(int dir)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

@@ -5,6 +5,7 @@
 #include "track_bar_receive.h"
 #include "imu_pid.h"
 #include "motor.h"
+#include "imu_pid.h"
 uint32_t time;
 
 #define LINE_FACTOR 200
@@ -74,7 +75,9 @@ void direct_move(int direct, int line_num, int edge_if)
     static int delay_time;
     if(count_line_status)//确保上一个任务完成的情况下，再执行下一个任务
     {
+       
 START_LINE:
+        set_imu_status(1);
         //使用任务创建的形式执行该函数
         if(direct == 1)
         {
@@ -214,6 +217,8 @@ void move_by_encoder(int  direct, int val)
     if(encodermove_status)//上一个任务运行结束，才可以开始运行下一个任务，避免出错
     {
         START_ENCODER:
+        set_imu_status(1);//确保陀螺仪开启，试验性，不确定要不要
+        
         en_dir = direct;//将参数传递给全局变量值
         en_val = val;
 

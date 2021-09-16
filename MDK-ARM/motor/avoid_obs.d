@@ -38,3 +38,17 @@ motor\avoid_obs.o: ..\Driver\time_cnt.h
 motor\avoid_obs.o: ..\Driver\time_cnt.h
 motor\avoid_obs.o: ..\Driver\delay.h
 motor\avoid_obs.o: ../Inc/tim.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+motor\avoid_obs.o: ../Inc/FreeRTOSConfig.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1/portmacro.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
+motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
