@@ -455,3 +455,11 @@ float imu_correct_val(void)
 
 ```
 - --
+## 循迹板（巡线）
+1. 循迹板信息
+本程序使用了宏佳电子的八路激光循迹版，以下是其外观:  
+   ![电路板](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/1632028810.jpg)  
+   ![对地面](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/35da41ec51cda17610018ee712c5e2b.jpg)  
+2. 必要的信息：
+此款循迹板支持多种输出口，包括**串口**、**IO口**、**PWM**、**ADC**等输出方式  
+但因为其串口输出最高频率为20Hz，不满足要求，所以只能使用<u>最基础的直接读取IO口电平</u>的方法来实现数据的采集  
