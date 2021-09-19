@@ -465,12 +465,15 @@ float imu_correct_val(void)
 本程序使用了宏佳电子的八路激光循迹版，以下是其外观:  
    ![电路板](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/1632028810.jpg)  
    ![对地面](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/35da41ec51cda17610018ee712c5e2b.jpg)  
-2. 必要的信息：  
+2. 必要的信息：
 **实现逻辑**
    ![循迹版实现逻辑](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/e15ae7b4d6a179b585d8081ca7f1fc0.jpg)
 此款循迹板支持多种输出口，包括**串口**、**IO口**、**PWM**、**ADC**等输出方式
 但因为其串口输出最高频率为20Hz，不满足要求，所以只能使用<u>最基础的直接读取IO口电平</u>的方法来实现数据的采集  
-此外，由于该款循迹板扫到白线后为低电平输出，但在代码逻辑中读到白线是高，所以最后在输出结果时需要按位进行取反操作或者在进行判断时手动取反。
+此外，由于该款循迹板扫到白线后为低电平输出，但在代码逻辑中读到白线是高，所以最后在输出结果时需要按位进行取反操作或者在进行判断时手动取反。  
+##### 重要信息：
+**由于CubeMX的Bug，默认生成的代码中关于DMA的初始化函数在USART的初始化函数之后  
+这将导致IDLE和DMA被失能，所以每一次使用CubeMX生成代码之后需要手动将DMA初始化移动到USART初始化之前！！**
 <span id="循迹拓展板"></span>
 3. 拓展板程序：
     1. 对IO口电平进行采集,并将采集到的信息进行编码到一个字节中
@@ -782,3 +785,4 @@ void track_decode(void)
 }
 ```
 ---
+## 系统整体运行框架
