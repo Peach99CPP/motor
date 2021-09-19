@@ -173,67 +173,67 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
     }
 ```
-3. #### 转速值的回零问题
-   在[编码器实现逻辑](#实现)中已经说过，通过检测方波边沿来进入计算的函数。该方法存在一个显著的问题在于，当**电机转速为0时，因为方波不再产生，将不再进入计算转速的函数中**，也就是说，==转速没有得到更新 停留在上一个值==,对于此问题，先后有两个解决方案 ：
-
-   	1. 在每一次读取完转速值后将其清0
-   		此方案借鉴了之前读取编码器的操作，读取之后便将其清0，但是因为滤波的操作，此方法将会降低数值的真实性以及导致速值的实时反应速度低。
-   		
-   	2. 检测 是否超时
-   		因为在编码器计算过程中会不断存在定时器中断的产生，在某些特殊时刻，编码器值的计算还与编码器的更新频率有关。因此在定时器中断中检测上一次进入边沿中断的时间，如果时长超过一定阈值(说明此时停转），则将电机的转速清0，并且将其他相关变量重新初始化一遍。经过测试，此方法有较高的可行性，能够较为及时准确地对停转的情况做出反应。
-**代码示例**
-```C
-/*******************
-*@name:HAL_TIM_PeriodElapsedCallback
-*@function:利用定时器来刷新任务,计算时长，只有不修改IRQHandler才能触发此函数
-*@param:定时器结构体
-*@return:无
-**********************/
-void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if(htim->Instance == TIM3)
+3. 转速值的回零问题
+       在[编码器实现逻辑](#实现)中已经说过，通过检测方波边沿来进入计算的函数。该方法存在一个显著的问题在于，当**电机转速为0时，因为方波不再产生，将不再进入计算转速的函数中**，也就是说，==转速没有得到更新 停留在上一个值==,对于此问题，先后有两个解决方案 ：
+    
+           1. 在每一次读取完转速值后将其清0
+               此方案借鉴了之前读取编码器的操作，读取之后便将其清0，但是因为滤波的操作，此方法将会降低数值的真实性以及导致速值的实时反应速度低。
+            
+           2. 检测 是否超时
+               因为在编码器计算过程中会不断存在定时器中断的产生，在某些特殊时刻，编码器值的计算还与编码器的更新频率有关。因此在定时器中断中检测上一次进入边沿中断的时间，如果时长超过一定阈值(说明此时停转），则将电机的转速清0，并且将其他相关变量重新初始化一遍。经过测试，此方法有较高的可行性，能够较为及时准确地对停转的情况做出反应。
+    **代码示例**
+    ```C
+    /*******************
+    *@name:HAL_TIM_PeriodElapsedCallback
+    *@function:利用定时器来刷新任务,计算时长，只有不修改IRQHandler才能触发此函数
+    *@param:定时器结构体
+    *@return:无
+    **********************/
+    void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
-        //用于计算脉宽，处理捕获中途发生定时器更新事件的情况
-        if(++update_count[1] >= 3) //当更新中断事件发生太多，说明此时的电机处于不转的状态，故电机转速置0
+        if(htim->Instance == TIM3)
         {
-            cap_cnt[1] = 0;//重新启动 滤波器
-            cap_temp_val[1] = 0 ;//重置临时转速存储值
-            status_flag[1] = 0;//回到对上升沿的捕获
-            update_count[1] = 0;//清空时间计数器
-            encoder_val[1] = 0;//转速清0
+            //用于计算脉宽，处理捕获中途发生定时器更新事件的情况
+            if(++update_count[1] >= 3) //当更新中断事件发生太多，说明此时的电机处于不转的状态，故电机转速置0
+            {
+                cap_cnt[1] = 0;//重新启动 滤波器
+                cap_temp_val[1] = 0 ;//重置临时转速存储值
+                status_flag[1] = 0;//回到对上升沿的捕获
+                update_count[1] = 0;//清空时间计数器
+                encoder_val[1] = 0;//转速清0
+            }
+            if(++update_count[2] >= 3)
+            {
+                cap_cnt[2] = 0;
+                cap_temp_val[2] = 0 ;
+                status_flag[2] = 0;
+                update_count[2] = 0;
+                encoder_val[2] = 0;
+            }
         }
-        if(++update_count[2] >= 3)
+        else if(htim->Instance == TIM5)
         {
-            cap_cnt[2] = 0;
-            cap_temp_val[2] = 0 ;
-            status_flag[2] = 0;
-            update_count[2] = 0;
-            encoder_val[2] = 0;
+            if(++update_count[3] >= 3)
+            {
+                cap_cnt[3] = 0;
+                cap_temp_val[3] = 0 ;
+                status_flag[3] = 0;
+                update_count[3] = 0;
+                encoder_val[3] = 0;
+            }
+            if(++update_count[4] >= 3)
+            {
+                cap_cnt[4] = 0;
+                cap_temp_val[4] = 0 ;
+                status_flag[4] = 0;
+                update_count[4] = 0;
+                encoder_val[4] = 0;
+            }
         }
+    
     }
-    else if(htim->Instance == TIM5)
-    {
-        if(++update_count[3] >= 3)
-        {
-            cap_cnt[3] = 0;
-            cap_temp_val[3] = 0 ;
-            status_flag[3] = 0;
-            update_count[3] = 0;
-            encoder_val[3] = 0;
-        }
-        if(++update_count[4] >= 3)
-        {
-            cap_cnt[4] = 0;
-            cap_temp_val[4] = 0 ;
-            status_flag[4] = 0;
-            update_count[4] = 0;
-            encoder_val[4] = 0;
-        }
-    }
-
-}
-
-```
+    
+    ``` 
 <span id="编码器效果展示"></span>
 - #### 效果
 此处应有一张图
@@ -261,7 +261,7 @@ ATK_IMU_t  imu =
     .get_angle = Get_Yaw             //函数指针，返回经过限幅和相对0的角度
 };
 ```
-#### 2.函数接口介绍
+#### 2.1 **陀螺仪数据接口**
    1. 解析函数本质上调用的是正点原子的解析函数。因为在**实际运行环境**下，会发现原有的单字节接收处理方法很容易触发ORE中断而卡死在中断（<u>与循迹板的接收函数同样问题</u>）
 因为此时系统内有其他多个中断正在运行，串口收到的字节极易未被CPU处理就直接被下一个字节覆盖而触发ORE中断。为避免出现上述问题，采用DMA进行传输。
 **以下为自行编写的接收函数,通过DMA接收数据，然后再对一整帧的数据进行解析**
@@ -309,6 +309,143 @@ limit_label:
     return angle;
 }
 ```
-3.
+3.角度初始化函数（参数为想设定当前角度为多少度）  
+    <u>因为陀螺仪上电时默认为0度，且不随着软件复位而复位   
+故编写此函数，实现将当前角度值设定为指定角度(软件层面)而无需修改IMU硬件</u>  
+***核心思想在于设置补偿角，用于补偿上电时的误差角度***
+```c
 
+/**********************************************************************
+  * @Name    Set_InitYaw
+  * @declaration : 设置当前角度为xx度
+  * @param   target: [输入/出]  想设置的角度值
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+void Set_InitYaw(int target)
+{
+    imu.switch_ = 0;//先把陀螺仪关掉，否则容易在修改过程中异常
 
+    imu.target_angle = angle_limit(target);//同步修改
+
+    float last_yaw, current_yaw;
+    int init_times = 0;
+
+    current_yaw = last_yaw = * imu.yaw_ptr;//获取当前原生数据
+    while(init_times < INIT_TIMES)//陀螺仪未达到稳定
+    {
+        if(fabs( current_yaw - last_yaw) < ERROR_THRESHILD)//偏移很小
+            init_times ++;
+        else init_times = 0;//飘了，清0，重置
+        //更新数值
+        last_yaw = current_yaw;
+        current_yaw = * imu.yaw_ptr;
+        //10ms一次查询,阻塞式
+        HAL_Delay(10);
+    }
+    //陀螺仪稳定，开始获取数据
+    imu.init_angle = angle_limit(- angle_limit(current_yaw) + angle_limit(target));
+    //恢复陀螺仪的使能状态
+    imu.switch_ = 1;
+}
+
+```
+4. 基于上一个函数实现了软件层面的**指定初始角度的修改**，因此使用的不再是传感器返回的数据，而是经过处理的函数  
+   此函数用于返回**经过处理的角度**，结构体中的函数指针就是指向此函数
+```c
+
+/**********************************************************************
+  * @Name    Get_Yaw
+  * @declaration :获取经过限幅的相对于上电位置的Yaw角
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+
+float Get_Yaw(void)
+{
+    float  angle = *(imu.yaw_ptr) + imu.init_angle ;//获取当前原生数据加上补偿角
+    return angle_limit(angle);
+}
+```
+***上述函数在移植时可以直接使用，只需要根据实际修改结构体的成员变量***
+- - -
+#### 2.2 **基于陀螺仪数据的应用**
+<u>全部源码在imu_pid.c</u>  
+        *核心思想在于设置想转到的角度为PID的目标值，而后利用实时系统来周期性刷新PID函数   
+        并将其控制值加在速度上*
+1. 转弯的入口函数
+```c
+
+/**********************************************************************
+  * @Name    turn_angle
+  * @declaration : 转弯的函数实现，可实现绝对角度的转弯和相对角度的转弯
+  * @param   mode: [输入/出]  转弯的类型
+                    relative(1): 相对角度，相对当前位置转动
+                    absolute(2): 绝对角度，转动到绝对角度（软件设定的0°）
+**			 angle: [输入/出]  角度数值
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+void turn_angle(int mode, int angle)
+{
+    if(imu.switch_)//检查使能状态
+    {
+        //限幅
+        angle = angle_limit(angle);
+        //相对角度模式
+        if(mode == relative)
+            imu.target_angle = angle_limit(imu.get_angle() + angle);
+        //绝对角度模式
+        else if( mode == absolute )
+            imu.target_angle = angle;
+        while(!get_turn_status()) osDelay(10);//转动结束再退出该函数
+        //开三秒循迹后关闭，防止转弯后车身偏离线太多导致循迹无法修正
+        x_leftbar.if_switch  = true;
+        x_rightbar.if_switch = true;
+        y_bar.if_switch = true;
+        osDelay(3000);
+        x_leftbar.if_switch  = false;
+        x_rightbar.if_switch = false;
+        y_bar.if_switch = false;
+    }
+}
+```
+2. 陀螺仪修正函数(底层实现逻辑)
+依赖此函数的周期调用来实现车身角度的修正
+```c
+
+/**********************************************************************
+  * @Name    imu_correct_val
+  * @declaration : imu pid实现的核心函数
+  * @param   None
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+
+float imu_correct_val(void)
+{
+    static float now_angle;//过程变量，为避免重复声明，使用静态变量
+    //判断此时转弯的状态
+    if(fabs(imu.get_angle() - imu.target_angle) < 2.0) if_completed = 1;
+    else if_completed = 1 ;
+
+    if(! imu.switch_ ) return 0; //未使能则直接返回0，不做修改
+    else
+    {
+        imu_data.expect = imu.target_angle;//设置好pid的目标
+        now_angle = imu.get_angle();//获取角度数值
+        //取最优路径
+        if(now_angle - imu.target_angle > 180 ) now_angle -= 360;
+        if(now_angle - imu.target_angle < -180 ) now_angle += 360;
+        //pid传参
+        imu_data.feedback = now_angle;
+        //获取PID值
+        delta = pos_pid_cal(&imu_data, &imu_para);
+        return delta;//返回计算值
+
+    }
+}
+
+```
+- --

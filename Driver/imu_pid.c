@@ -32,7 +32,7 @@ static int if_completed;
 
 /**********************************************************************
   * @Name    imu_correct_val
-  * @declaration :
+  * @declaration : imu pid实现的核心函数
   * @param   None
   * @retval   :
   * @author  peach99CPP
