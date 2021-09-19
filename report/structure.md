@@ -894,3 +894,80 @@ void track_decode(void)
 ```
 ---
 ## 系统整体运行框架
+
+
+ - #### 全局通信协议：
+   1.实现逻辑：
+   - 发送时的编码  
+ <u>以openmv的解码函数举例</u>
+       - 帧头
+       - 事件ID
+       - 正负标志位
+       - 参数低8位
+       - 参数高8位
+       - 校验和
+       - 帧尾
+ ```c
+/**********************************************************************
+  * @Name    cmd_encode
+  * @declaration : 根据协议编码发送的内容
+  * @param   event_id: [输入/出]  时间的类型
+**			 param: [输入/出] 参数
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+void cmd_encode(const uint8_t event_id, int  param)
+{
+    static uint8_t pos_flag;
+    if(param > 0 ) pos_flag = 1;
+    else
+    {
+        pos_flag = 2;
+        param *= -1;
+    }
+
+    uint8_t h_byte, l_byte;//获取参数的高8位和低8位
+    h_byte = (param >> 8);
+    l_byte = (param & 0xff);
+    //定义通讯协议
+    MV.mv_cmd[0] = START_BYTE;//帧头
+    MV.mv_cmd[1] = event_id;//触发的事件id
+    MV.mv_cmd[2] = pos_flag;
+    MV.mv_cmd[3] = l_byte;//参数高8位
+    MV.mv_cmd[4] = h_byte;//参数低8位
+    MV.mv_cmd[5] = (uint8_t)(event_id + pos_flag + h_byte + l_byte);//和校验
+    MV.mv_cmd[6] = END_BYTE;//帧尾
+}
+```
+  - 接收时解码:   
+<u>以openmv的解码函数举例</u>
+```c
+/**********************************************************************
+  * @Name    MV_rec_decode
+  * @declaration : 判断接收完成后，对接收的内容进行解码
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+void MV_rec_decode(void)
+{
+    static int pn = 1; //正负标志符
+    if(MV.rec_buffer[0] + MV.rec_buffer[1] + MV.rec_buffer[2] + MV.rec_buffer[3] == MV.rec_buffer[4])
+    {
+        //根据参数内容对参数进行处理
+        if( MV.rec_buffer[1] == 1 ) pn = 1;
+        else pn = -1;
+
+        mv_param = (MV.rec_buffer[2] +  (MV.rec_buffer[3] << 8)) * pn;
+    }
+    MV.rec_len = 0;
+    MV.RX_Status = 0;
+    //处理完之后记得重新初始化结构体中的rec_len和RX_status变量，避免出错
+    ;
+}
+```
+
+  2.待改进的地方：
+  - 目前的协议在当前的应用范围下未出现问题，但对于其他特殊数据，其存在没有解决`透明传输`的问题，当因传输错误或数据内容中出现与帧头帧尾相同的字节时，未有有效的方法来裁决其属于正文信号或是帧尾信号可能因此出现错误。    
+目前正计划通过`字符填充`来解决上述问题。**提高鲁棒性**，在参数传输过程中无需考虑其值可能使接收机制产生误判的可能。
+
