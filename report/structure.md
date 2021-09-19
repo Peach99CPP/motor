@@ -243,6 +243,72 @@ void MY_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 - - -
 <span id="陀螺仪"></span>
 ## 陀螺仪
-#### 选型
-本程序使用的陀螺仪型号为**正点原子ATK_IMU601**，因其官方例程中提供了解析数据的函数，所以该部分主要是基于陀螺仪数据实现功能的讲解
-#### 接口
+### 选型
+本程序使用的陀螺仪型号为**正点原子ATK_IMU601**，因其官方例程中提供了解析数据的函数，所以该部分主要是基于陀螺仪数据实现功能的讲解   
+#### 结构体介绍:
+<u>当运行环境发生改变时，只需要修改结构体成员变量的值即可</u>
+```c
+
+ATK_IMU_t  imu =
+{
+    /*移植时只需要修改以下结构体变量即可*/
+
+    .imu_uart = &huart6,             //串口号
+    .yaw_ptr = &(attitude.yaw),     //解析出来的原始数据的指针
+    .target_angle = 0,              //pid的目标角度
+    .init_angle = 0,                //初始化角度，补偿上电时的初始角度
+    .switch_ = 1,                   //使能开关
+    .get_angle = Get_Yaw             //函数指针，返回经过限幅和相对0的角度
+};
+```
+#### 2.函数接口介绍
+   1. 解析函数本质上调用的是正点原子的解析函数。因为在**实际运行环境**下，会发现原有的单字节接收处理方法很容易触发ORE中断而卡死在中断（<u>与循迹板的接收函数同样问题</u>）
+因为此时系统内有其他多个中断正在运行，串口收到的字节极易未被CPU处理就直接被下一个字节覆盖而触发ORE中断。为避免出现上述问题，采用DMA进行传输。
+**以下为自行编写的接收函数,通过DMA接收数据，然后再对一整帧的数据进行解析**
+```c
+
+/**********************************************************************
+  * @Name    IMU_IRQ
+  * @declaration :陀螺仪的中断处理函数，处理DMA收到的数据,在DMA 开启的情况下，放在HAL_UART_RxCpltCallback中
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+
+void IMU_IRQ(void)
+{
+
+    for(uint8_t i = 0; i < BUFFER_SIZE; ++i)//开始遍历DMA接收到的数据
+    {
+        if(imu901_unpack(imu_cmd[i]))//接收完成
+            atkpParsing(&rxPacket);//开始解码，得到姿态角，此函数是正点原子例程中的函数
+    }
+
+    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE);//再次开启DMA
+}
+```
+2.角度限幅函数，用于将角度转换到+-180范围之内，实现传入参数的规范化
+```c
+
+/**********************************************************************
+  * @Name    angle_limit
+  * @declaration :
+  * @param   angle: [输入/出]
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+
+float  angle_limit(float  angle)
+{
+    //把传进来的角度限制在正负180范围
+limit_label:
+    //采用while的原因在于相比IF可以实现更大的处理范围
+    while(angle > 180) angle -= 360;
+    while(angle <= -180) angle += 360;
+    if(ABS(angle) > 180) goto limit_label;//意义不大，但是避免出错
+    return angle;
+}
+```
+3.
+
+
