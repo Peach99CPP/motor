@@ -107,8 +107,6 @@ void U1_IRQHandler(void)
 
 #endif
         }
-
-
     }
     else if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_TXE))
     {

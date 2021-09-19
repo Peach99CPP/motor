@@ -19,15 +19,120 @@
     - [拓展板](#循迹拓展板)
     - [主控板](#循迹主控板)
 5. *[机械臂部分](#机械臂)*    
-6. *[总体系统运行逻辑](#整体系统框架)*  
+6. *[系统整体](#整体系统框架)*  
     - [运行框架]()
     - [任务管理]()
+    - [通讯协议](#通讯协议)
 - - -
 <span id="调试"></span>
 ## 调试组件
 #### 提升
 <span id="优点"></span>今年的新一代程序在原有的基础上加入了==USMART==调试组件, 其在诸如PID调参时起到了重大的作用，相比于以往的重复烧录的繁琐以及对内存寿命的影响，提升了工作效率。在平时进行各项测试时更加灵活多变。
 <span id="相关源码"></span>
+#### 串口接收函数（基于正点原子通讯协议进行修改）
+因为部分移动端串口调试设备不支持自动末尾追加`0X0D 0X0A`换行符，所以修改了以`!`为结尾信号的通讯协议。   
+**根据运行情况的需要，通过`修改宏定义`来实现不同种类设备的支持！**
+```c
+
+/**********************************************************************
+  * @Name    USART1_IRQHandler
+  * @功能说明 usrat1 handler
+  * @param   None
+  * @返回值
+  * @author  peach99CPP
+***********************************************************************/
+
+void U1_IRQHandler(void)
+{
+    uint8_t rec;
+    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
+    {
+        __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+        rec =  huart1.Instance->RDR;
+        if(!(USART_RX_STA & 0x8000))//接收未完成
+        {
+#ifdef USE_BLE
+            if(rec == 0x0a || rec == 0x21)//兼容非电脑设备的串口发送 以！为结尾
+
+            {
+                USART_RX_STA |= 0x8000;
+                return ;
+            }
+            if( rec == 0x0d ) return ;
+            else
+            {
+                USART_RX_BUF[USART_RX_STA & 0x3fff] = rec;
+                USART_RX_STA++;
+                if(USART_RX_STA & USART_RX_STA & 0x3fff == MAX_SIZE) USART_RX_STA = 0;
+            }
+#endif
+#ifdef USE_ATK
+            if(rec == 0x0d)
+            {
+                USART_RX_STA |= 0x4000;
+                return;
+            }
+            if( USART_RX_STA & 0x4000 && rec == 0x0a)
+            {
+                USART_RX_STA |= 0x8000;
+                return;
+            }
+            else
+            {
+                USART_RX_BUF[USART_RX_STA & 0x3fff] = rec;
+                USART_RX_STA++;
+                if(USART_RX_STA & USART_RX_STA & 0x3fff == MAX_SIZE) USART_RX_STA = 0;
+            }
+
+#endif
+        }
+    }
+}
+```
+#### 串口发送函数
+基于队列进行管理，需要对printf函数进行重定向，将要打印的字符放入队列。  
+```c
+//重定义fputc函数,使用队列来进行printf,此时要另外开一个task循环刷
+int fputc(int ch, FILE *f)
+{
+    if(tx_queue != NULL)
+    {
+        if(vPortGetIPSR())
+        {
+            BaseType_t if_higher_woken = pdFALSE;
+            while( xQueueSendFromISR(tx_queue, &ch, &if_higher_woken) != pdTRUE); //阻塞式。确保此时已经成功把消息放入队列
+            portYIELD_FROM_ISR(if_higher_woken);//判断是否需要进行任务调度
+        }
+        else
+        {
+            //此时并不是在中断中被调用，可以直接写入数据
+            xQueueSend(tx_queue, &ch, 1);
+        }
+    }
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_TXE);
+    return ch;
+}
+//串口中断处理函数中的部分
+if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_TXE))
+{
+__HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_TXE);
+BaseType_t xTaskWokenByReceive = pdFALSE;
+//发送队列中有数据需要发送
+if (xQueueReceiveFromISR(tx_queue, (void*)&rec, &xTaskWokenByReceive) == pdPASS)
+huart1.Instance->TDR = rec;
+else
+//无数据发送就关闭发送中断
+__HAL_UART_DISABLE_IT(&huart1, UART_IT_TXE);
+}
+//增强健壮性，在中断函数中加入对ORE中断，避免卡死在该中断
+if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE))//处理ORE错误导致卡死在中断里
+{
+uint8_t tmp;
+tmp = USART1->ISR;
+tmp = USART1->RDR;
+__HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_ORE);
+}
+```
 #### ***用户配置USMART的源码***
 ```C
 #include "usmart.h"
