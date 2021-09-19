@@ -65,4 +65,6 @@ void avoid_task(void const * argument)
 - --
 ###对上述的改动进行`调试`，确保上述改动不会产生新问题
 
-
+## 2021.9.19
+### 今日工作内容
+完成大部分[自动分拣编程组报告](https://github.com/Peach99CPP/motor/edit/master/report/structure.md)
