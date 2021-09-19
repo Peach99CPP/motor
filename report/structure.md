@@ -455,3 +455,8 @@ float imu_correct_val(void)
 
 ```
 - --
+## 循迹板（巡线）
+1. 循迹板信息
+本程序使用了宏佳电子的八路激光循迹版，以下是其外观
+   ![电路板](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/1632028810.jpg)
+   ![对地面](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/35da41ec51cda17610018ee712c5e2b.jpg)
