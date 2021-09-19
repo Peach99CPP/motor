@@ -14,7 +14,10 @@
     - [概括](#陀螺仪信息)
     - [数据获取](#陀螺仪数据获取)
     - [数据应用](#陀螺仪数据应用)   
-4. *[循迹版部分](#寻迹板信息)*  
+4. *[循迹版部分](#循迹板)*  
+    - [循迹版信息](#循迹板信息)
+    - [拓展板](#循迹拓展板)
+    - [主控板](#循迹主控板)
 5. *[机械臂部分](#机械臂)*    
 6. *[总体系统运行逻辑](#整体系统框架)*  
 - - -
@@ -462,8 +465,10 @@ float imu_correct_val(void)
 本程序使用了宏佳电子的八路激光循迹版，以下是其外观:  
    ![电路板](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/1632028810.jpg)  
    ![对地面](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/35da41ec51cda17610018ee712c5e2b.jpg)  
-2. 必要的信息：
-此款循迹板支持多种输出口，包括**串口**、**IO口**、**PWM**、**ADC**等输出方式  
+2. 必要的信息：  
+**实现逻辑**
+   ![循迹版实现逻辑](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/e15ae7b4d6a179b585d8081ca7f1fc0.jpg)
+此款循迹板支持多种输出口，包括**串口**、**IO口**、**PWM**、**ADC**等输出方式
 但因为其串口输出最高频率为20Hz，不满足要求，所以只能使用<u>最基础的直接读取IO口电平</u>的方法来实现数据的采集  
 此外，由于该款循迹板扫到白线后为低电平输出，但在代码逻辑中读到白线是高，所以最后在输出结果时需要按位进行取反操作或者在进行判断时手动取反。
 <span id="循迹拓展板"></span>
@@ -604,12 +609,12 @@ void cmd_encode(uint8_t id, uint16_t sum)
 //通过串口发送给主控板，为提高实时性，发送频率为200Hz
 void send_value(void)
 {
-for(uint8_t i=1;i<=3;++i)
-{
-cmd_encode(i,(i+track_value[i]));
-HAL_UART_Transmit(track_uart.uart,uart_cmd,BUFFER_SIZE,0xff);
-delay_ms(5);
-}
+    for(uint8_t i=1;i<=3;++i)
+    {
+    cmd_encode(i,(i+track_value[i]));
+    HAL_UART_Transmit(track_uart.uart,uart_cmd,BUFFER_SIZE,0xff);
+    delay_ms(5);
+    }
 }
 ```
 - --
@@ -776,3 +781,4 @@ void track_decode(void)
 
 }
 ```
+---
