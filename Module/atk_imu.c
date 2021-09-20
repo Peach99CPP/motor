@@ -491,5 +491,18 @@ limit_label:
     while(angle <= -180) angle += 360;
     if(ABS(angle) > 180) goto limit_label;//意义不大，但是避免出错
     return angle;
+
+}
+
+/**********************************************************************
+  * @Name    Get_IMUStatus
+  * @declaration : 获取陀螺仪使能状态的接口
+  * @param   None
+  * @retval   : 陀螺仪使能状态
+  * @author  peach99CPP
+***********************************************************************/
+int Get_IMUStatus(void)
+{
+    return imu.switch_;
 }
 /*******************************END OF FILE************************************/

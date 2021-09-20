@@ -7,7 +7,7 @@
 #define MAX_CONTROL_VAL 9500
 #include "track_bar_receive.h"
 #include "imu_pid.h"
-
+#include "atk_imu.h"
 float  x_error = 0, y_error = 0, w_error = 0;
 int i;
 float speed_factor = 0, min_val;
@@ -126,32 +126,55 @@ void chassis_synthetic_control(void)
 
     max_val = 0;//对最大值数据进行初始化
     factor = 1;//倍率因子初始化
-
-    w_error = imu_correct_val();
-    x = chassis.x_speed - y_error ;
-    y = chassis.y_speed - x_error;
-    w = chassis.w_speed + w_error;
-    min_val = x;
-    if(min_val > y) min_val = y;
-    if(min_val > w) min_val = w;
-
-    /***************************************
-            1*************2
-             *************
-             *************
-             *************
-             *************
-            3*************4
-    ****************************************/
-    if(min_val > 50)
+    min_val = chassis.x_speed;
+    if(min_val > y) min_val = chassis.y_speed;
+    if(min_val > w) min_val = chassis.w_speed;
+    if(min_val > 100)
     {
-        speed_factor = min_val / 50.0;
+        speed_factor = min_val / 100.0;
     }
     else speed_factor = 1;
-    motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w;
-    motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w;
-    motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w;
-    motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w ;
+
+    if(Get_IMUStatus())
+    {
+        w_error = imu_correct_val();
+        x = chassis.x_speed - y_error * speed_factor ;
+        y = chassis.y_speed - x_error * speed_factor;
+        w = chassis.w_speed + w_error * speed_factor;
+
+        /***************************************
+                1*************2
+                 *************
+                 *************
+                 *************
+                 *************
+                3*************4
+        ****************************************/
+        motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w;
+        motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w;
+        motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w;
+        motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w ;
+    }
+    else
+    { 
+        //陀螺仪关闭状态下的巡线，待测试
+        x = chassis.x_speed;
+        y = chassis.y_speed;
+        w = chassis.w_speed;
+        /***************************************
+                1*************2
+                 *************
+                 *************
+                 *************
+                 *************
+                3*************4
+        ****************************************/
+        //明日调试内容
+        motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + speed_factor * (y_error + x_error);
+        motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + speed_factor * (y_error + x_error);
+        motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + speed_factor * (y_error + x_error);
+        motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w + speed_factor * (y_error + x_error);
+    }
 
     //再来一个限幅操作，避免单边速度过高导致控制效果不理想
     //
@@ -186,8 +209,8 @@ void chassis_synthetic_control(void)
         motor_data[i].expect = motor_target[i];
         motor_data[i].feedback = read_encoder(i);
         control_val[i] =  pid_control(&motor_data[i], &motor_param);
-        if(control_val[i]> MAX_CONTROL_VAL )  control_val[i] = MAX_CONTROL_VAL;
-        if(control_val[i]<- MAX_CONTROL_VAL )  control_val[i] = - MAX_CONTROL_VAL;
+        if(control_val[i] > MAX_CONTROL_VAL )  control_val[i] = MAX_CONTROL_VAL;
+        if(control_val[i] < - MAX_CONTROL_VAL )  control_val[i] = - MAX_CONTROL_VAL;
         set_motor(i, control_val[i]);
 
 
