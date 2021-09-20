@@ -573,11 +573,11 @@ float imu_correct_val(void)
 <span id="循迹版"></span>
 ## 循迹板（巡线）
 <span id="循迹板概述"></span>
-1. 循迹板信息
+1. 循迹板信息  
 本程序使用了宏佳电子的八路激光循迹版，以下是其外观:  
    ![电路板](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/1632028810.jpg)  
    ![对地面](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/35da41ec51cda17610018ee712c5e2b.jpg)  
-2. 必要的信息：
+2. 必要的信息：  
 **实现逻辑**
    ![循迹版实现逻辑](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/e15ae7b4d6a179b585d8081ca7f1fc0.jpg)
 此款循迹板支持多种输出口，包括**串口**、**IO口**、**PWM**、**ADC**等输出方式
@@ -800,7 +800,7 @@ void send_value(void)
       }
   }
 ```
-   - 数据处理程序 
+   - 数据处理程序   
     此部分是对循迹版信息的解码处理环节。功能实现的核心依赖于此函数。  
 通过对循迹版信息的处理获取当前循迹板的状态，并以此实现数线、巡线等功能。
 ```c
@@ -896,6 +896,62 @@ void track_decode(void)
 
 }
 ```
+  - 数据应用  
+    **计算PID值，并将返回值输出到底盘的速度上**
+```c
+/*
+ * 此为循迹版的输出函数
+ * PID的目标值已经设置成0
+*/
+/**********************************************************************
+  * @Name    track_pid_cal
+  * @declaration : 寻迹板pid计算函数
+  * @param   bar: [输入/出] 哪一个寻迹板
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+float track_pid_cal(trackbar_t * bar)
+{
+    if(bar->if_switch == true)//使能，计算pid值并进行返回
+    {
+        return pos_pid_cal(&bar->data, &track_pid_param);
+    }
+    return 0;//未使能，不做改变
+}
+
+/*
+ *下列代码展示了循迹版PID如何参与底盘速度分解
+ */
+/************************************************************
+*@name:chassis_synthetic_control
+*@function:底盘的综合控制函数，包含多种控制
+*@param:无
+*@return:无
+**************************************************************/
+void chassis_synthetic_control(void)
+{
+static float x, y, w, factor;
+static double max_val;
+if (chassis._switch == false ) return; //如果底盘不被使能，则没有后续操作
+
+if (++time_count == TIME_PARAM)
+{
+time_count = 0;
+y_error = track_pid_cal(&y_bar);
+x_error = (track_pid_cal(&x_rightbar) - track_pid_cal(&x_leftbar)) / 2.0;
+}
+
+max_val = 0;//对最大值数据进行初始化
+factor = 1;//倍率因子初始化
+
+w_error = imu_correct_val();
+x = chassis.x_speed - y_error ;
+y = chassis.y_speed - x_error;
+w = chassis.w_speed + w_error;
+min_val = x;
+if(min_val > y) min_val = y;
+if(min_val > w) min_val = w;
+```
 ---
 ## 系统整体运行框架
 <span id="运行流程图"></span>
@@ -906,7 +962,7 @@ void track_decode(void)
     **在本程序中集成了`FreeRTOS`，使用的是STM32CubeMX中的`CMSIS V1`版本，经过了一定程度的封装**  
  相对优点有： 
   - 提高其移植性，   
-  - 同时<u>简化任务创建的操作过程</u>
+  - 同时<u>简化任务创建的操作过程</u>  
   以下是在本程序中用到的任务列表   
     ![任务列表](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/20210920212556.png)  
     每个任务的作用，查阅[运行流程图](#运行流程图)中`任务`部分的介绍。

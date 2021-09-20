@@ -208,6 +208,7 @@ void ATK_IMU_Init(void);
 void Set_InitYaw(int target);
 float Get_Yaw(void);
 float angle_limit(float  angle);
+int Get_IMUStatus(void);
 #endif
 
 
