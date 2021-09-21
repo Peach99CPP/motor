@@ -1203,10 +1203,20 @@ void MV_rec_decode(void)
 
   - --
   <span id="联系方式"></span>
-###有问题联系：
-- ***13311889904(TEL)***
-- ***1831427532(QQ)***
-- ***[邮箱](3120000903@mail2.gdut.edu.cn) <u>3120000903@mail2.gdut.edu.cn</u>***  
+# 有问题联系：
+- ***13311889904(TEL)***  
+       
+       
+- ***1831427532(QQ)***  
+      
+       
+- ***3120000903@mail2.gdut.edu.cn***     
+  ***1831427532@qq.com***     
+          
+          
 - ***Wechat***   
+      
    ![联系方式](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/7db7780b6dc421984e3c67cde1c089b.jpg)
-
+    
+        
+- -- 
