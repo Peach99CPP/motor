@@ -27,7 +27,47 @@ Project File Date:  09/15/2021
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'motor'
-"motor\motor.axf" - 0 Error(s), 0 Warning(s).
+compiling imu_pid.c...
+compiling atk_imu.c...
+compiling track_bar_receive.c...
+compiling usmart_config.c...
+compiling stm32f7xx_it.c...
+compiling main.c...
+compiling read_status_task.c...
+compiling chassis.c...
+..\Driver\chassis.c(124): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          x_error = (track_pid_cal(&x_rightbar) - track_pid_cal(&x_leftbar)) / 2.0;
+..\Driver\chassis.c(134): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          speed_factor = min_val / 100.0;
+..\Driver\chassis.c(154): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w;
+..\Driver\chassis.c(154): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w;
+..\Driver\chassis.c(155): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w;
+..\Driver\chassis.c(156): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w;
+..\Driver\chassis.c(156): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w;
+..\Driver\chassis.c(157): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w ;
+..\Driver\chassis.c(174): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + speed_factor * (y_error + x_error);
+..\Driver\chassis.c(174): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + speed_factor * (y_error + x_error);
+..\Driver\chassis.c(175): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + speed_factor * (y_error + x_error);
+..\Driver\chassis.c(176): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + speed_factor * (y_error + x_error);
+..\Driver\chassis.c(176): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + speed_factor * (y_error + x_error);
+..\Driver\chassis.c(177): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+          motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w + speed_factor * (y_error + x_error);
+..\Driver\chassis.c: 14 warnings, 0 errors
+linking...
+Program Size: Code=38800 RO-data=1472 RW-data=968 ZI-data=21016  
+FromELF: creating hex file...
+"motor\motor.axf" - 0 Error(s), 14 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -51,7 +91,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.5.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:32
 </pre>
 </body>
 </html>

@@ -137,10 +137,11 @@ void chassis_synthetic_control(void)
 
     if(Get_IMUStatus())
     {
+        //陀螺仪开启时的巡线模式，已测试通过
         w_error = imu_correct_val();
         x = chassis.x_speed - y_error * speed_factor ;
-        y = chassis.y_speed - x_error* speed_factor;
-        w = chassis.w_speed + w_error* speed_factor;
+        y = chassis.y_speed - x_error * speed_factor;
+        w = chassis.w_speed + w_error * speed_factor;
 
         /***************************************
                 1*************2
@@ -155,8 +156,9 @@ void chassis_synthetic_control(void)
         motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w;
         motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w ;
     }
-    else 
-    {
+    else
+    { 
+        //陀螺仪关闭状态下的巡线，待测试
         x = chassis.x_speed;
         y = chassis.y_speed;
         w = chassis.w_speed;
@@ -169,10 +171,10 @@ void chassis_synthetic_control(void)
                 3*************4
         ****************************************/
         //明日调试内容
-        motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + speed_factor*(y_error+x_error);
-        motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + speed_factor*(y_error+x_error);
-        motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w+ speed_factor*(y_error+x_error);
-        motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w + speed_factor*(y_error+x_error);
+        motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + speed_factor * (y_error + x_error);
+        motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + speed_factor * (y_error + x_error);
+        motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + speed_factor * (y_error + x_error);
+        motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w + speed_factor * (y_error + x_error);
     }
 
     //再来一个限幅操作，避免单边速度过高导致控制效果不理想

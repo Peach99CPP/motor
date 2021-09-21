@@ -137,6 +137,7 @@ void chassis_synthetic_control(void)
 
     if(Get_IMUStatus())
     {
+        //陀螺仪开启时的巡线模式，已测试通过
         w_error = imu_correct_val();
         x = chassis.x_speed - y_error * speed_factor ;
         y = chassis.y_speed - x_error * speed_factor;
@@ -156,7 +157,7 @@ void chassis_synthetic_control(void)
         motor_target[4] = -0.707 * y - 0.707 * x - Radius_[4] * w ;
     }
     else
-    { 
+    {
         //陀螺仪关闭状态下的巡线，待测试
         x = chassis.x_speed;
         y = chassis.y_speed;

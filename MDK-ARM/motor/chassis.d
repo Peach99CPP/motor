@@ -64,3 +64,5 @@ motor\chassis.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 motor\chassis.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 motor\chassis.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\chassis.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
+motor\chassis.o: ..\Module\atk_imu.h
+motor\chassis.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
