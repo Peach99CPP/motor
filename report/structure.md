@@ -1195,3 +1195,10 @@ void MV_rec_decode(void)
 目前正计划通过`字符填充`来解决上述问题。**提高鲁棒性**，在参数传输过程中无需考虑其值可能使接收机制产生误判的可能。
 
   - --
+###有问题联系：
+- ***13311889904(TEL)***
+- ***1831427532(QQ)***
+- ***[邮箱](3120000903@mail2.gdut.edu.cn) <u>3120000903@mail2.gdut.edu.cn</u>***  
+- ***Wechat***   
+   ![联系方式](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/7db7780b6dc421984e3c67cde1c089b.jpg)
+
