@@ -1112,7 +1112,8 @@ if(min_val > w) min_val = w;
 <span id="整体框架"></span>
 ## 系统整体运行框架
 <span id="整体流程图"></span>
-- #### 运行框架
+- #### 运行框架    
+[整体流程图直链](https://m.liuchengtu.com/lct//#Reb7c5cf321e1bdbf8567b77ca1e735e7)
    ![流程图](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/%E6%9C%AA%E5%91%BD%E5%90%8D%E8%A1%A8%E5%8D%95%20(1).png)
 <span id="RTOS"></span>
 - #### FreeRTOS
