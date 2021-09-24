@@ -28,6 +28,7 @@ int Get_Switch_Status(int id);
 void Start_Read_Switch(void);
 void Exit_Swicth_Read(void);
 void Wait_Switches(int dir);
+void Single_Switch(int switch_id);
 #endif
 
 

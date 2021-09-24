@@ -8,9 +8,9 @@
 #include "track_bar_receive.h"
 #include "imu_pid.h"
 #include "atk_imu.h"
-float  x_error = 0, y_error = 0, w_error = 0;
+double  x_error = 0, y_error = 0, w_error = 0;
 int i;
-float speed_factor = 0, min_val;
+double speed_factor = 0, min_val;
 CHASSIS_t chassis;
 float Radius_[5] = {0, \
                     1, \
@@ -171,6 +171,7 @@ void chassis_synthetic_control(void)
                 3*************4
         ****************************************/
         //明日调试内容
+        //乘上speed_factor的原因在于在高速时动态增强控制效果
         motor_target[1] = 0.707 * y + 0.707 * x - Radius_[1] * w + speed_factor * (y_error + x_error);
         motor_target[2] = -0.707 * y + 0.707 * x - Radius_[2] * w + speed_factor * (y_error + x_error);
         motor_target[3] = 0.707 * y - 0.707 * x - Radius_[3] * w + speed_factor * (y_error + x_error);
