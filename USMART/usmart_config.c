@@ -32,6 +32,7 @@ struct _m_usmart_nametab usmart_nametab[] =
     (void*)Set_InitYaw, "void Set_InitYaw(int target)",
     (void*)turn_angle, "void turn_angle(int mode ,int angle)",
     (void*)Wait_Switches, "void Wait_Switches(int dir)",
+    (void*)Single_Switch,"void Single_Switch(int switch_id)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

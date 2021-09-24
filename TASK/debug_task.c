@@ -11,7 +11,6 @@ void Startdebug(void const * argument)
     Start_Read_Switch();
     while(1)
     {
-//        motor_debug();
         osDelay(1);
 
     }

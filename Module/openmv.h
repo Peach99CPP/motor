@@ -19,11 +19,27 @@ typedef struct
     uint8_t rec_len;
     uint8_t RX_Status;
 }mv_t;
+typedef enum
+{
+    red=1,
+    blue
+}mvcolor_t;
+typedef struct
+{
+    int event;
+    int param;
+}mvrec_t;
+
 
 void cmd_encode(const uint8_t event_id,int  param);
 void MV_SendCmd(const uint8_t event_id,const int  param);
 void MV_IRQ(void);
 void MV_rec_decode(void);
+
+void MV_Ball(int color);
+void MV_Decode(void);
+void MV_SendOK(void);
+void MV_PID(void);
 #endif
 
 
