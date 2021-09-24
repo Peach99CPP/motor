@@ -585,7 +585,8 @@ float imu_correct_val(void)
    ![电路板](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/1632028810.jpg)  
    ![对地面](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/35da41ec51cda17610018ee712c5e2b.jpg)  
 2. 必要的信息：  
-**实现逻辑**   
+**实现逻辑**    
+[循迹板流程图直链](https://m.liuchengtu.com/lct//#R26b8d6fa19f4b990bac03dac30e8a959)
    ![循迹版流程图](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/%E6%9C%AA%E5%91%BD%E5%90%8D%E8%A1%A8%E5%8D%95%20(4).png)
    ![循迹版实现逻辑](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/e15ae7b4d6a179b585d8081ca7f1fc0.jpg)
 此款循迹板支持多种输出口，包括**串口**、**IO口**、**PWM**、**ADC**等输出方式
@@ -1112,7 +1113,8 @@ if(min_val > w) min_val = w;
 <span id="整体框架"></span>
 ## 系统整体运行框架
 <span id="整体流程图"></span>
-- #### 运行框架
+- #### 运行框架    
+[整体流程图直链](https://m.liuchengtu.com/lct//#R1e79982406d487b28368954fb46414e7)
    ![流程图](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/%E6%9C%AA%E5%91%BD%E5%90%8D%E8%A1%A8%E5%8D%95%20(1).png)
 <span id="RTOS"></span>
 - #### FreeRTOS
