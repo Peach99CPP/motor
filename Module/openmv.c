@@ -104,6 +104,7 @@ void MV_rec_decode(void)
             pn = -1;
         mv_rec.event = MV.rec_buffer[0];
         mv_rec.param = (MV.rec_buffer[2] + (MV.rec_buffer[3] << 8)) * pn;
+        MV_Decode();
     }
     MV.rec_len = 0;
     MV.RX_Status = 0;
@@ -152,25 +153,34 @@ void MV_SendOK(void)
     MV_SendCmd(3, 0);
 }
 
+
+/**********************************************************************
+  * @Name    MV_Decode
+  * @declaration :根据自己定义的参数含义执行命令
+  * @param   None
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void MV_Decode(void)
 {
 #define Catch_ 1
 #define MVPID_THRESHOLD 10
-    if (mv_rec.event == 1)
+#define pid_p 0.5
+    if (mv_rec.event == 1)//接收的是球
     {
         if (mv_rec.param == 1)
             Action_Gruop(Catch_, 1);
         else if (mv_rec.param == 2)
             Action_Gruop(Catch_, 1);
     }
-    else if (mv_rec.event == 2)
+    else if (mv_rec.event == 2) //接收的是PID值
     {
-        if (ABS(mv_rec.param) < MVPID_THRESHOLD)
+        if (ABS(mv_rec.param) < MVPID_THRESHOLD)//值过小时，直接退出
         {
-            set_speed(0, 0, 0);
-            MV_SendOK();
+            set_speed(0, 0, 0);//停车
+            MV_SendOK();//让MV那边停止发送
         }
         else
-            set_speed(mv_rec.param, 0, 0);
+            set_speed(mv_rec.param*pid_p, 0, 0);
     }
 }

@@ -147,22 +147,22 @@ void Wait_Switches(int dir)
         //关于参数的解析，根据方向来判定速度的分配方向
         if (dir == 1) //正Y方向
         {
-            w1 = 2, w2 = 1;
+            w1 = 1, w2 = 2;
             x_pn = 0, y_pn = 1;
         }
         else if (dir == 2) //正X方向
         {
-            w1 = 3, w2 = 4;
-            x_pn = 1, y_pn = 0;
+            w1 = 4, w2 = 3;
+            x_pn = -1, y_pn = 0;
         }
         else if (dir == 3) //负X方向
         {
             w1 = 5, w2 = 6;
-            x_pn = -1, y_pn = 0;
+            x_pn = 1, y_pn = 0;
         }
         else if (dir == 4) //负Y方向
         {
-            w1 = 7, w2 = 8;
+            w1 = 8, w2 = 7;
             x_pn = 0, y_pn = -1;
         }
     }
@@ -237,6 +237,7 @@ void Single_Switch(int switch_id)
         if (status == err)
             Start_Read_Switch(); //防止此时任务退出而卡死在循环里
         osDelay(20);             //任务调度
-    } while (status == off);     //直到开关导通
+    } while (status == on);     //直到开关断开，此时说明到达边界
     set_speed(0, 0, 0);          //停车
+    Exit_Swicth_Read(); 
 }
