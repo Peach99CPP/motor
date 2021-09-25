@@ -6,12 +6,20 @@
 #include "motor.h"
 #include "imu_pid.h"
 #include "read_status.h "
-void Startdebug(void const * argument)
+#include "avoid_obs.h"
+#include "atk_imu.h"
+#include "track_bar_receive.h"
+void Startdebug(void const *argument)
 {
     Start_Read_Switch();
-    while(1)
-    {
-        osDelay(1);
+    avoid_keep();
+    track_status(1, 0);
+    track_status(2, 0);
+    Set_IMUStatus(false);
 
+    while (1)
+    {
+        motor_debug();
+        osDelay(1);
     }
 }

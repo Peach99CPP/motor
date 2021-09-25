@@ -37,6 +37,7 @@ void EncoderTask(void const * argument);
 
 void move_slantly(int dir, int speed, uint16_t delay)
 {
+    set_imu_status(true);//开启陀螺仪保证角度稳定
     int  x_factor, y_factor;
     switch(dir)
     {
@@ -244,9 +245,9 @@ void move_by_encoder(int  direct, int val)
 }
 void EncoderTask(void const * argument)
 {
-#define  ENOCDER_DIVIDE_FACTOR 100
+#define  ENOCDER_DIVIDE_FACTOR 10
 #define ENCODE_THRESHOLD 2
-#define ENCODER_FACTOR 15
+#define ENCODER_FACTOR 8
     clear_motor_data();
     time = TIME_ISR_CNT;//获取系统时间
     if(en_dir == 1)
@@ -257,13 +258,14 @@ void EncoderTask(void const * argument)
 
         if(en_val < 0)//向左
         {
+            en_val *= -1;
             while(1)//未到达目标
             {
                 if( (TIME_ISR_CNT - time > 50) && ABS((en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)) < ENCODE_THRESHOLD))goto Encoder_Exit;//超时处理，避免卡死
-                bias =  -(ABS(en_val) - (encoder_sum / ENOCDER_DIVIDE_FACTOR));//得到差值
+                bias =  - ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR));//得到差值
                 variation = bias * ENCODER_FACTOR;//计算得出输出值。P环
                 variation = variation < - MAX_SPEED ? -MAX_SPEED : variation;//限幅
-                variation = variation < MIN_SPEED ? MIN_SPEED : variation;//分配最低速度，避免卡死
+                variation = variation > MIN_SPEED ? MIN_SPEED : variation;//分配最低速度，避免卡死
                 set_speed(variation, 0, 0);//分配速度
 
                 osDelay(5);//给任务调度内核切换的机会
@@ -271,15 +273,15 @@ void EncoderTask(void const * argument)
         }
         else
         {
-            en_val *= -1;
+            //向右为正
             while(1)
             {
                 if( (TIME_ISR_CNT - time > 50) && ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR) < ENCODE_THRESHOLD)) goto Encoder_Exit;
                 bias = ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR));
                 variation = bias * ENCODER_FACTOR;
                 variation = variation > MAX_SPEED ? MAX_SPEED : variation;
-                variation = variation < MIN_SPEED ? MIN_SPEED : variation;
-                set_speed(-variation, 0, 0);
+                variation = variation < -MIN_SPEED ? -MIN_SPEED : variation;
+                set_speed(variation, 0, 0);
                 osDelay(5);
             }
         }
@@ -303,7 +305,7 @@ void EncoderTask(void const * argument)
             bias = fabs(ABS(en_val) - (encoder_sum / ENOCDER_DIVIDE_FACTOR));
             variation = bias * ENCODER_FACTOR;
             variation = variation > MAX_SPEED ? MAX_SPEED : variation;
-            variation = variation < MIN_SPEED ? MIN_SPEED : variation;
+            variation = variation < -MIN_SPEED ? -MIN_SPEED : variation;
             set_speed(0, variation * pn, 0);
             osDelay(5);
 
