@@ -121,6 +121,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
                 else
                 {
                     //普遍的情况
+                    
                     temp_val = cap_temp_val[1] / FILTER;//获取本采样周期内的平均值
                     if(!(fabs(temp_val + encoder_val[1]) < THRESHOLD_)) //没有因为毛刺发生方向跳变，有的话直接舍弃本次获得的值
                     {
@@ -257,7 +258,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             update_count[4] = 0;
             if(HAL_GPIO_ReadPin(motor4.Encoder_IO.Port, motor4.Encoder_IO.Pin) == GPIO_PIN_RESET)
             {
-                direct_[4] =  FORWARD  ;
+                direct_[4] =  FORWARD;
             }
             else
             {
@@ -274,6 +275,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
             __HAL_TIM_SET_CAPTUREPOLARITY(motor4.IC.Tim, motor4.IC.Channel, TIM_ICPOLARITY_RISING);
             if(cap_cnt[4] == FILTER)
             {
+                
                 if(!first_flag[4])
                 {
                     first_flag[4] = 1;

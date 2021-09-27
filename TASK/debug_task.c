@@ -13,13 +13,13 @@ void Startdebug(void const *argument)
 {
     Start_Read_Switch();
     avoid_keep();
-    track_status(1, 0);
-    track_status(2, 0);
-    Set_IMUStatus(false);
+//    track_status(1, 0);
+//    track_status(2, 0);
+//    Set_IMUStatus(false);
 
     while (1)
     {
-        motor_debug();
+//        motor_debug();
         osDelay(1);
     }
 }

@@ -19,6 +19,9 @@ int read_task_exit = 1; //任务退出标志
 
 short swicth_status[8]; //开关状态，只在内部进行赋值
 
+int MIN_ = 100;
+int VERTICAL = 30;
+
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
 
 /**********************************************************************
@@ -30,11 +33,14 @@ short swicth_status[8]; //开关状态，只在内部进行赋值
 ***********************************************************************/
 void Start_Read_Switch(void)
 {
-    read_task_exit = 0;                              //标记任务开启
-    memset(swicth_status, 0, sizeof(swicth_status)); //初始化数组
-    /* definition and creation of Read_Swicth_tas */
-    osThreadDef(Read_Swicth_tas, Read_Swicth, osPriorityNormal, 0, 128);
-    Read_Swicth_tasHandle = osThreadCreate(osThread(Read_Swicth_tas), NULL);
+    if(read_task_exit)
+    {
+        read_task_exit = 0;                              //标记任务开启
+        memset(swicth_status, 0, sizeof(swicth_status)); //初始化数组
+        /* definition and creation of Read_Swicth_tas */
+        osThreadDef(Read_Swicth_tas, Read_Swicth, osPriorityNormal, 0, 128);
+        Read_Swicth_tasHandle = osThreadCreate(osThread(Read_Swicth_tas), NULL);
+    }
 }
 
 /**********************************************************************
@@ -169,21 +175,21 @@ void Wait_Switches(int dir)
     //开始靠近
 Closing:
     set_speed(MIN_SPEED * x_pn, MIN_SPEED * y_pn, 0); //设置一个基础速度，此速度与方向参数有关
-                                                      //等待开关都开启
+    //等待开关都开启
     do
     {
         flag1 = Get_Switch_Status(w1); //获取状态
         flag2 = Get_Switch_Status(w2);
         /*下面这一句语句，只在单个开关开启时会有作用*/
         w_speed_set(Switch_Factor * (flag1 * w1_factor + flag2 * w2_factor));
-        
 
         if (flag1 == err || flag2 == err)
             Start_Read_Switch(); //防止此时任务未启动导致卡死循环
         //任务调度
         osDelay(10);
 
-    } while (flag1 == off || flag2 == off); //只有两个都接通，才退出该循环
+    }
+    while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
     osDelay(100);
     if (flag1 == off || flag2 == off)
     {
@@ -193,7 +199,7 @@ Closing:
         goto Closing;         //继续回到靠近的程序
     }
 switch_exit:
-    Exit_Swicth_Read(); //用完了就关闭任务
+//    Exit_Swicth_Read(); //用完了就关闭任务
     set_speed(0, 0, 0); //开关
     /*******本来这里应该接一个矫正陀螺仪，但是会降低程序的灵活性，所以不添加。在调用本程序之后，自己操作陀螺仪*******/
 }
@@ -207,10 +213,8 @@ switch_exit:
 ***********************************************************************/
 void Single_Switch(int switch_id)
 {
-#define MIN_ 80
-#define VERTICAL 30
-    Set_IMUStatus(true); //稳定角度
-    short x, y;          //不同方向的速度因子
+    Set_IMUStatus(false); //直接抵着墙撞击，无需陀螺仪稳定角度
+    short x, y;           //不同方向的速度因子
     short x_vertical, y_vertical;
     int status;         //存储开关状态的变量
     if (read_task_exit) //确保开关的开启状态
@@ -253,14 +257,27 @@ void Single_Switch(int switch_id)
         x = 0, y = 0;
         x_vertical = 0, y_vertical = 0;
     }
-    set_speed(x * MIN_+x_vertical*VERTICAL, y * MIN_+y_vertical*VERTICAL , 0); //给一个速度,经测试需要在垂直方向上也给一个速度值避免车身被反弹
+    while(Get_Switch_Status(switch_id) != on)
+    {
+        set_speed(x_vertical * VERTICAL, y_vertical * VERTICAL, 0);
+        osDelay(5);
+    }
+    set_speed(x * MIN_ + x_vertical * VERTICAL, y * MIN_ + y_vertical * VERTICAL, 0); //给一个速度,经测试需要在垂直方向上也给一个速度值避免车身被反弹
     do
     {
         status = Get_Switch_Status(switch_id); //获取状态
         if (status == err)
             Start_Read_Switch(); //防止此时任务退出而卡死在循环里
         osDelay(20);             //任务调度
-    } while (status == on);      //直到开关断开，此时说明到达边界
+    }
+    while (status == on);        //直到开关断开，此时说明到达边界
     set_speed(0, 0, 0);          //停车
-    Exit_Swicth_Read();          //退出任务
+}
+
+void Set_SwitchParam(int main, int vertical)
+{
+    //调试速度的API
+    MIN_ = main;         //沿着板子水平方向的速度
+    VERTICAL = vertical; //垂直板子的速度，确保紧贴着。
+
 }

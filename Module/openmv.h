@@ -21,8 +21,8 @@ typedef struct
 }mv_t;
 typedef enum
 {
-    red=1,
-    blue
+    red_color=1,
+    blue_color
 }mvcolor_t;
 typedef struct
 {
