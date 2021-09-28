@@ -19,8 +19,8 @@ int read_task_exit = 1; //任务退出标志
 
 short swicth_status[8]; //开关状态，只在内部进行赋值
 
-int MIN_ = 100;
-int VERTICAL = 30;
+int MIN_ = 80;
+int VERTICAL = 50;
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
 
@@ -138,7 +138,7 @@ void Exit_Swicth_Read(void)
 void Wait_Switches(int dir)
 {
     /*关于运行时速度的变量,不宜过高否则不稳定*/
-    int Switch_Factor = 10;
+    int Switch_Factor = 20;
     int MIN_SPEED = 80;
 
     if (read_task_exit)
@@ -153,7 +153,7 @@ void Wait_Switches(int dir)
         //关于参数的解析，根据方向来判定速度的分配方向
         if (dir == 1) //正Y方向
         {
-            w1 = 2, w2 = 1;
+            w1 = 1, w2 = 2;
             x_pn = 0, y_pn = 1;
         }
         else if (dir == 2) //正X方向
@@ -190,7 +190,7 @@ Closing:
 
     }
     while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
-    osDelay(100);
+    osDelay(500);
     if (flag1 == off || flag2 == off)
     {
         MIN_SPEED /= 2; //更低的速度
@@ -213,7 +213,7 @@ switch_exit:
 ***********************************************************************/
 void Single_Switch(int switch_id)
 {
-    Set_IMUStatus(false); //直接抵着墙撞击，无需陀螺仪稳定角度
+//    Set_IMUStatus(false); //直接抵着墙撞击，无需陀螺仪稳定角度
     short x, y;           //不同方向的速度因子
     short x_vertical, y_vertical;
     int status;         //存储开关状态的变量
@@ -257,11 +257,14 @@ void Single_Switch(int switch_id)
         x = 0, y = 0;
         x_vertical = 0, y_vertical = 0;
     }
+RECLOSE:
     while(Get_Switch_Status(switch_id) != on)
     {
         set_speed(x_vertical * VERTICAL, y_vertical * VERTICAL, 0);
         osDelay(5);
     }
+    osDelay(500);
+    if(Get_Switch_Status(switch_id) != on) goto RECLOSE;
     set_speed(x * MIN_ + x_vertical * VERTICAL, y * MIN_ + y_vertical * VERTICAL, 0); //给一个速度,经测试需要在垂直方向上也给一个速度值避免车身被反弹
     do
     {

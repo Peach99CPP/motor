@@ -35,6 +35,11 @@ pid_paramer_t track_pid_param = { \
                                 };
 
 
+void Clear_Line(trackbar_t* bar)
+{
+    bar->line_flag = 0;
+    bar->line_num = 0;
+}
 
 /**********************************************************************
   * @Name    set_track_pid
@@ -124,9 +129,9 @@ uint8_t get_avaiable_pos(void)
 void track_decode(void)
 {
     /***相关宏定义****/
-#define EDGE_THRESHOLD 3 //在边缘数线模式下，几颗灯亮起时为有效计数
+#define EDGE_THRESHOLD 4 //在边缘数线模式下，几颗灯亮起时为有效计数
 #define NUM_THRESHOLD 6  //非边缘线计算下，判断到达线的数量
-#define MIN_NUM 3        //在压线之后，过线了才会计算一根线，根据灯的数量进行计数
+#define MIN_NUM 2        //在压线之后，过线了才会计算一根线，根据灯的数量进行计数
 #define EDGE_VAL 7      //边缘数线状态下的循迹读回来的值
     
     times_counts++;//总的处理次数，查看此 数据可以判断是否卡DMA

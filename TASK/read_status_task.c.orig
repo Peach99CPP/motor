@@ -19,8 +19,8 @@ int read_task_exit = 1; //任务退出标志
 
 short swicth_status[8]; //开关状态，只在内部进行赋值
 
-int MIN_ = 100;
-int VERTICAL = 30;
+int MIN_ = 80;
+int VERTICAL = 50;
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
 
@@ -190,7 +190,7 @@ Closing:
 
     }
     while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
-    osDelay(100);
+    osDelay(500);
     if (flag1 == off || flag2 == off)
     {
         MIN_SPEED /= 2; //更低的速度
@@ -257,7 +257,14 @@ void Single_Switch(int switch_id)
         x = 0, y = 0;
         x_vertical = 0, y_vertical = 0;
     }
-    while(Get_Switch_Status(switch_id) != on) {set_speed(x_vertical * VERTICAL, y_vertical * VERTICAL,0); osDelay(5);}
+    RECLOSE:
+    while(Get_Switch_Status(switch_id) != on)
+    {
+        set_speed(x_vertical * VERTICAL, y_vertical * VERTICAL, 0);
+        osDelay(5);
+    }
+    osDelay(500);
+    if(Get_Switch_Status(switch_id) != on) goto RECLOSE;
     set_speed(x * MIN_ + x_vertical * VERTICAL, y * MIN_ + y_vertical * VERTICAL, 0); //给一个速度,经测试需要在垂直方向上也给一个速度值避免车身被反弹
     do
     {

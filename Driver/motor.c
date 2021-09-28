@@ -8,10 +8,10 @@ int debug_speed = 0;
 pid_data_t motor_data[5];
 pid_paramer_t motor_param;
 //积分限幅放宽，尝试让车更具有动力
-float param_[5] = {4000,
+float param_[5] = {2000,
                    9900,
                    130,
-                   15,
+                   50,
                    10};
 
 motor_t motor1, motor2, motor3, motor4;
@@ -477,6 +477,7 @@ void set_debug_speed(int speed)
 
 void set_motor_pid(int kp, int ki, int kd)
 {
+    clear_motor_data();
     motor_param.kp = kp;
     motor_param.ki = ki;
     motor_param.kd = kd;
@@ -493,6 +494,7 @@ void set_motor_pid(int kp, int ki, int kd)
 
 void set_motor_maxparam(int integrate_max, int control_output_limit)
 {
+    clear_motor_data();
     motor_param.control_output_limit = control_output_limit;
     motor_param.integrate_max = integrate_max;
 }

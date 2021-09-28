@@ -43,7 +43,7 @@ float imu_correct_val(void)
     static float now_angle;//过程变量，为避免重复声明，使用静态变量
     //判断此时转弯的状态
     if(fabs(imu.get_angle() - imu.target_angle) < 2.0) if_completed = 1;
-    else if_completed = 1 ;
+    else if_completed = 0 ;
 
     if(! imu.switch_ ) return 0; //未使能则直接返回0，不做修改
     else

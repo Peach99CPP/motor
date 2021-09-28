@@ -49,6 +49,7 @@ void set_track_pid(int kp,int ki,int kd);
 extern trackbar_t y_bar,x_leftbar,x_rightbar;
 extern int dma_count;
 float track_pid_cal(trackbar_t * bar);
+void Clear_Line(trackbar_t* bar);
 #endif
 
 

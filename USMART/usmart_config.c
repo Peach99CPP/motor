@@ -16,10 +16,11 @@
 
 #define DEBUG_MOTOR 0
 #define DEBUG_TRACKER 0
-#define DEBUG_IMU 0
+#define DEBUG_IMU 1
 #define DEBUG_CHASSIS 1
 #define DEBUG_SWITCH 1
 #define DEBUG_OPENMV 0
+extern void  Global_Debug(void);
 /******将显示界面变得更加整洁****/
 //函数名列表初始化(用户自己添加)
 //用户直接在这里输入要执行的函数名及其查找串
@@ -60,6 +61,8 @@ struct _m_usmart_nametab usmart_nametab[] =
 #endif
 #if DEBUG_CHASSIS == 1
         /**底盘运动部分**/
+        (void*)move_slantly,
+        "void move_slantly(int dir, int speed, uint16_t delay)",
         (void *)set_motor,
         "void set_motor(int motor_id, int control_val)",
         (void *)set_speed,
@@ -85,7 +88,8 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void set_imu_status(int status)",
         (void *)track_status,
         "void track_status(int id, int status)",
-
+        (void*)Global_Debug,
+        "void  Global_Debug(void)",
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

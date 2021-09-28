@@ -221,7 +221,7 @@ void chassis_synthetic_control(void)
        printf("%.2f  %.2f %.2f %.2f ", motor_data[debug_motor_id].feedback, motor_data[debug_motor_id].expect,\
        motor_data[debug_motor_id].control_output,motor_data[debug_motor_id].integrate\
        );
-        printf("%.2f  %.2f %.2f %.2f ",motor_data[1].feedback,motor_data[2].feedback,motor_data[3].feedback,motor_data[4].feedback);
+//        printf("%.2f  %.2f %.2f %.2f ",motor_data[1].feedback,motor_data[2].feedback,motor_data[3].feedback,motor_data[4].feedback);
         printf("\r\n");
     }
 }

@@ -37,6 +37,7 @@ void car_shaking(int direct);
 
 int get_count_line_status(void);
 int get_enocdermove_status(void);
+int Limit_Speed(int speed); 
 
 extern int edge_status[3];
 
