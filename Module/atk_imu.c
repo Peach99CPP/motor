@@ -354,7 +354,7 @@ ATK_IMU_t imu =
     {
         /*移植时只需要修改以下结构体变量即可*/
 
-        .imu_uart = &huart6,        //串口号
+        .imu_uart = &huart2,        //串口号
         .yaw_ptr = &(attitude.yaw), //解析出来的原始数据的指针
         .target_angle = 0,          //pid的目标角度
         .init_angle = 0,            //初始化角度，补偿上电时的初始角度
@@ -383,14 +383,10 @@ void Set_IMUStatus(int status)
 
 void IMU_IRQ(void)
 {
-
-    for (uint8_t i = 0; i < BUFFER_SIZE; ++i) //开始遍历DMA接收到的数据
-    {
-        if (imu901_unpack(imu_cmd[i])) //接收完成
-            atkpParsing(&rxPacket);    //开始解码，得到姿态角
-    }
-
-    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE); //再次开启DMA
+    static uint8_t rec;
+    rec = imu.imu_uart->Instance->RDR;
+    if (imu901_unpack(rec))     //接收完成
+        atkpParsing(&rxPacket); //开始解码，得到姿态角
 }
 
 /**********************************************************************
@@ -403,8 +399,8 @@ void IMU_IRQ(void)
 
 void ATK_IMU_Init(void)
 {
-    HAL_UART_Receive_DMA(imu.imu_uart, imu_cmd, BUFFER_SIZE); //开启DMA
-    Set_InitYaw(0);                                           //获取初始化角度，用于补偿上电时的角度,并设置当前角度为0度
+    __HAL_UART_ENABLE_IT(imu.imu_uart, UART_IT_RXNE); //开启DMA
+    Set_InitYaw(0);                                   //获取初始化角度，用于补偿上电时的角度,并设置当前角度为0度
 }
 
 /**********************************************************************
@@ -416,7 +412,7 @@ void ATK_IMU_Init(void)
 ***********************************************************************/
 void Set_InitYaw(int target)
 {
-    Set_IMUStatus(false) ;//先把陀螺仪关掉，否则容易在修改过程中异常
+    Set_IMUStatus(false); //先把陀螺仪关掉，否则容易在修改过程中异常
 
     imu.target_angle = angle_limit(target); //同步修改
 

@@ -91,8 +91,7 @@ void track_bar_init(void)//相关的初始化函数
     x_rightbar.line_num = 0;
     x_rightbar.data.expect = 0;
     x_rightbar.if_switch = true;
-    //开启DMA接收，此处应确保main中DMA初始化函数在串口初始化前运行
-    HAL_UART_Receive_DMA(&TRACK_UART, (uint8_t*)track_dma, BUFF_SIZE);
+    HAL_UART_Receive_DMA(&TRACK_UART,track_dma[0],BUFF_SIZE);
 }
 
 
@@ -233,7 +232,6 @@ void track_IT_handle(void)
     {
         memset(memset(track_dma, 0, sizeof(track_dma)), 0, sizeof(memset(track_dma, 0, sizeof(track_dma)))); //清空掉，作用不大，习惯为止
         HAL_UART_Receive_DMA(&TRACK_UART, (uint8_t*)track_dma[dma_trans_pos], BUFF_SIZE);
-
     }
 
 }
@@ -249,13 +247,9 @@ void track_IT_handle(void)
 ***********************************************************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if(huart == &huart2)//寻迹板对应的串口，为了移植性，后续会用结构体
+    if(huart == &TRACK_UART)//寻迹板对应的串口，为了移植性，后续会用结构体
     {
         track_IT_handle();
-    }
-    else if(huart ==  imu.imu_uart)
-    {
-        IMU_IRQ();//陀螺仪的DMA解析函数
     }
 
 }

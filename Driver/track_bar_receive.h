@@ -24,7 +24,7 @@
 #include "task.h"
 #include "pid.h"
 #include "string.h"
-#define TRACK_UART  huart2
+#define TRACK_UART  huart6
 typedef enum{
     forward_bar=0,
     left_bar,
