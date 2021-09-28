@@ -255,7 +255,7 @@ void EncoderTask(void const *argument)
 {
 #define ENOCDER_DIVIDE_FACTOR 10
 #define ENCODE_THRESHOLD 2
-#define ENCODER_FACTOR 8
+#define ENCODER_FACTOR 5
     clear_motor_data();
     time = TIME_ISR_CNT; //获取系统时间
     if (en_dir == 1)

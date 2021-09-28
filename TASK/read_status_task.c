@@ -18,12 +18,12 @@ void Read_Swicth(void const *argument); //函数声明
 int read_task_exit = 1; //任务退出标志
 
 short swicth_status[8]; //开关状态，只在内部进行赋值
-
+short HW_Switch[4];     //红外开关的状态
 int MIN_ = 80;
 int VERTICAL = 50;
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
-
+#define HW_SWITCH(X) HW_Switch[(X)-1]
 /**********************************************************************
   * @Name    Start_Read_Switch
   * @declaration : 启动轻触开关任务
@@ -33,10 +33,13 @@ int VERTICAL = 50;
 ***********************************************************************/
 void Start_Read_Switch(void)
 {
-    if(read_task_exit)
+    if (read_task_exit)
     {
-        read_task_exit = 0;                              //标记任务开启
-        memset(swicth_status, 0, sizeof(swicth_status)); //初始化数组
+        read_task_exit = 0; //标记任务开启
+        //初始化数组
+        memset(swicth_status, 0, sizeof(swicth_status));
+        memset(HW_Switch, 0, sizeof(HW_Switch));
+
         /* definition and creation of Read_Swicth_tas */
         osThreadDef(Read_Swicth_tas, Read_Swicth, osPriorityNormal, 0, 128);
         Read_Swicth_tasHandle = osThreadCreate(osThread(Read_Swicth_tas), NULL);
@@ -95,6 +98,24 @@ void Read_Swicth(void const *argument)
         else
             SWITCH(8) = off;
 
+        if (HAL_GPIO_ReadPin(HW_S1_GPIO_Port, HW_S1_Pin) == GPIO_PIN_SET)
+            HW_SWITCH(1) = off;
+        else
+            HW_SWITCH(1) = on;
+
+        if (HAL_GPIO_ReadPin(HW_S2_GPIO_Port, HW_S2_Pin) == GPIO_PIN_SET)
+            HW_SWITCH(2) = off;
+        else
+            HW_SWITCH(2) = on;
+
+        if (HAL_GPIO_ReadPin(HW_S3_GPIO_Port, HW_S3_Pin) == GPIO_PIN_SET)
+            HW_SWITCH(3) = off;
+        else
+            HW_SWITCH(3) = on;
+        if (HAL_GPIO_ReadPin(HW_S4_GPIO_Port, HW_S4_Pin) == GPIO_PIN_SET)
+            HW_SWITCH(4) = off;
+        else
+            HW_SWITCH(4) = on;
         osDelay(50); //对请求的频率不高,所以可以50ms来单次刷新
     }
     memset(swicth_status, err, sizeof(swicth_status)); //清空到未初始状态，用于标记此时任务未运行
@@ -116,6 +137,19 @@ int Get_Switch_Status(int id)
     return SWITCH(id); //返回对应开关的状态
 }
 
+/**********************************************************************
+  * @Name    Get_HW_Status
+  * @declaration :获取指定ID号红外开关的状态
+  * @param   id: [输入/出] 红外开关编号
+  * @retval   : 状态
+  * @author  peach99CPP
+***********************************************************************/
+int Get_HW_Status(int id)
+{
+    if (read_task_exit || (id < 1 || id > 4))//输入值限制避免出错
+        return err;
+    return HW_SWITCH(id);
+}
 /**********************************************************************
   * @Name    Exit_Swicth_Read
   * @declaration : 退出查询开关状态的任务
@@ -188,8 +222,7 @@ Closing:
         //任务调度
         osDelay(10);
 
-    }
-    while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
+    } while (flag1 == off || flag2 == off); //只有两个都接通，才退出该循环
     osDelay(500);
     if (flag1 == off || flag2 == off)
     {
@@ -199,7 +232,7 @@ Closing:
         goto Closing;         //继续回到靠近的程序
     }
 switch_exit:
-//    Exit_Swicth_Read(); //用完了就关闭任务
+    //    Exit_Swicth_Read(); //用完了就关闭任务
     set_speed(0, 0, 0); //开关
     /*******本来这里应该接一个矫正陀螺仪，但是会降低程序的灵活性，所以不添加。在调用本程序之后，自己操作陀螺仪*******/
 }
@@ -213,8 +246,8 @@ switch_exit:
 ***********************************************************************/
 void Single_Switch(int switch_id)
 {
-//    Set_IMUStatus(false); //直接抵着墙撞击，无需陀螺仪稳定角度
-    short x, y;           //不同方向的速度因子
+    //    Set_IMUStatus(false); //直接抵着墙撞击，无需陀螺仪稳定角度
+    short x, y; //不同方向的速度因子
     short x_vertical, y_vertical;
     int status;         //存储开关状态的变量
     if (read_task_exit) //确保开关的开启状态
@@ -258,13 +291,14 @@ void Single_Switch(int switch_id)
         x_vertical = 0, y_vertical = 0;
     }
 RECLOSE:
-    while(Get_Switch_Status(switch_id) != on)
+    while (Get_Switch_Status(switch_id) != on)
     {
         set_speed(x_vertical * VERTICAL, y_vertical * VERTICAL, 0);
         osDelay(5);
     }
     osDelay(500);
-    if(Get_Switch_Status(switch_id) != on) goto RECLOSE;
+    if (Get_Switch_Status(switch_id) != on)
+        goto RECLOSE;
     set_speed(x * MIN_ + x_vertical * VERTICAL, y * MIN_ + y_vertical * VERTICAL, 0); //给一个速度,经测试需要在垂直方向上也给一个速度值避免车身被反弹
     do
     {
@@ -272,8 +306,7 @@ RECLOSE:
         if (status == err)
             Start_Read_Switch(); //防止此时任务退出而卡死在循环里
         osDelay(20);             //任务调度
-    }
-    while (status == on);        //直到开关断开，此时说明到达边界
+    } while (status == on);      //直到开关断开，此时说明到达边界
     set_speed(0, 0, 0);          //停车
 }
 
@@ -282,5 +315,4 @@ void Set_SwitchParam(int main, int vertical)
     //调试速度的API
     MIN_ = main;         //沿着板子水平方向的速度
     VERTICAL = vertical; //垂直板子的速度，确保紧贴着。
-
 }

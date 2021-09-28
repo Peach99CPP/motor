@@ -1,21 +1,12 @@
 #include "servo.h "
 #include "uart_handle.h"
 ServoControler_t servo_controler =
-{
-    .uart = &huart5,
-    .current_index = 0,
-    .cmd_buffer = {0}
-};
+    {
+        .uart = &huart5,
+        .current_index = 0,
+        .cmd_buffer = {0}
+    };
 
-
-
-/**********************************************************************
-  * @Name    Error_Report
-  * @declaration : 进行错误报告
-  * @param   type: [输入/出]  错误类型
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
 void Error_Report(int type)
 {
     if (type == 1)
@@ -26,24 +17,15 @@ void Error_Report(int type)
         printf("舵控发生未知错误\r\n");
 }
 
-
-
-/**********************************************************************
-  * @Name    Cmd_Convert
-  * @declaration : 将传入的参数编码成单个数字格式
-  * @param   cmd: [输入/出] 
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
 void Cmd_Convert(int cmd)
 {
     short temp_num[5] = {0}, index = 0;
-    if (cmd == 0)//对为0的参数进行单独的处理
+    if (cmd == 0)
     {
         servo_controler.cmd_buffer[servo_controler.current_index++] = 0;
         return;
     }
-    while (cmd != 0)//获取其数字的每一位，转化成字符
+    while (cmd != 0)
     {
         temp_num[index++] = cmd % 10 + '0';
         cmd /= 10;
@@ -109,7 +91,6 @@ void Single_Control(int id, int control_mode, int angle, int time, int delay)
         angle = 500 + (2000.0 / 270.0) * angle; //满角度为270度的舵机的指令
     }
     Cmd_Convert(angle);
-    
     //设置执行时间
     servo_controler.cmd_buffer[servo_controler.current_index++] = 'T';
     Cmd_Convert(time);
@@ -121,7 +102,7 @@ void Single_Control(int id, int control_mode, int angle, int time, int delay)
 }
 void Action_Gruop(int id, int times)
 {
-    if (id > 255 || id < 0)//限制输入值，避免出错
+    if (id > 255 || id < 0)
     {
         Error_Report(2);
         return;

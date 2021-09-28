@@ -24,7 +24,7 @@
 #include "main.h"
 #include "usart.h"
 
-#define MAX_SERVO_SIZE 30
+#define MAX_SERVO_SIZE 100
 
 typedef struct{
     UART_HandleTypeDef * uart;

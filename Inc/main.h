@@ -87,6 +87,14 @@ void Error_Handler(void);
 #define SW_7_GPIO_Port GPIOC
 #define SW_8_Pin GPIO_PIN_8
 #define SW_8_GPIO_Port GPIOA
+#define HW_S1_Pin GPIO_PIN_15
+#define HW_S1_GPIO_Port GPIOA
+#define HW_S2_Pin GPIO_PIN_0
+#define HW_S2_GPIO_Port GPIOD
+#define HW_S3_Pin GPIO_PIN_1
+#define HW_S3_GPIO_Port GPIOD
+#define HW_S4_Pin GPIO_PIN_3
+#define HW_S4_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
