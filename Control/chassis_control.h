@@ -32,13 +32,13 @@ typedef enum
 void edge_move(int direct, int line_num);
 void move_by_encoder(int direct, int val);
 void move_slantly(int dir,int speed,uint16_t delay);
-void direct_move(int direct, int line_num,int edge_if);
+void direct_move(int direct, int line_num, int edge_if,int imu_if);
 void car_shaking(int direct);
 
 int get_count_line_status(void);
 int get_enocdermove_status(void);
 int Limit_Speed(int speed); 
-
+void Comfirm_Online(int dir);
 extern int edge_status[3];
 
 #endif

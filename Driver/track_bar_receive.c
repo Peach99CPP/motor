@@ -277,3 +277,7 @@ void track_status(int id, int status)
         x_rightbar.if_switch = status;
     }
 }
+int Get_Trcker_Num(trackbar_t *bar)
+{
+    return bar->num;
+}

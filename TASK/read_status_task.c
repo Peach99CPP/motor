@@ -12,6 +12,7 @@
 #include "chassis.h"
 #include "atk_imu.h"
 
+
 osThreadId Read_Swicth_tasHandle;       //任务句柄
 void Read_Swicth(void const *argument); //函数声明
 
@@ -19,8 +20,8 @@ int read_task_exit = 1; //任务退出标志
 
 short swicth_status[8]; //开关状态，只在内部进行赋值
 short HW_Switch[4];     //红外开关的状态
-int MIN_ = 80;
-int VERTICAL = 50;
+int MIN_ = 60;
+int VERTICAL = 10;
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
 #define HW_SWITCH(X) HW_Switch[(X)-1]
@@ -116,7 +117,7 @@ void Read_Swicth(void const *argument)
             HW_SWITCH(4) = off;
         else
             HW_SWITCH(4) = on;
-        osDelay(50); //对请求的频率不高,所以可以50ms来单次刷新
+        osDelay(10); //对请求的频率不高,所以可以50ms来单次刷新
     }
     memset(swicth_status, err, sizeof(swicth_status)); //清空到未初始状态，用于标记此时任务未运行
     vTaskDelete(Read_Swicth_tasHandle);                //从任务列表中移除该任务
@@ -172,8 +173,8 @@ void Exit_Swicth_Read(void)
 void Wait_Switches(int dir)
 {
     /*关于运行时速度的变量,不宜过高否则不稳定*/
-    int Switch_Factor = 20;
-    int MIN_SPEED = 80;
+    int Switch_Factor = 50;
+    int MIN_SPEED = 50;
 
     if (read_task_exit)
         Start_Read_Switch();
@@ -315,4 +316,20 @@ void Set_SwitchParam(int main, int vertical)
     //调试速度的API
     MIN_ = main;         //沿着板子水平方向的速度
     VERTICAL = vertical; //垂直板子的速度，确保紧贴着。
+}
+void HWSwitch_Move(int dir)
+{
+    Set_IMUStatus(true);
+    if(dir ==1 )
+    {
+        set_speed(-MIN_,VERTICAL,0);
+        while(Get_HW_Status(dir)== on) osDelay(10);
+    }
+    else if(dir == 2)
+    {
+         set_speed(MIN_,VERTICAL,0);
+         while(Get_HW_Status(dir)== on) osDelay(10);
+    }
+    set_speed(0,0,0);
+    osDelay(200);
 }
