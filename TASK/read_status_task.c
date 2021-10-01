@@ -11,7 +11,7 @@
 
 #include "chassis.h"
 #include "atk_imu.h"
-
+#include "openmv.h"
 
 osThreadId Read_Swicth_tasHandle;       //任务句柄
 void Read_Swicth(void const *argument); //函数声明
@@ -317,9 +317,9 @@ void Set_SwitchParam(int main, int vertical)
     MIN_ = main;         //沿着板子水平方向的速度
     VERTICAL = vertical; //垂直板子的速度，确保紧贴着。
 }
-void HWSwitch_Move(int dir)
+void HWSwitch_Move(int dir,int enable_imu)
 {
-    Set_IMUStatus(true);
+    Set_IMUStatus(enable_imu);
     if(dir ==1 )
     {
         set_speed(-MIN_,VERTICAL,0);
@@ -332,4 +332,21 @@ void HWSwitch_Move(int dir)
     }
     set_speed(0,0,0);
     osDelay(200);
+}
+
+void MV_HW(int dir,int enable_imu)
+{
+    Set_IMUStatus(enable_imu);
+    if(dir ==1 )
+    {
+        set_speed(-MIN_,VERTICAL,0);
+        while(Get_HW_Status(dir)== on && Get_Stop_Signal()== false) osDelay(10);
+    }
+    else if(dir == 2)
+    {
+         set_speed(MIN_,VERTICAL,0);
+         while(Get_HW_Status(dir)== on && Get_Stop_Signal()== false) osDelay(10);
+    }
+    set_speed(0,0,0);
+    osDelay(100);
 }

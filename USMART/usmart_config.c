@@ -85,7 +85,9 @@ struct _m_usmart_nametab usmart_nametab[] =
         (void *)Set_SwitchParam,
         "void Set_SwitchParam(int main,int vertical)",
         (void *)HWSwitch_Move,
-        "void HWSwitch_Move(int dir)",
+        "void HWSwitch_Move(int dir,int enable_imu)",
+        (void *)MV_HW,
+        "void MV_HW(int dir,int enable_imu)",
 #endif
 #if Debug_Servo == 1
         (void *)Single_Control,
@@ -98,7 +100,7 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void set_imu_status(int status)",
         (void *)track_status,
         "void track_status(int id, int status)",
-        (void*)Comfirm_Online,
+        (void *)Comfirm_Online,
         "void Comfirm_Online(int dir)",
         (void *)turn_angle,
         "void turn_angle(int mode ,int angle)",

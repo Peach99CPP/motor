@@ -46,10 +46,10 @@ void Global_Debug(void)
     move_slantly(1, 150, 1150);
     Wait_Switches(1);
     Set_InitYaw(0);
-    HWSwitch_Move(1);
+    HWSwitch_Move(1,1);
     Wait_Switches(1);
     Set_InitYaw(0);
-    HWSwitch_Move(2);
+    HWSwitch_Move(2,1);
     move_by_encoder(2, -200);
     while (!get_enocdermove_status())
         osDelay(10);

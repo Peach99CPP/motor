@@ -2,7 +2,10 @@
 #include "servo.h"
 #include "chassis.h"
 #include "uart_handle.h"
+
+#define STOP_SIGNAL 0XAABB
 int mv_param;
+static short mv_stop_flag=0;
 mvrec_t mv_rec;
 mv_t MV =
     {
@@ -195,4 +198,20 @@ void MV_Decode(void)
         else
             set_speed(mv_rec.param * pid_p, 0, 0);
     }
+    else if(mv_rec.event == 3)
+    {
+        if(mv_rec.param == 0XAABB)
+        {
+            mv_stop_flag =1;
+        }
+    }
+}
+int Get_Stop_Signal(void)
+{
+    if(mv_stop_flag)
+    {
+        mv_stop_flag =0;
+        return true;
+    }
+    else return false;
 }

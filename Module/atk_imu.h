@@ -197,7 +197,7 @@ typedef struct{
     volatile float* yaw_ptr;
     float target_angle;
     float init_angle;
-    bool switch_; 
+    bool enable_switch; 
     float (*get_angle)(void);
 }ATK_IMU_t;
 

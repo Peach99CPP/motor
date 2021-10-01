@@ -358,7 +358,7 @@ ATK_IMU_t imu =
         .yaw_ptr = &(attitude.yaw), //解析出来的原始数据的指针
         .target_angle = 0,          //pid的目标角度
         .init_angle = 0,            //初始化角度，补偿上电时的初始角度
-        .switch_ = 1,               //使能开关
+        .enable_switch = 1,               //使能开关
         .get_angle = Get_Yaw        //函数指针，返回经过限幅和相对0的角度
 };
 
@@ -482,6 +482,6 @@ limit_label:
 ***********************************************************************/
 int Get_IMUStatus(void)
 {
-    return imu.switch_;
+    return imu.enable_switch;
 }
 /*******************************END OF FILE************************************/

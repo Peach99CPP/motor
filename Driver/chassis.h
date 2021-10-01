@@ -15,7 +15,7 @@
 #include "tim_control.h"
 typedef struct chassis_structure
 {
-    bool _switch;//是否使能底盘
+    bool enable_switch;//是否使能底盘
     double x_speed;//x方向底盘速度
     double  y_speed;//y方向底盘速度
     double  w_speed;//w方向底盘角速度

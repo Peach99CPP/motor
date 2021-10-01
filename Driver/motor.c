@@ -462,7 +462,7 @@ void motor_debug(void)
 
 void set_debug_speed(int speed)
 {
-    chassis._switch = true;
+    chassis.enable_switch = true;
     debug_speed = speed;
 }
 /**********************************************************************

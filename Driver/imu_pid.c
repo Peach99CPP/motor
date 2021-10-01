@@ -11,9 +11,10 @@
 #include "imu_pid.h"
 #include "atk_imu.h"
 #include "track_bar_receive.h "
-
-#define ABS(X)  (((X) > 0)? (X) : -(X))
-
+#include "uart_handle.h"
+/*****因为在别的地方已经有该宏定义，故无需重复添加
+ #define ABS(X)  (((X) > 0)? (X) : -(X))
+******/
 pid_data_t imu_data, anglekeep_data;
 pid_paramer_t imu_para =
 {
@@ -45,7 +46,7 @@ float imu_correct_val(void)
     if(fabs(imu.get_angle() - imu.target_angle) < 2.0) if_completed = 1;
     else if_completed = 0 ;
 
-    if(! imu.switch_ ) return 0; //未使能则直接返回0，不做修改
+    if(! imu.enable_switch ) return 0; //未使能则直接返回0，不做修改
     else
     {
         imu_data.expect = imu.target_angle;//设置好pid的目标
@@ -73,7 +74,7 @@ float imu_correct_val(void)
 
 void set_imu_angle(int  angle)
 {
-    imu.switch_ = 1;//默认开启开关
+    imu.enable_switch = 1;//默认开启开关
     imu.target_angle = angle_limit(angle);//将限幅后的角度，传给结构体
 
 }
@@ -106,7 +107,7 @@ void set_imu_param(int p, int i, int d)
 void set_imu_status(int status)
 {
     //改变陀螺仪的使能状态
-    imu.switch_ = status;
+    imu.enable_switch = status;
 }
 
 
@@ -123,7 +124,7 @@ void set_imu_status(int status)
 ***********************************************************************/
 void turn_angle(int mode, int angle)
 {
-    if(imu.switch_)
+    if(imu.enable_switch)
     {
         //限幅
         angle = angle_limit(angle);
@@ -142,8 +143,9 @@ void turn_angle(int mode, int angle)
         x_leftbar.if_switch  = false;
         x_rightbar.if_switch = false;
         y_bar.if_switch = false;
-
     }
+      else 
+      printf("陀螺仪未开启,无法转弯\r\n");
 
 }
 int get_turn_status(void)

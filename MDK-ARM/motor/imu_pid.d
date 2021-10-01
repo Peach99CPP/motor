@@ -58,3 +58,11 @@ motor\imu_pid.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.
 motor\imu_pid.o: ../Inc/usart.h
 motor\imu_pid.o: ..\Driver\track_bar_receive.h 
 motor\imu_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+motor\imu_pid.o: ..\Driver\uart_handle.h
+motor\imu_pid.o: ..\Driver\motor.h
+motor\imu_pid.o: ..\Control\tim_control.h
+motor\imu_pid.o: ..\Driver\motor.h
+motor\imu_pid.o: ..\Driver\uart_handle.h
+motor\imu_pid.o: ../Inc/tim.h
+motor\imu_pid.o: ..\Driver\delay.h
+motor\imu_pid.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

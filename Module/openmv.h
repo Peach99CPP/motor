@@ -35,6 +35,7 @@ void cmd_encode(const uint8_t event_id,int  param);
 void MV_SendCmd(const uint8_t event_id,const int  param);
 void MV_IRQ(void);
 void MV_rec_decode(void);
+int Get_Stop_Signal(void);
 
 void MV_Ball(int color);
 void MV_Decode(void);

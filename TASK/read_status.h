@@ -30,7 +30,8 @@ void Start_Read_Switch(void);
 void Exit_Swicth_Read(void);
 void Wait_Switches(int dir);
 void Single_Switch(int switch_id);
-void HWSwitch_Move(int dir);//使用红外开关进行移动
+void HWSwitch_Move(int dir,int enable_imu);//使用红外开关进行移动
+void MV_HW(int dir,int enable_imu);
 void Set_SwitchParam(int main,int vertical);
 #endif
 

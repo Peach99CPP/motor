@@ -64,7 +64,7 @@ float get_chassis_speed(char dir)
 ***********************************************************************/
 void set_speed(int x, int y, int w)
 {
-    if (chassis._switch) //只有当底盘的使能开关被打开时才允许进行操作
+    if (chassis.enable_switch) //只有当底盘的使能开关被打开时才允许进行操作
     {
         chassis.x_speed = x;
         chassis.y_speed = y;
@@ -80,7 +80,7 @@ void set_speed(int x, int y, int w)
 **************************************************************/
 void set_chassis_status(bool status)
 {
-    chassis._switch = status;
+    chassis.enable_switch = status;
 }
 
 /**********************************************************************
@@ -96,7 +96,7 @@ void set_chassis_status(bool status)
 
 void speed_variation(float x_var, float y_var, float w_var)
 {
-    if (chassis._switch)
+    if (chassis.enable_switch)
     {
         chassis.x_speed += x_var;
         chassis.y_speed += y_var;
@@ -114,7 +114,7 @@ void chassis_synthetic_control(void)
 {
     static float x, y, w, factor;
     static double max_val;
-    if (chassis._switch == false)
+    if (chassis.enable_switch == false)
         return; //如果底盘不被使能，则没有后续操作
 
     if (++time_count == TIME_PARAM)
