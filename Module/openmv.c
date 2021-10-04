@@ -168,26 +168,27 @@ void MV_Decode(void)
         mv_stop_flag = 1;
         osDelay(300);
         printf("收到了球的信息,Paarmter=%d\r\n",mv_rec.param);    //todo：调试模式下进行使用，用于测试是否收到了消息
-        if (mv_rec.param == ladder_type) //阶梯平台三种高度
-        {
-            switch (Get_Height())
-            {
-            case 1:
-                Action_Gruop(Lowest, 1);
-                break;
-            case 2:
-                Action_Gruop(Highest, 1);
-                break;
-            case 3:
-                Action_Gruop(Medium, 1);
-            default:
-                ;
-            }
-        }
-        else if (mv_rec.param == bar_type)
-        {
-            Action_Gruop(Bar, 1);
-        }
+        
+        // if (mv_rec.param == ladder_type) //阶梯平台三种高度
+        // {
+        //     switch (Get_Height())
+        //     {
+        //     case 1:
+        //         Action_Gruop(Lowest, 1);
+        //         break;
+        //     case 2:
+        //         Action_Gruop(Highest, 1);
+        //         break;
+        //     case 3:
+        //         Action_Gruop(Medium, 1);
+        //     default:
+        //         ;
+        //     }
+        // }
+        // else if (mv_rec.param == bar_type)
+        // {
+        //     Action_Gruop(Bar, 1);
+        // }
         osDelay(2000);
     }
 }

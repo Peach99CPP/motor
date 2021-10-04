@@ -234,7 +234,7 @@ Closing:
     if (flag1 == off || flag2 == off)
     {
         MIN_SPEED /= 2; //更低的速度
-        if (MIN_SPEED < 5)
+        if (ABS(MIN_SPEED) < 5)
             goto switch_exit; //防止卡死在这里
         goto Closing;         //继续回到靠近的程序
     }
@@ -359,6 +359,7 @@ void MV_HW(int dir, int enable_imu)
     }
     set_speed(0, 0, 0);
     osDelay(100);
+    Wait_Switches(1);
 }
 int Get_Height(void)
 {
