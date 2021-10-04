@@ -32,6 +32,12 @@ typedef struct{
     uint8_t cmd_buffer[MAX_SERVO_SIZE];
 }ServoControler_t;
 
+typedef enum{
+    Lowest =1,
+    Medium,
+    Highest,
+    Bar
+}Servo_ID_t;
 void Cmd_Convert(int cmd);
 
 void Servo_Uart_Send(void);

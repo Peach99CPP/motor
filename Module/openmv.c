@@ -2,18 +2,20 @@
 #include "servo.h"
 #include "chassis.h"
 #include "uart_handle.h"
+#include "read_status.h"
 
 #define STOP_SIGNAL 0XAABB
 int mv_param;
-static short mv_stop_flag=0;
+static short mv_stop_flag = 0;
 mvrec_t mv_rec;
 mv_t MV =
-    {
-        .mv_uart = &huart4,
-        .mv_cmd = {0},
-        .rec_buffer = {0},
-        .rec_len = 0,
-        .RX_Status = 0}; //初始化变量
+{
+    .mv_uart = &huart4,
+    .mv_cmd = {0},
+    .rec_buffer = {0},
+    .rec_len = 0,
+    .RX_Status = 0
+}; //初始化变量
 
 /**********************************************************************
   * @Name    cmd_encode
@@ -86,7 +88,7 @@ void MV_IRQ(void)
                 {
                     MV.RX_Status = 0; //防止因为出错导致卡死
                     MV.rec_len = 0;
-                    memset(MV.rec_buffer,0,sizeof(MV.rec_buffer));
+                    memset(MV.rec_buffer, 0, sizeof(MV.rec_buffer));
                 }
             }
         }
@@ -112,9 +114,9 @@ void MV_rec_decode(void)
             pn = -1;
         mv_rec.event = MV.rec_buffer[0];
         mv_rec.param = (MV.rec_buffer[2] + (MV.rec_buffer[3] << 8)) * pn;
-            MV.rec_len = 0;
-            MV.RX_Status = 0;
         MV_Decode();
+        MV.rec_len = 0;
+        MV.RX_Status = 0;
     }
     //处理完之后记得重新初始化结构体中的rec_len和RX_status变量，避免出错
     ;
@@ -122,26 +124,6 @@ void MV_rec_decode(void)
 
 /****上面是底层实现，下面是上层的应用****/
 
-/**********************************************************************
-  * @Name    MV_Ball
-  * @declaration :告诉MV要检查什么颜色的球
-  * @param   color: [输入/出]  目标球的颜色
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
-void MV_Ball(int color)
-{
-    if (color == red_color)
-    {
-        printf("红色的二维码\r\n");
-        MV_SendCmd(1, 1);
-    }
-    else if (color == blue_color)
-    {
-        printf("蓝色的二维码");
-        MV_SendCmd(1, 2);
-    }
-}
 
 /**********************************************************************
   * @Name    MV_PID
@@ -164,7 +146,7 @@ void MV_PID(void)
 ***********************************************************************/
 void MV_SendOK(void)
 {
-    MV_SendCmd(3, 0);
+    MV_SendCmd(4, 0);
 }
 
 /**********************************************************************
@@ -179,39 +161,121 @@ void MV_Decode(void)
 #define Catch_ 1
 #define MVPID_THRESHOLD 10
 #define pid_p 0.5
-    if (mv_rec.event == 1) //接收的是球
+#define Ball_Signal 0x04
+    if (mv_rec.event == Ball_Signal)
     {
-        printf("收到了球的信息\r\n"); //todo：调试模式下进行使用，用于测试是否收到了消息
-        if (mv_rec.param == 1)
-            Action_Gruop(Catch_, 1); //
-        else if (mv_rec.param == 2)
-            Action_Gruop(Catch_, 1);
-    }
-    else if (mv_rec.event == 2) //接收的是PID值
-    {
-        printf("收到了定位PID的信息\r\n");//todo:打印调试信息
-        if (ABS(mv_rec.param) < MVPID_THRESHOLD) //值过小时，直接退出
+        set_speed(0, 0, 0);
+        mv_stop_flag = 1;
+        osDelay(300);
+        printf("收到了球的信息,Paarmter=%d\r\n",mv_rec.param);    //todo：调试模式下进行使用，用于测试是否收到了消息
+        if (mv_rec.param == ladder_type) //阶梯平台三种高度
         {
-            set_speed(0, 0, 0); //停车
-            MV_SendOK();        //让MV那边停止发送
+            switch (Get_Height())
+            {
+            case 1:
+                Action_Gruop(Lowest, 1);
+                break;
+            case 2:
+                Action_Gruop(Highest, 1);
+                break;
+            case 3:
+                Action_Gruop(Medium, 1);
+            default:
+                ;
+            }
         }
-        else
-            set_speed(mv_rec.param * pid_p, 0, 0);
-    }
-    else if(mv_rec.event == 3)
-    {
-        if(mv_rec.param == 0XAABB)
+        else if (mv_rec.param == bar_type)
         {
-            mv_stop_flag =1;
+            Action_Gruop(Bar, 1);
         }
+        osDelay(2000);
     }
 }
+
+
+
+/**********************************************************************
+  * @Name    Get_Stop_Signal
+  * @declaration :返回此时是否停止的信号
+  * @param   None
+  * @retval   : 是否应该停车
+  * @author  peach99CPP
+***********************************************************************/
 int Get_Stop_Signal(void)
 {
-    if(mv_stop_flag)
+    if (mv_stop_flag)
     {
-        mv_stop_flag =0;
+        mv_stop_flag = 0;
         return true;
     }
-    else return false;
+    else
+        return false;
+}
+
+
+
+/**********************************************************************
+  * @Name    MV_Start
+  * @declaration : Mv开始响应命令
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+void MV_Start(void)
+{
+    MV_SendCmd(0, 0);
+}
+
+/**********************************************************************
+  * @Name    MV_Scan_High
+  * @declaration :让MV扫描阶梯平台的高层
+  * @param   color: [输入/出] 要抓的球的颜色
+  * @retval   :无
+  * @author  peach99CPP
+***********************************************************************/
+void MV_Scan_High(mvcolor_t color)
+{
+    MV_SendCmd(2, color);
+}
+
+
+
+/**********************************************************************
+  * @Name    MV_Scan_Low
+  * @declaration : 让MV扫描阶梯平台的中层及下层
+  * @param   color: [输入/出]  要抓的球的颜色
+  * @retval   :无
+  * @author  peach99CPP
+***********************************************************************/
+void MV_Scan_Low(mvcolor_t color)
+{
+    MV_SendCmd(2, color);
+}
+
+
+
+/**********************************************************************
+  * @Name    MV_Scan_Bar
+  * @declaration :让MV扫描条形平台
+  * @param   color: [输入/出]  要抓的球的颜色
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+void MV_Scan_Bar(mvcolor_t color)
+{
+    MV_SendCmd(3, color);
+}
+
+
+
+/**********************************************************************
+  * @Name    MV_Stop
+  * @declaration : 向MV发送停止信号
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+void MV_Stop(void)
+{
+    MV_SendCmd(4, 0);
 }

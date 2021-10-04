@@ -13,11 +13,13 @@
 #include "atk_imu.h"
 #include "openmv.h"
 
+#define Height_HW 5
+
 osThreadId Read_Swicth_tasHandle;       //任务句柄
 void Read_Swicth(void const *argument); //函数声明
 
 int read_task_exit = 1; //任务退出标志
-
+static short height_status = 0;
 short swicth_status[8]; //开关状态，只在内部进行赋值
 short HW_Switch[4];     //红外开关的状态
 int MIN_ = 60;
@@ -117,6 +119,10 @@ void Read_Swicth(void const *argument)
             HW_SWITCH(4) = off;
         else
             HW_SWITCH(4) = on;
+        if (Get_HW_Status(Height_HW) == on && height_status == 0)
+        {
+            height_status = 1;
+        }
         osDelay(10); //对请求的频率不高,所以可以50ms来单次刷新
     }
     memset(swicth_status, err, sizeof(swicth_status)); //清空到未初始状态，用于标记此时任务未运行
@@ -147,7 +153,7 @@ int Get_Switch_Status(int id)
 ***********************************************************************/
 int Get_HW_Status(int id)
 {
-    if (read_task_exit || (id < 1 || id > 4))//输入值限制避免出错
+    if (read_task_exit || (id < 1 || id > 4)) //输入值限制避免出错
         return err;
     return HW_SWITCH(id);
 }
@@ -173,8 +179,8 @@ void Exit_Swicth_Read(void)
 void Wait_Switches(int dir)
 {
     /*关于运行时速度的变量,不宜过高否则不稳定*/
-    int Switch_Factor = 50;
-    int MIN_SPEED = 50;
+    int Switch_Factor = 30;
+    int MIN_SPEED = 30;
 
     if (read_task_exit)
         Start_Read_Switch();
@@ -317,36 +323,58 @@ void Set_SwitchParam(int main, int vertical)
     MIN_ = main;         //沿着板子水平方向的速度
     VERTICAL = vertical; //垂直板子的速度，确保紧贴着。
 }
-void HWSwitch_Move(int dir,int enable_imu)
+void HWSwitch_Move(int dir, int enable_imu)
 {
     Set_IMUStatus(enable_imu);
-    if(dir ==1 )
+    if (dir == 1)
     {
-        set_speed(-MIN_,VERTICAL,0);
-        while(Get_HW_Status(dir)== on) osDelay(10);
+        set_speed(-MIN_, VERTICAL, 0);
+        while (Get_HW_Status(dir) == on)
+            osDelay(10);
     }
-    else if(dir == 2)
+    else if (dir == 2)
     {
-         set_speed(MIN_,VERTICAL,0);
-         while(Get_HW_Status(dir)== on) osDelay(10);
+        set_speed(MIN_, VERTICAL, 0);
+        while (Get_HW_Status(dir) == on)
+            osDelay(10);
     }
-    set_speed(0,0,0);
+    set_speed(0, 0, 0);
     osDelay(200);
 }
 
-void MV_HW(int dir,int enable_imu)
+void MV_HW(int dir, int enable_imu)
 {
     Set_IMUStatus(enable_imu);
-    if(dir ==1 )
+    if (dir == 1)
     {
-        set_speed(-MIN_,VERTICAL,0);
-        while(Get_HW_Status(dir)== on && Get_Stop_Signal()== false) osDelay(10);
+        set_speed(-MIN_, VERTICAL, 0);
+        while (Get_HW_Status(dir) == on && Get_Stop_Signal() == false)
+            osDelay(10);
     }
-    else if(dir == 2)
+    else if (dir == 2)
     {
-         set_speed(MIN_,VERTICAL,0);
-         while(Get_HW_Status(dir)== on && Get_Stop_Signal()== false) osDelay(10);
+        set_speed(MIN_, VERTICAL, 0);
+        while (Get_HW_Status(dir) == on && Get_Stop_Signal() == false)
+            osDelay(10);
     }
-    set_speed(0,0,0);
+    set_speed(0, 0, 0);
     osDelay(100);
+}
+int Get_Height(void)
+{
+    if (height_status == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        if (Get_HW_Status(Height_HW) == on)
+        {
+            return 2;
+        }
+        else 
+        {
+            return 3;
+        }
+    }
 }

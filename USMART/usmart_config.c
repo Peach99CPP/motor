@@ -20,8 +20,8 @@
 #define DEBUG_IMU 1     //调试陀螺仪
 #define DEBUG_CHASSIS 1 //底盘运动
 #define DEBUG_SWITCH 1  //轻触开关、红外开关
-#define DEBUG_OPENMV 0  //openmv通讯
-#define Debug_Servo 0   //舵控通讯
+#define DEBUG_OPENMV 1  //openmv通讯
+#define Debug_Servo 1   //舵控通讯
 extern void Global_Debug(void);
 /******将显示界面变得更加整洁****/
 //函数名列表初始化(用户自己添加)
@@ -56,19 +56,31 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void Set_InitYaw(int target)",
 #endif
 #if DEBUG_OPENMV == 1
-        (void *)MV_Ball,
-        "void MV_Ball(int color)",
+        (void *)MV_Start,
+        "void MV_Start(void)",
+        (void *)MV_Stop,
+        "void MV_Stop(void)",
+        (void *)MV_Scan_Low,
+        "void MV_Scan_Low(mvcolor_t color)",
+        (void *)MV_Scan_High,
+        "void MV_Scan_High(mvcolor_t color)",
+        (void *)MV_Scan_Bar,
+        "void MV_Scan_Bar(mvcolor_t color)",
+        (void *)MV_SendCmd,
+        "void MV_SendCmd(const uint8_t event_id, const int param)",
         (void *)MV_PID,
         "void MV_PID(void)",
 #endif
 #if DEBUG_CHASSIS == 1
         /**底盘运动部分**/
+        (void *)Comfirm_Online,
+        "void Comfirm_Online(int dir)",
         (void *)move_slantly,
         "void move_slantly(int dir, int speed, uint16_t delay)",
         /***目前用不到
-        (void *)set_motor,
-        "void set_motor(int motor_id, int control_val)",
-        ***/
+    (void *)set_motor,
+    "void set_motor(int motor_id, int control_val)",
+    ***/
         (void *)set_speed,
         "void set_speed(int x, int y, int w)",
         (void *)move_by_encoder,
@@ -80,10 +92,10 @@ struct _m_usmart_nametab usmart_nametab[] =
         /***轻触开关部分***/
         (void *)Wait_Switches,
         "void Wait_Switches(int dir)",
-        (void *)Single_Switch,
-        "void Single_Switch(int switch_id)",
-        (void *)Set_SwitchParam,
-        "void Set_SwitchParam(int main,int vertical)",
+        //    (void *)Single_Switch,
+        //    "void Single_Switch(int switch_id)",
+        //    (void *)Set_SwitchParam,
+        //    "void Set_SwitchParam(int main,int vertical)",
         (void *)HWSwitch_Move,
         "void HWSwitch_Move(int dir,int enable_imu)",
         (void *)MV_HW,
@@ -100,12 +112,11 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void set_imu_status(int status)",
         (void *)track_status,
         "void track_status(int id, int status)",
-        (void *)Comfirm_Online,
-        "void Comfirm_Online(int dir)",
         (void *)turn_angle,
         "void turn_angle(int mode ,int angle)",
         (void *)Global_Debug,
         "void  Global_Debug(void)",
+
 };
 ///////////////////////////////////END///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
