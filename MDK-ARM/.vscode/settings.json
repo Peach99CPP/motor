@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "QR_code.C": "cpp"
+        "QR_code.C": "cpp",
+        "uart_handle.h": "c"
     }
 }

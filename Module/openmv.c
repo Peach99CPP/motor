@@ -1,10 +1,11 @@
 #include "openmv.h"
 #include "servo.h"
 #include "chassis.h"
-#include "uart_handle.h"
+
 #include "read_status.h"
 
 #define STOP_SIGNAL 0XAABB
+short Handle_Flag = 0;
 int mv_param;
 static short mv_stop_flag = 0;
 mvrec_t mv_rec;
@@ -124,7 +125,6 @@ void MV_rec_decode(void)
 
 /****上面是底层实现，下面是上层的应用****/
 
-
 /**********************************************************************
   * @Name    MV_PID
   * @declaration :让MV返回PID信号
@@ -162,38 +162,37 @@ void MV_Decode(void)
 #define MVPID_THRESHOLD 10
 #define pid_p 0.5
 #define Ball_Signal 0x04
-    if (mv_rec.event == Ball_Signal)
+    if (Get_MV_Servo_Flag())//空闲，可以接收指令 Get_MV_Servo_Flag()
     {
-        set_speed(0, 0, 0);
-        mv_stop_flag = 1;
-        osDelay(300);
-        printf("收到了球的信息,Paarmter=%d\r\n",mv_rec.param);    //todo：调试模式下进行使用，用于测试是否收到了消息
-        
-        // if (mv_rec.param == ladder_type) //阶梯平台三种高度
-        // {
-        //     switch (Get_Height())
-        //     {
-        //     case 1:
-        //         Action_Gruop(Lowest, 1);
-        //         break;
-        //     case 2:
-        //         Action_Gruop(Highest, 1);
-        //         break;
-        //     case 3:
-        //         Action_Gruop(Medium, 1);
-        //     default:
-        //         ;
-        //     }
-        // }
-        // else if (mv_rec.param == bar_type)
-        // {
-        //     Action_Gruop(Bar, 1);
-        // }
-        osDelay(2000);
+        if (mv_rec.event == Ball_Signal)
+        {
+            set_speed(0,0,0);
+            mv_stop_flag = 1;
+            //todo：调试模式下进行使用，用于测试是否收到了消息
+
+            if (mv_rec.param == ladder_type) //阶梯平台三种高度
+            {
+                switch (Get_Height())
+                {
+                case 1:
+                    Action_Gruop(Lowest, 1);
+                    break;
+                case 2:
+                    Action_Gruop(Medium, 1);
+                    break;
+                case 3:
+                    Action_Gruop(Highest, 1);
+                default:
+                    ;
+                }
+            }
+            else if (mv_rec.param == bar_type)
+            {
+                Action_Gruop(Bar, 1);
+            }
+        }
     }
 }
-
-
 
 /**********************************************************************
   * @Name    Get_Stop_Signal
@@ -212,8 +211,6 @@ int Get_Stop_Signal(void)
     else
         return false;
 }
-
-
 
 /**********************************************************************
   * @Name    MV_Start
@@ -239,8 +236,6 @@ void MV_Scan_High(mvcolor_t color)
     MV_SendCmd(2, color);
 }
 
-
-
 /**********************************************************************
   * @Name    MV_Scan_Low
   * @declaration : 让MV扫描阶梯平台的中层及下层
@@ -250,10 +245,8 @@ void MV_Scan_High(mvcolor_t color)
 ***********************************************************************/
 void MV_Scan_Low(mvcolor_t color)
 {
-    MV_SendCmd(2, color);
+    MV_SendCmd(1, color);
 }
-
-
 
 /**********************************************************************
   * @Name    MV_Scan_Bar
@@ -266,8 +259,6 @@ void MV_Scan_Bar(mvcolor_t color)
 {
     MV_SendCmd(3, color);
 }
-
-
 
 /**********************************************************************
   * @Name    MV_Stop

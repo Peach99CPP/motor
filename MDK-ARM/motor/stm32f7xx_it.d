@@ -68,3 +68,4 @@ motor\stm32f7xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.
 motor\stm32f7xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 motor\stm32f7xx_it.o: ..\Module\openmv.h
 motor\stm32f7xx_it.o: ..\Driver\track_bar_receive.h
+motor\stm32f7xx_it.o: ..\Module\servo.h

@@ -4,7 +4,9 @@ ServoControler_t servo_controler =
 {
     .uart = &huart5,
     .current_index = 0,
-    .cmd_buffer = {0}
+    .cmd_buffer = {0},
+    .rec_buffer = {0},
+    .rec_index = 0
 };
 
 
@@ -31,7 +33,7 @@ void Error_Report(int type)
 /**********************************************************************
   * @Name    Cmd_Convert
   * @declaration : 将传入的参数编码成单个数字格式
-  * @param   cmd: [输入/出] 
+  * @param   cmd: [输入/出]
   * @retval   : 无
   * @author  peach99CPP
 ***********************************************************************/
@@ -109,7 +111,7 @@ void Single_Control(int id, int control_mode, int angle, int time, int delay)
         angle = 500 + (2000.0 / 270.0) * angle; //满角度为270度的舵机的指令
     }
     Cmd_Convert(angle);
-    
+
     //设置执行时间
     servo_controler.cmd_buffer[servo_controler.current_index++] = 'T';
     Cmd_Convert(time);
@@ -134,4 +136,32 @@ void Action_Gruop(int id, int times)
     Cmd_Convert(times);
     //串口发送
     Servo_Uart_Send();
+}
+uint8_t mv_rec_flag = 0;
+void Servo_RX_IRQ(void)
+{
+    if(__HAL_UART_GET_IT(servo_controler.uart, UART_IT_RXNE))
+    {
+        static uint8_t rec_data;
+        rec_data = servo_controler.uart->Instance->RDR;
+        servo_controler.rec_buffer[servo_controler.rec_index++] = rec_data;
+        if(servo_controler.rec_index >= 2)
+        {
+            if(servo_controler.rec_buffer[0] == 'O' && servo_controler.rec_buffer[1] == 'K')
+            {
+                servo_controler.rec_index = 0;
+                mv_rec_flag = 1;
+            }
+        }
+
+    }
+}
+int  Get_Servo_Flag(void)
+{
+    if(mv_rec_flag == 1)
+    {
+        mv_rec_flag = 0;
+        return true;
+    }
+    return false;
 }

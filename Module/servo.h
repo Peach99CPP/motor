@@ -25,11 +25,13 @@
 #include "usart.h"
 
 #define MAX_SERVO_SIZE 100
-
+#define MAX_SERVO_REC_SIZE 20
 typedef struct{
     UART_HandleTypeDef * uart;
     uint8_t current_index;
     uint8_t cmd_buffer[MAX_SERVO_SIZE];
+    uint8_t rec_buffer[MAX_SERVO_REC_SIZE];
+    uint8_t rec_index;
 }ServoControler_t;
 
 typedef enum{
@@ -43,9 +45,11 @@ void Cmd_Convert(int cmd);
 void Servo_Uart_Send(void);
 void Single_Control(int id, int control_mode, int angle, int  time, int delay);
 void Action_Gruop(int  id,int  times);
+int  Get_Servo_Flag(void);
+void Servo_RX_IRQ(void);
 
 extern ServoControler_t servo_controler;
-
+extern uint8_t mv_rec_flag ;
 #endif
 
 

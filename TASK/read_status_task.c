@@ -12,18 +12,20 @@
 #include "chassis.h"
 #include "atk_imu.h"
 #include "openmv.h"
+#include "servo.h"
 
 #define Height_HW 5
-
+#define RED_TARGET 1
+#define BLUE_TARGET 0
 osThreadId Read_Swicth_tasHandle;       //任务句柄
 void Read_Swicth(void const *argument); //函数声明
 
 int read_task_exit = 1; //任务退出标志
 static short height_status = 0;
 short swicth_status[8]; //开关状态，只在内部进行赋值
-short HW_Switch[4];     //红外开关的状态
+short HW_Switch[5];     //红外开关的状态
 int MIN_ = 60;
-int VERTICAL = 10;
+int VERTICAL = 5;
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
 #define HW_SWITCH(X) HW_Switch[(X)-1]
@@ -119,6 +121,12 @@ void Read_Swicth(void const *argument)
             HW_SWITCH(4) = off;
         else
             HW_SWITCH(4) = on;
+
+        if (HAL_GPIO_ReadPin(HW_Height_GPIO_Port, HW_Height_Pin) == GPIO_PIN_SET)
+            HW_SWITCH(4) = off;
+        else
+            HW_SWITCH(4) = on;
+
         if (Get_HW_Status(Height_HW) == on && height_status == 0)
         {
             height_status = 1;
@@ -229,7 +237,8 @@ Closing:
         //任务调度
         osDelay(10);
 
-    } while (flag1 == off || flag2 == off); //只有两个都接通，才退出该循环
+    }
+    while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
     osDelay(500);
     if (flag1 == off || flag2 == off)
     {
@@ -313,7 +322,8 @@ RECLOSE:
         if (status == err)
             Start_Read_Switch(); //防止此时任务退出而卡死在循环里
         osDelay(20);             //任务调度
-    } while (status == on);      //直到开关断开，此时说明到达边界
+    }
+    while (status == on);        //直到开关断开，此时说明到达边界
     set_speed(0, 0, 0);          //停车
 }
 
@@ -359,10 +369,10 @@ void MV_HW(int dir, int enable_imu)
     }
     set_speed(0, 0, 0);
     osDelay(100);
-    Wait_Switches(1);
 }
 int Get_Height(void)
 {
+    //TODO:在切换上下半场时记得修改宏定义
     if (height_status == 0)
     {
         return 1;
@@ -371,11 +381,85 @@ int Get_Height(void)
     {
         if (Get_HW_Status(Height_HW) == on)
         {
-            return 2;
-        }
-        else 
-        {
             return 3;
+        }
+        else
+        {
+            return 2;
         }
     }
 }
+
+void Init_Height_Inf(void)
+{
+    height_status = 0; //防止在使用前红外被意外触发
+}
+
+int MV_Servo_Flag = 1;
+void MV_HW_Scan(int dir, int enable_imu)
+{
+    int time_delay = 0;
+    Action_Gruop(11, 1);
+    while (Get_Servo_Flag() == false && time_delay <= 5000)
+    {
+        time_delay += 10;
+        osDelay(10);
+    }
+    mv_rec_flag = 1;
+    Init_Height_Inf();
+    Set_IMUStatus(enable_imu);
+    if (dir == 1)
+    {
+dir1_Start_Symbol:
+        while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
+        {
+            set_speed(-MIN_, VERTICAL, 0);
+            osDelay(10);
+        }
+        if (Get_HW_Status(dir) == off)
+        {
+            set_speed(0, 0, 0);
+            return;
+        }
+        else
+        {
+            while (Get_Servo_Flag() == false)
+                osDelay(10);
+            MV_Servo_Flag = 1;
+            goto dir1_Start_Symbol;
+        }
+    }
+    else if (dir == 2)
+    {
+dir2_Start_Symbol:
+        set_speed(MIN_, VERTICAL, 0);
+        while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
+            osDelay(10);
+        set_speed(0, 0, 0);
+        Wait_Switches(1);
+        if (Get_HW_Status(dir) == off)
+        {
+            return;
+        }
+        else
+        {
+
+            while (Get_Servo_Flag() == false)
+                osDelay(10);
+            MV_Servo_Flag = 1;
+            goto dir2_Start_Symbol;
+        }
+    }
+}
+
+int Get_MV_Servo_Flag(void)
+{
+    if(MV_Servo_Flag)
+    {
+        MV_Servo_Flag = 0;
+        return true;
+    }
+    else
+        return false;
+}
+

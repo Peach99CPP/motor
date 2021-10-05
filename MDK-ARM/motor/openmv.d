@@ -36,9 +36,7 @@ motor\openmv.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\openmv.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 motor\openmv.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
 motor\openmv.o: ../Inc/usart.h
-motor\openmv.o: ..\Module\servo.h
-motor\openmv.o: ..\Driver\chassis.h
-motor\openmv.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+motor\openmv.o: ..\Driver\uart_handle.h
 motor\openmv.o: ..\Driver\motor.h
 motor\openmv.o: ..\Control\tim_control.h
 motor\openmv.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
@@ -46,10 +44,13 @@ motor\openmv.o: ..\Driver\time_cnt.h
 motor\openmv.o: ..\Driver\time_cnt.h
 motor\openmv.o: ..\Driver\motor.h
 motor\openmv.o: ..\Driver\uart_handle.h
-motor\openmv.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+motor\openmv.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\openmv.o: ..\Math\pid.h
 motor\openmv.o: ../Inc/tim.h
 motor\openmv.o: ..\Driver\delay.h
+motor\openmv.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+motor\openmv.o: ..\Module\servo.h
+motor\openmv.o: ..\Driver\chassis.h
 motor\openmv.o: ..\TASK\read_status.h
 motor\openmv.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 motor\openmv.o: ../Inc/FreeRTOSConfig.h

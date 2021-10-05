@@ -95,6 +95,8 @@ void Error_Handler(void);
 #define HW_S3_GPIO_Port GPIOD
 #define HW_S4_Pin GPIO_PIN_3
 #define HW_S4_GPIO_Port GPIOD
+#define HW_Height_Pin GPIO_PIN_4
+#define HW_Height_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

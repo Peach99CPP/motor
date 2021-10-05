@@ -66,3 +66,4 @@ motor\read_status_task.o: ..\Driver\delay.h
 motor\read_status_task.o: ..\Module\atk_imu.h
 motor\read_status_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 motor\read_status_task.o: ..\Module\openmv.h
+motor\read_status_task.o: ..\Module\servo.h

@@ -33,6 +33,9 @@ void Single_Switch(int switch_id);
 void HWSwitch_Move(int dir,int enable_imu);//使用红外开关进行移动
 void MV_HW(int dir,int enable_imu);
 void Set_SwitchParam(int main,int vertical);
+void MV_HW_Scan(int dir, int enable_imu);
+
+int Get_MV_Servo_Flag(void);
 int Get_Height(void);
 #endif
 
