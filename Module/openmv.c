@@ -183,7 +183,7 @@ void MV_Decode(void)
                 case 3:
                     Action_Gruop(Highest, 1);
                 default:
-                    ;
+                    Action_Gruop(11,1);
                 }
             }
             else if (mv_rec.param == bar_type)

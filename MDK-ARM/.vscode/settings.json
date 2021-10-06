@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "QR_code.C": "cpp",
-        "uart_handle.h": "c"
+        "uart_handle.h": "c",
+        "limits": "c",
+        "memory": "c",
+        "bit": "c",
+        "compare": "c",
+        "cstddef": "c",
+        "type_traits": "c",
+        "xutility": "c"
     }
 }

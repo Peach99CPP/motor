@@ -38,7 +38,7 @@ typedef enum{
     Lowest =1,
     Medium,
     Highest,
-    Bar
+    Bar,
 }Servo_ID_t;
 void Cmd_Convert(int cmd);
 
