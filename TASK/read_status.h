@@ -31,6 +31,22 @@ typedef enum
   Medium_Head
 }ScanDir_t;
 
+typedef enum
+{
+  PrimaryHeight= 0,
+  LowestHeight ,
+  MediumHeight,
+  HighestHeight,
+}Height_t;
+
+typedef enum
+{
+  Not_Running=0,
+  Red_ ,
+  Blue_,
+}Game_Color_t;
+
+
 
 int Get_Switch_Status(int id);
 int Get_HW_Status(int id);
@@ -41,7 +57,7 @@ void Single_Switch(int switch_id);
 void HWSwitch_Move(int dir, int enable_imu); //使用红外开关进行移动
 void MV_HW(int dir, int enable_imu);
 void Set_SwitchParam(int main, int vertical);
-void MV_HW_Scan(int dir, int enable_imu);
+void MV_HW_Scan(int r_b,int dir, int enable_imu);
 
 int Get_MV_Servo_Flag(void);
 int Get_Height(void);

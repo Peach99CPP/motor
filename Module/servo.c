@@ -1,5 +1,6 @@
 #include "servo.h "
 #include "uart_handle.h"
+int Servo_Running = 1;
 ServoControler_t servo_controler =
 {
     .uart = &huart5,

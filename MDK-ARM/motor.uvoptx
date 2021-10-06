@@ -173,12 +173,27 @@
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>servo_controler.cmd_buffer</ItemText>
+          <ItemText>servo_controler.rec_buffer</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>servo_controler.rec_buffer</ItemText>
+          <ItemText>HW_Switch</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>mv_rec_flag</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Height_Flag</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Current_Height</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -231,6 +246,11 @@
           <count>9</count>
           <WinNumber>2</WinNumber>
           <ItemText>MV.rec_buffer</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Height_task_exit</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

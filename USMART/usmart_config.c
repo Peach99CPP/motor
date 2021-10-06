@@ -101,7 +101,7 @@ struct _m_usmart_nametab usmart_nametab[] =
         (void *)MV_HW,
         "void MV_HW(int dir,int enable_imu)",
         (void*)MV_HW_Scan,
-        "void MV_HW_Scan(int dir, int enable_imu)",
+        "void MV_HW_Scan(int r_b,int dir, int enable_imu)",
 #endif
 #if Debug_Servo == 1
         (void *)Single_Control,

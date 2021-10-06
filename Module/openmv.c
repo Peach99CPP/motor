@@ -7,6 +7,7 @@
 #define STOP_SIGNAL 0XAABB
 short Handle_Flag = 0;
 int mv_param;
+
 static short mv_stop_flag = 0;
 mvrec_t mv_rec;
 mv_t MV =
@@ -168,22 +169,23 @@ void MV_Decode(void)
         {
             set_speed(0,0,0);
             mv_stop_flag = 1;
+            Servo_Running = 1;
             //todo：调试模式下进行使用，用于测试是否收到了消息
 
             if (mv_rec.param == ladder_type) //阶梯平台三种高度
             {
                 switch (Get_Height())
                 {
-                case 1:
+                case LowestHeight:
                     Action_Gruop(Lowest, 1);
                     break;
-                case 2:
+                case MediumHeight:
                     Action_Gruop(Medium, 1);
                     break;
-                case 3:
+                case HighestHeight:
                     Action_Gruop(Highest, 1);
                 default:
-                    Action_Gruop(11,1);
+                    Action_Gruop(11,1);//机械臂升起
                 }
             }
             else if (mv_rec.param == bar_type)
