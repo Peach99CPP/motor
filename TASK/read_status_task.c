@@ -28,7 +28,6 @@ Height_t Current_Height = MediumHeight;
 
 Game_Color_t Current_Color = Not_Running;
 
-int MV_Servo_Flag = 1;
 int read_task_exit = 1, Height_task_exit = 1; //任务退出标志
 static short Height_Flag = 0;
 
@@ -43,6 +42,17 @@ int VERTICAL = 5;
 #define Height_SWITCH HW_Switch[4]            //高度的开关
 #define Side_SWITCH(X) HW_Switch[(X) + 5 - 1] //侧边红外的安装位置
 
+
+
+
+/**********************************************************************
+  * @Name    Judge_Side
+  * @declaration :
+  * @param   color_mode: [输入/出]
+**			 dir: [输入/出]
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void Judge_Side(int color_mode, int dir)
 {
     if (color_mode == Red_)
@@ -68,6 +78,16 @@ void Judge_Side(int color_mode, int dir)
         }
     }
 }
+
+
+
+/**********************************************************************
+  * @Name    Start_HeightUpdate
+  * @declaration :
+  * @param   None
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void Start_HeightUpdate(void)
 {
     Height_Flag = 0;
@@ -75,10 +95,20 @@ void Start_HeightUpdate(void)
     {
         Height_task_exit = 0;
         Current_Height = MediumHeight;
-        osThreadDef(Height_UpadteTask, HeightUpdate_Task, osPriorityNormal, 0, 128);
+        osThreadDef(Height_UpadteTask, HeightUpdate_Task, osPriorityHigh, 0, 128);
         Height_UpadteTask = osThreadCreate(osThread(Height_UpadteTask), NULL);
     }
 }
+
+
+
+/**********************************************************************
+  * @Name    HeightUpdate_Task
+  * @declaration :
+  * @param   argument: [输入/出]
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void HeightUpdate_Task(void const *argument)
 {
     Height_Flag = 0;
@@ -94,7 +124,7 @@ void HeightUpdate_Task(void const *argument)
                     Height_Flag = 1;
                     Current_Height = HighestHeight;
                 }
-                if (Height_Flag == 1 && !Servo_Running)
+                if (Height_Flag == 1 && Get_Servo_Flag() == true)
                 {
                     if (Get_HW_Status(Height_HW) == off)
                     {
@@ -114,7 +144,7 @@ void HeightUpdate_Task(void const *argument)
                     Height_Flag = 1;
                     Current_Height = HighestHeight;
                 }
-                if (Height_Flag == 1 && !Servo_Running)
+                if (Height_Flag == 1 && Get_Servo_Flag() == true)
                 {
                     if (Get_HW_Status(Height_HW) == off)
                     {
@@ -128,10 +158,21 @@ void HeightUpdate_Task(void const *argument)
     Current_Height = PrimaryHeight;
     vTaskDelete(Height_UpadteTask);
 }
+
+
+
+/**********************************************************************
+  * @Name    Exit_Height_Upadte
+  * @declaration :
+  * @param   None
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void Exit_Height_Upadte(void)
 {
     Height_task_exit = 1;
 }
+
 /**********************************************************************
   * @Name    Start_Read_Switch
   * @declaration : 启动轻触开关任务
@@ -149,7 +190,7 @@ void Start_Read_Switch(void)
         memset(HW_Switch, 0, sizeof(HW_Switch));
 
         /* definition and creation of Read_Swicth_tas */
-        osThreadDef(Read_Swicth_tas, Read_Swicth, osPriorityNormal, 0, 128);
+        osThreadDef(Read_Swicth_tas, Read_Swicth, osPriorityAboveNormal, 0, 128);
         Read_Swicth_tasHandle = osThreadCreate(osThread(Read_Swicth_tas), NULL);
     }
 }
@@ -256,7 +297,10 @@ void Read_Swicth(void const *argument)
 int Get_Switch_Status(int id)
 {
     if (read_task_exit)
-        return err;    //确保当前任务处在进行中
+        return err; //确保当前任务处在进行中
+    if (id < 1 || id > 10)
+        return off;    // todo当有开关数量更新时记得修改此处的值
+    //上面两个是为了避免出错的判断条件
     return SWITCH(id); //返回对应开关的状态
 }
 
@@ -269,6 +313,7 @@ int Get_Switch_Status(int id)
 ***********************************************************************/
 int Get_HW_Status(int id)
 {
+    // todo当有开关数量更新时记得修改此处的值
     if (read_task_exit || (id < 1 || id > 8)) //输入值限制避免出错
         return err;
     return HW_SWITCH(id);
@@ -283,7 +328,7 @@ int Get_HW_Status(int id)
 ***********************************************************************/
 int Get_Side_Switch(int id)
 {
-    if (id < 1 || id > 2)
+    if (id < 1 || id > 2) // todo当有开关数量更新时记得修改此处的值
         return off;
     return Side_SWITCH(id);
 }
@@ -300,7 +345,7 @@ void Exit_Swicth_Read(void)
 }
 /**********************************************************************
   * @Name    Get_Height
-  * @declaration : 获取此时应该调用的动作组编号
+  * @declaration : 获取此时高度以计算应该调用的动作组编号
   * @param   None
   * @retval   : 动作组编号
   * @author  peach99CPP
@@ -314,39 +359,37 @@ int Get_Height(void)
   * @Name    MV_HW_Scan
   * @declaration :利用MV 舵控 联动对阶梯平台进行扫描并抓取
   * @param   dir: [输入/出]  移动的方向
-                 1  为车头朝前   向左扫描
-                 2  为车头朝前   向右扫描
-                 5  为侧身贴边   向前移动
-                 6  为侧身贴边   向后移动
+                 1  为车头朝前   向左扫描   用于条形平台
+                 2  为车头朝前   向右扫描   用于条形平台
+                 5  为侧身贴边   向前移动   用于阶梯平台
+                 6  为侧身贴边   向后移动   用于阶梯平台
 **			 enable_imu: [输入/出] 是否使能IMU来保持车身角度的为直线
-  * @retval   :
+  * @retval   : 无
   * @author  peach99CPP
 ***********************************************************************/
 void MV_HW_Scan(int r_b, int dir, int enable_imu)
 {
-    int time_delay = 0;
-    mv_rec_flag = 0;
+    int time_delay = 0;                                     //避免超时卡死的临时变量
+    Disable_StopSignal();                                   //此时不会停车
     Action_Gruop(11, 1);                                    //展开爪子
-    while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时
+    while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
     {
         time_delay += 10;
         osDelay(10);
     }
     Set_IMUStatus(enable_imu); //设置陀螺仪状态
-    Judge_Side(r_b, dir);      //裁决高度判断模式
-    // mv_rec_flag = 1;           //避免在最边缘有球而导致卡死，手动设置一下
-    Start_HeightUpdate();
+    Judge_Side(r_b, dir);      //裁决高度判断模式，根据参数给变量赋值
+    Start_HeightUpdate();      //开始更新高度信息的任务
     /*1 2为正前方， 5 6为右侧*/
     if (dir == 1)
     {
-    dir1_Start_Symbol:
+dir1_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on) //当未收到MV停止信号或红外开持续导通时
         {
             set_speed(-MIN_, VERTICAL, 0); //一边走一边贴边
-            osDelay(10);
+            osDelay(5);
         }
         set_speed(0, 0, 0);            //停车
-        Wait_Switches(1);              //贴边
         if (Get_HW_Status(dir) == off) //判断退出上述循环的原因，如果是红外触发的，说明此时到达边界，扫描结束，退出函数
         {
             Exit_Height_Upadte();
@@ -356,21 +399,19 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
         {
             //是因为收到MV抓球的信号而停止，等到动作组执行完毕后继续扫描，只单次响应
             while (Get_Servo_Flag() == false)
-                osDelay(10);
-            MV_Servo_Flag = 1; //打开MV处理的开关，为下一次抓球做准备
-            Servo_Running = 0;
+                osDelay(5);
+            Disable_StopSignal(); //清除停车标志位，此时可以开车
+            osDelay(100);         //没啥用，求个心安
             goto dir1_Start_Symbol;
         }
     }
     else if (dir == 2)
     {
-        Start_HeightUpdate();
-    dir2_Start_Symbol:
+dir2_Start_Symbol:
         set_speed(MIN_, VERTICAL, 0);
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
-            osDelay(10);
+            osDelay(5);
         set_speed(0, 0, 0);
-        Wait_Switches(1);
         if (Get_HW_Status(dir) == off)
         {
             Exit_Height_Upadte();
@@ -378,20 +419,19 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
         }
         else
         {
-
             while (Get_Servo_Flag() == false)
-                osDelay(10);
-            MV_Servo_Flag = 1;
+                osDelay(5);
+            Disable_StopSignal(); //清除停车标志位，此时可以开车
+            osDelay(100);         //没啥用，求个心安
             goto dir2_Start_Symbol;
         }
     }
     else if (dir == 5)
     {
-        Start_HeightUpdate();
-    dir5_Start_Symbol:
+dir5_Start_Symbol:
         set_speed(VERTICAL, MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
-            osDelay(10);
+            osDelay(5);
         set_speed(0, 0, 0);
         if (Get_Side_Switch(1) == off)
         {
@@ -400,54 +440,34 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
         }
         else
         {
-            Wait_Switches(3);
             while (Get_Servo_Flag() == false)
-                osDelay(10);
-            MV_Servo_Flag = 1;
+                osDelay(5);
+            Disable_StopSignal(); //清除停车标志位，此时可以开车
+            osDelay(100);         //没啥用，求个心安
             goto dir5_Start_Symbol;
         }
     }
     else if (dir == 6)
     {
-        Start_HeightUpdate();
-    dir6_Start_Symbol:
+dir6_Start_Symbol:
         set_speed(VERTICAL, -MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on)
-            osDelay(10);
-        set_speed(0, 0, 0);
-        if (Get_Side_Switch(2) == off)
+            osDelay(5);
+        set_speed(0, 0, 0);            //停车再说
+        if (Get_Side_Switch(2) == off) //是边缘的红外导致的停车
         {
-            Exit_Height_Upadte();
-            return;
+            Exit_Height_Upadte(); //结束任务
+            return;               //退出
         }
         else
         {
-            set_speed(0, 0, 0);
-            while (Get_Servo_Flag() == false)
-                osDelay(10);
-            MV_Servo_Flag = 1;
-            Servo_Running = 0;
-            goto dir6_Start_Symbol;
+            while (Get_Servo_Flag() == false) //当上一个动作组未运行结束时，卡在这里
+                osDelay(5);
+            Disable_StopSignal();   //清除停车标志位，此时可以开车
+            osDelay(100);           //没啥用，求个心安
+            goto dir6_Start_Symbol; //回到开头位置
         }
     }
-}
-
-/**********************************************************************
-  * @Name    Get_MV_Servo_Flag
-  * @declaration : 状态判断接口 用于判断是否可以执行舵机动作组，避免同时发送重复指令
-  * @param   None
-  * @retval   : 是否可以运行动作组
-  * @author  peach99CPP
-***********************************************************************/
-int Get_MV_Servo_Flag(void)
-{
-    if (MV_Servo_Flag)
-    {
-        MV_Servo_Flag = 0;
-        return true;
-    }
-    else
-        return false;
 }
 
 /**********************************************************************
@@ -512,7 +532,8 @@ Closing:
         //任务调度
         osDelay(10);
 
-    } while (flag1 == off || flag2 == off); //只有两个都接通，才退出该循环
+    }
+    while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
     osDelay(500);
     if (flag1 == off || flag2 == off)
     {
@@ -596,7 +617,8 @@ RECLOSE:
         if (status == err)
             Start_Read_Switch(); //防止此时任务退出而卡死在循环里
         osDelay(20);             //任务调度
-    } while (status == on);      //直到开关断开，此时说明到达边界
+    }
+    while (status == on);        //直到开关断开，此时说明到达边界
     set_speed(0, 0, 0);          //停车
 }
 

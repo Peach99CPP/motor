@@ -1,5 +1,6 @@
 #include "servo.h "
 #include "uart_handle.h"
+uint8_t mv_rec_flag = 1; //初始状态，可以直接执行舵控指令
 ServoControler_t servo_controler =
 {
     .uart = &huart5,
@@ -9,8 +10,10 @@ ServoControler_t servo_controler =
     .rec_index = 0
 };
 
-
-
+void Servo_Rx_Deinit(void)
+{
+    servo_controler.rec_index = 0;
+}
 /**********************************************************************
   * @Name    Error_Report
   * @declaration : 进行错误报告
@@ -28,8 +31,6 @@ void Error_Report(int type)
         printf("舵控发生未知错误\r\n");
 }
 
-
-
 /**********************************************************************
   * @Name    Cmd_Convert
   * @declaration : 将传入的参数编码成单个数字格式
@@ -40,12 +41,12 @@ void Error_Report(int type)
 void Cmd_Convert(int cmd)
 {
     short temp_num[5] = {0}, index = 0;
-    if (cmd == 0)//对为0的参数进行单独的处理
+    if (cmd == 0) //对为0的参数进行单独的处理
     {
         servo_controler.cmd_buffer[servo_controler.current_index++] = 0;
         return;
     }
-    while (cmd != 0)//获取其数字的每一位，转化成字符
+    while (cmd != 0) //获取其数字的每一位，转化成字符
     {
         temp_num[index++] = cmd % 10 + '0';
         cmd /= 10;
@@ -110,6 +111,7 @@ void Single_Control(int id, int control_mode, int angle, int time, int delay)
         }
         angle = 500 + (2000.0 / 270.0) * angle; //满角度为270度的舵机的指令
     }
+    Disable_ServoFlag(); //把标志位设置好
     Cmd_Convert(angle);
 
     //设置执行时间
@@ -121,13 +123,26 @@ void Single_Control(int id, int control_mode, int angle, int time, int delay)
     //通过串口发送
     Servo_Uart_Send();
 }
+
+
+
+/**********************************************************************
+  * @Name    Action_Gruop
+  * @declaration :
+  * @param   id: [输入/出] 
+**			 times: [输入/出] 
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void Action_Gruop(int id, int times)
 {
-    if (id > 255 || id < 0)//限制输入值，避免出错
+
+    if (id > 255 || id < 0) //限制输入值，避免出错
     {
         Error_Report(2);
         return;
     }
+    Disable_ServoFlag();
     //设置动作组编号
     servo_controler.cmd_buffer[servo_controler.current_index++] = 'G';
     Cmd_Convert(id);
@@ -137,32 +152,72 @@ void Action_Gruop(int id, int times)
     //串口发送
     Servo_Uart_Send();
 }
-uint8_t mv_rec_flag = 0;
+
+
+
+/**********************************************************************
+  * @Name    Servo_RX_IRQ
+  * @declaration :
+  * @param   None
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void Servo_RX_IRQ(void)
 {
-    if(__HAL_UART_GET_IT(servo_controler.uart, UART_IT_RXNE))
+    if (__HAL_UART_GET_IT(servo_controler.uart, UART_IT_RXNE))
     {
         static uint8_t rec_data;
         rec_data = servo_controler.uart->Instance->RDR;
         servo_controler.rec_buffer[servo_controler.rec_index++] = rec_data;
-        if(servo_controler.rec_index >= 2)
+        if (servo_controler.rec_index >= 2)
         {
-            if(servo_controler.rec_buffer[0] == 'O' && servo_controler.rec_buffer[1] == 'K')
+            if (servo_controler.rec_buffer[0] == 'O' && servo_controler.rec_buffer[1] == 'K')
             {
-                
-                            servo_controler.rec_index = 0;
-            mv_rec_flag = 1;
+                Servo_Rx_Deinit();
+                Enable_ServoFlag();
             }
         }
-
     }
 }
-int  Get_Servo_Flag(void)
+
+
+
+/**********************************************************************
+  * @Name    Get_Servo_Flag
+  * @declaration :获取舵控运行状态
+  * @param   None
+  * @retval   : 舵机运行结束为1 否则为0
+  * @author  peach99CPP
+***********************************************************************/
+int Get_Servo_Flag(void)
 {
-    if(mv_rec_flag ==  3)
-    {
-        mv_rec_flag = 0;
-        return true;
-    }
-    return false;
+    return mv_rec_flag;
+}
+
+
+
+/**********************************************************************
+  * @Name    Enable_ServoFlag
+  * @declaration :使能舵机标志位，表明此时舵机运行结束
+  * @param   None
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+void Enable_ServoFlag(void)
+{
+    mv_rec_flag = 1;
+}
+
+
+
+/**********************************************************************
+  * @Name    Disable_ServoFlag
+  * @declaration : 清除舵机标志位，说明此时多斤正在运行中
+  * @param   None
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+void Disable_ServoFlag(void)
+{
+    mv_rec_flag = 0;
 }

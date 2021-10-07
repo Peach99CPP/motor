@@ -47,10 +47,11 @@ void Single_Control(int id, int control_mode, int angle, int  time, int delay);
 void Action_Gruop(int  id,int  times);
 int  Get_Servo_Flag(void);
 void Servo_RX_IRQ(void);
+void Enable_ServoFlag(void);
+void Disable_ServoFlag(void);
 
 extern ServoControler_t servo_controler;
 extern uint8_t mv_rec_flag ;
-extern int Servo_Running;
 #endif
 
 

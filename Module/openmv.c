@@ -22,8 +22,8 @@ mv_t MV =
 /**********************************************************************
   * @Name    cmd_encode
   * @declaration : 根据协议编码发送的内容
-  * @param   event_id: [输入/出]  时间的类型
-**			 param: [输入/出] 参数
+  * @param   event_id: [输入/出]  事件的类型
+**			 param: [输入/出]     参数，16位数字
   * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
@@ -45,8 +45,8 @@ void cmd_encode(const uint8_t event_id, int param)
     MV.mv_cmd[0] = START_BYTE; //帧头
     MV.mv_cmd[1] = event_id;   //触发的事件id
     MV.mv_cmd[2] = pos_flag;
-    MV.mv_cmd[3] = l_byte;                                           //参数高8位
-    MV.mv_cmd[4] = h_byte;                                           //参数低8位
+    MV.mv_cmd[3] = l_byte;                                           //参数低8位
+    MV.mv_cmd[4] = h_byte;                                           //参数高8位
     MV.mv_cmd[5] = (uint8_t)(event_id + pos_flag + h_byte + l_byte); //和校验
     MV.mv_cmd[6] = END_BYTE;                                         //帧尾
 }
@@ -154,7 +154,7 @@ void MV_SendOK(void)
   * @Name    MV_Decode
   * @declaration :根据自己定义的参数含义执行命令
   * @param   None
-  * @retval   :
+  * @retval   : 无
   * @author  peach99CPP
 ***********************************************************************/
 void MV_Decode(void)
@@ -163,18 +163,17 @@ void MV_Decode(void)
 #define MVPID_THRESHOLD 10
 #define pid_p 0.5
 #define Ball_Signal 0x04
-    if (Get_MV_Servo_Flag())//空闲，可以接收指令 Get_MV_Servo_Flag()
+    if (Get_Servo_Flag()) //空闲，可以接收指令 此时openmv和舵控都准备好执行指令
     {
         if (mv_rec.event == Ball_Signal)
         {
-            set_speed(0,0,0);
-            mv_stop_flag = 1;
-            Servo_Running = 1;
+            Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
             //todo：调试模式下进行使用，用于测试是否收到了消息
 
             if (mv_rec.param == ladder_type) //阶梯平台三种高度
             {
-                switch (Get_Height())
+                switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
                 {
                 case LowestHeight:
                     Action_Gruop(Lowest, 1);
@@ -185,10 +184,10 @@ void MV_Decode(void)
                 case HighestHeight:
                     Action_Gruop(Highest, 1);
                 default:
-                    Action_Gruop(11,1);//机械臂升起
+                    Action_Gruop(11, 1); //机械臂升起
                 }
             }
-            else if (mv_rec.param == bar_type)
+            else if (mv_rec.param == bar_type)//是在条形平台上进行扫描的话，执行条形平台的任务
             {
                 Action_Gruop(Bar, 1);
             }
@@ -200,18 +199,40 @@ void MV_Decode(void)
   * @Name    Get_Stop_Signal
   * @declaration :返回此时是否停止的信号
   * @param   None
-  * @retval   : 是否应该停车
+  * @retval   : 是否应该停车，停车则为1
   * @author  peach99CPP
 ***********************************************************************/
 int Get_Stop_Signal(void)
 {
-    if (mv_stop_flag)
-    {
-        mv_stop_flag = 0;
-        return true;
-    }
-    else
-        return false;
+    return mv_stop_flag;
+}
+
+
+
+/**********************************************************************
+  * @Name    Enable_StopSignal
+  * @declaration :使能停车的标志位
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+void Enable_StopSignal(void)
+{
+    mv_stop_flag = 1;
+}
+
+
+
+/**********************************************************************
+  * @Name    Disable_StopSignal
+  * @declaration : 清除停车标志位
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+void Disable_StopSignal(void)
+{
+    mv_stop_flag = 0;
 }
 
 /**********************************************************************
