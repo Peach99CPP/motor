@@ -15,7 +15,6 @@ motor\debug_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 motor\debug_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 motor\debug_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\debug_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
-motor\debug_task.o: ..\Driver\chassis.h
 motor\debug_task.o: ../Inc/main.h
 motor\debug_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h
 motor\debug_task.o: ../Inc/stm32f7xx_hal_conf.h
@@ -48,6 +47,7 @@ motor\debug_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 motor\debug_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\debug_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 motor\debug_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
+motor\debug_task.o: ..\Driver\chassis.h
 motor\debug_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\debug_task.o: ..\Driver\motor.h
 motor\debug_task.o: ..\Control\tim_control.h

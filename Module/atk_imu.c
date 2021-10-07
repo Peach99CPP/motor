@@ -347,7 +347,7 @@ void imu901_init(void)
 
 /***********************自行编写的函数*************************************/
 #include "imu_pid.h"
-
+extern int if_OsRunning(void);
 #define ABS(X) (((X) > 0) ? (X) : -(X))
 
 ATK_IMU_t imu =
@@ -412,8 +412,10 @@ void ATK_IMU_Init(void)
 ***********************************************************************/
 void Set_InitYaw(int target)
 {
+    bool os_running =0;
     Set_IMUStatus(false); //先把陀螺仪关掉，否则容易在修改过程中异常
-
+    if(if_OsRunning()) 
+    os_running = 1;
     imu.target_angle = angle_limit(target); //同步修改
 
     float last_yaw, current_yaw;
@@ -429,8 +431,9 @@ void Set_InitYaw(int target)
         //更新数值
         last_yaw = current_yaw;
         current_yaw = *imu.yaw_ptr;
-        //10ms一次查询,阻塞式
-        HAL_Delay(10);
+        //10ms一次查询,根据系统运行结果执行延时函数。系统未运行时使用阻塞式，系统运行时使用系统的延时函数
+        if(os_running) osDelay(10);
+        else HAL_Delay(10);
     }
     //陀螺仪稳定，开始获取数据
     imu.init_angle = angle_limit(-angle_limit(current_yaw) + angle_limit(target));

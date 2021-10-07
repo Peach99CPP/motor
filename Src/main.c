@@ -56,7 +56,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -225,6 +224,7 @@ void USER_Init(void)
     track_status(1, 0);
     track_status(2, 0);
 }
+
 /* USER CODE END 4 */
 
 /**
