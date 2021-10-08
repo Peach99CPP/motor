@@ -59,7 +59,7 @@ void MV_HW(int dir, int enable_imu);
 void Set_SwitchParam(int main, int vertical);
 void MV_HW_Scan(int r_b,int dir, int enable_imu);
 
-
+int Get_Height_Switch(int id);
 int Get_MV_Servo_Flag(void);
 int Get_Height(void);
 #endif

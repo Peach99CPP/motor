@@ -14,7 +14,7 @@
 #include "openmv.h"
 #include "servo.h"
 
-#define Height_HW 5
+#define Height_HW1 5
 #define RED_TARGET 1
 #define BLUE_TARGET 0
 
@@ -37,13 +37,11 @@ int MIN_ = 60;
 int VERTICAL = 5;
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
-#define HW_SWITCH(X) HW_Switch[(X)-1]
+#define HW_SWITCH(X) HW_Switch[(X)-1]  //0到3下标就是红外开关的位置
 
-#define Height_SWITCH HW_Switch[4]            //高度的开关
-#define Side_SWITCH(X) HW_Switch[(X) + 5 - 1] //侧边红外的安装位置
+#define Height_SWITCH(x) HW_Switch[(x) + 4-1] //高度的开关，第4和第5下标分配给高度红外
 
-
-
+#define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7 
 
 /**********************************************************************
   * @Name    Judge_Side
@@ -79,8 +77,6 @@ void Judge_Side(int color_mode, int dir)
     }
 }
 
-
-
 /**********************************************************************
   * @Name    Start_HeightUpdate
   * @declaration :
@@ -100,18 +96,18 @@ void Start_HeightUpdate(void)
     }
 }
 
-
-
 /**********************************************************************
   * @Name    HeightUpdate_Task
   * @declaration :
-  * @param   argument: [输入/出] 
+  * @param   argument: [输入/出]
   * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
 void HeightUpdate_Task(void const *argument)
 {
     Height_Flag = 0;
+    static int Height_id =1; 
+    // todo 后续增加参数或者其他赋值的变量来指定使用哪个红外（使用双高度红外的情况下）
     while (!Height_task_exit)
     {
         if (Height_Mode == Low_Head)
@@ -119,14 +115,14 @@ void HeightUpdate_Task(void const *argument)
             Current_Height = LowestHeight;
             while (!Height_task_exit)
             {
-                if (Get_HW_Status(Height_HW) == on && Height_Flag == 0)
+                if (Get_Height_Switch(Height_id) == on && Height_Flag == 0)
                 {
                     Height_Flag = 1;
                     Current_Height = HighestHeight;
                 }
                 if (Height_Flag == 1 && Get_Servo_Flag() == true)
                 {
-                    if (Get_HW_Status(Height_HW) == off)
+                    if (Get_Height_Switch(Height_id) == off)
                     {
                         Current_Height = MediumHeight;
                     }
@@ -139,14 +135,14 @@ void HeightUpdate_Task(void const *argument)
             Current_Height = MediumHeight;
             while (!Height_task_exit)
             {
-                if (Get_HW_Status(Height_HW) == on && Height_Flag == 0)
+                if (Get_Height_Switch(Height_id) == on && Height_Flag == 0)
                 {
                     Height_Flag = 1;
                     Current_Height = HighestHeight;
                 }
                 if (Height_Flag == 1 && Get_Servo_Flag() == true)
                 {
-                    if (Get_HW_Status(Height_HW) == off)
+                    if (Get_Height_Switch(Height_id) == off)
                     {
                         Current_Height = LowestHeight;
                     }
@@ -158,10 +154,19 @@ void HeightUpdate_Task(void const *argument)
     Current_Height = PrimaryHeight;
     vTaskDelete(Height_UpadteTask);
 }
+
+/**********************************************************************
+  * @Name    Exit_Height_Upadte
+  * @declaration :
+  * @param   None
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
 void Exit_Height_Upadte(void)
 {
     Height_task_exit = 1;
 }
+
 /**********************************************************************
   * @Name    Start_Read_Switch
   * @declaration : 启动轻触开关任务
@@ -255,11 +260,18 @@ void Read_Swicth(void const *argument)
         else
             HW_SWITCH(4) = on;
         //定高红外
-        if (HAL_GPIO_ReadPin(HW_Height_GPIO_Port, HW_Height_Pin) == GPIO_PIN_SET)
-            Height_SWITCH = off;
+        if (HAL_GPIO_ReadPin(HW_Height1_GPIO_Port, HW_Height1_Pin) == GPIO_PIN_SET)
+            Height_SWITCH(1) = off;
         else
             //侧边红外
-            Height_SWITCH = on;
+            Height_SWITCH(1) = on;
+
+        if (HAL_GPIO_ReadPin(HW_Height2_GPIO_Port, HW_Height2_Pin) == GPIO_PIN_SET)
+            Height_SWITCH(2) = off;
+        else
+            //侧边红外
+            Height_SWITCH(2) = on;
+
         if (HAL_GPIO_ReadPin(Side_HW1_GPIO_Port, Side_HW1_Pin) == GPIO_PIN_SET)
             Side_SWITCH(1) = off;
         else
@@ -277,6 +289,18 @@ void Read_Swicth(void const *argument)
 }
 
 /**********************************************************************
+  * @Name    Exit_Swicth_Read
+  * @declaration : 退出查询开关状态的任务
+  * @param   None
+  * @retval   : 无
+  * @author  peach99CPP
+***********************************************************************/
+void Exit_Swicth_Read(void)
+{
+    read_task_exit = 1; //此变量为1 将使得任务函数循环条件不满足
+}
+
+/**********************************************************************
   * @Name    Get_Switch_Status
   * @declaration : 获取指定ID开关的通断状态
   * @param   id: [输入/出] 电机编号（1-8）
@@ -288,7 +312,7 @@ int Get_Switch_Status(int id)
     if (read_task_exit)
         return err; //确保当前任务处在进行中
     if (id < 1 || id > 10)
-        return off;    // todo当有开关数量更新时记得修改此处的值
+        return off; // todo当有开关数量更新时记得修改此处的值
     //上面两个是为了避免出错的判断条件
     return SWITCH(id); //返回对应开关的状态
 }
@@ -321,17 +345,13 @@ int Get_Side_Switch(int id)
         return off;
     return Side_SWITCH(id);
 }
-/**********************************************************************
-  * @Name    Exit_Swicth_Read
-  * @declaration : 退出查询开关状态的任务
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
-void Exit_Swicth_Read(void)
+int Get_Height_Switch(int id)
 {
-    read_task_exit = 1; //此变量为1 将使得任务函数循环条件不满足
+    if (id < 1 || id > 2)
+        return off; //todo 记得在更新元器件数量后更新次此处的限制范围
+    return Height_SWITCH(id);
 }
+
 /**********************************************************************
   * @Name    Get_Height
   * @declaration : 获取此时高度以计算应该调用的动作组编号
@@ -343,7 +363,26 @@ int Get_Height(void)
 {
     return Current_Height;
 }
-
+/**********************************************************************
+  * @Name    Return_AdverseID
+  * @declaration : 获取相对的开关编号
+  * @param   id: [输入/出] 当前的开关编号
+  * @retval   : 同侧的相对编号
+  * @author  peach99CPP
+***********************************************************************/
+int Return_AdverseID(int id)
+{
+    if (id == 1)
+        return 2;
+    else if (id == 2)
+        return 1;
+    else if (id == 5)
+        return 6;
+    else if (id == 6)
+        return 5;
+    else
+        return 1; //避免出错，返回0容易引起数组越界 todo最好在此分支增加一个错误报告的打印数据
+}
 /**********************************************************************
   * @Name    MV_HW_Scan
   * @declaration :利用MV 舵控 联动对阶梯平台进行扫描并抓取
@@ -360,22 +399,30 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
 {
     int time_delay = 0;                                     //避免超时卡死的临时变量
     Disable_StopSignal();                                   //此时不会停车
-    Action_Gruop(11, 1);                                    //展开爪子
     while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
     {
         time_delay += 10;
         osDelay(10);
     }
     Set_IMUStatus(enable_imu); //设置陀螺仪状态
-    Judge_Side(r_b, dir);      //裁决高度判断模式，根据参数给变量赋值
-    Start_HeightUpdate();      //开始更新高度信息的任务
-    /*1 2为正前方， 5 6为右侧*/
-    if (dir == 1)
+    if (dir == 5 || dir == 6)
     {
-dir1_Start_Symbol:
+        Action_Gruop(11, 1);                                    //展开爪子
+        Judge_Side(r_b, dir); //裁决高度判断模式，根据参数给变量赋值 只在阶梯平台需要用到
+    }
+    /*1 2为正前方， 5 6为左右侧*/
+    if (dir == 1) //使用左边的红外来完成任务
+    {
+        set_speed(MIN_, 0, 0);
+        while (Get_HW_Status(dir) == false)
+            osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
+    dir1_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on) //当未收到MV停止信号或红外开持续导通时
         {
-            set_speed(-MIN_, VERTICAL, 0); //一边走一边贴边
+            if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
+                set_speed(MIN_*0.8, VERTICAL*0, 0);               //一边走一边贴边
+            else
+                set_speed(MIN_, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
             osDelay(5);
         }
         set_speed(0, 0, 0);            //停车
@@ -396,10 +443,18 @@ dir1_Start_Symbol:
     }
     else if (dir == 2)
     {
-dir2_Start_Symbol:
-        set_speed(MIN_, VERTICAL, 0);
+        set_speed(-MIN_, 0, 0); //横向移动
+        while (Get_HW_Status(dir) == false)
+            osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
+    dir2_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
+        {
+            if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
+                set_speed(-MIN_, VERTICAL, 0);              //一边走一边贴边
+            else
+                set_speed(-MIN_, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
             osDelay(5);
+        }
         set_speed(0, 0, 0);
         if (Get_HW_Status(dir) == off)
         {
@@ -415,9 +470,11 @@ dir2_Start_Symbol:
             goto dir2_Start_Symbol;
         }
     }
+    //只有在阶梯平台移动时需要使用高度信息，前面两个用于扫描阶梯平台
     else if (dir == 5)
     {
-dir5_Start_Symbol:
+        Start_HeightUpdate(); //开始更新高度信息的任务
+    dir5_Start_Symbol:
         set_speed(VERTICAL, MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
             osDelay(5);
@@ -438,7 +495,8 @@ dir5_Start_Symbol:
     }
     else if (dir == 6)
     {
-dir6_Start_Symbol:
+        Start_HeightUpdate(); //开始更新高度信息的任务
+    dir6_Start_Symbol:
         set_speed(VERTICAL, -MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on)
             osDelay(5);
@@ -521,8 +579,7 @@ Closing:
         //任务调度
         osDelay(10);
 
-    }
-    while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
+    } while (flag1 == off || flag2 == off); //只有两个都接通，才退出该循环
     osDelay(500);
     if (flag1 == off || flag2 == off)
     {
@@ -535,6 +592,7 @@ switch_exit:
     //    Exit_Swicth_Read(); //用完了就关闭任务
     set_speed(0, 0, 0); //开关
     /*******本来这里应该接一个矫正陀螺仪，但是会降低程序的灵活性，所以不添加。在调用本程序之后，自己操作陀螺仪*******/
+    //todo：调用完函数根据实际需要进行陀螺仪角度的修正
 }
 
 /**********************************************************************
@@ -606,8 +664,7 @@ RECLOSE:
         if (status == err)
             Start_Read_Switch(); //防止此时任务退出而卡死在循环里
         osDelay(20);             //任务调度
-    }
-    while (status == on);        //直到开关断开，此时说明到达边界
+    } while (status == on);      //直到开关断开，此时说明到达边界
     set_speed(0, 0, 0);          //停车
 }
 

@@ -142,6 +142,7 @@ void chassis_synthetic_control(void)
     {
         //陀螺仪开启时的巡线模式，已测试通过
         w_error = imu_correct_val();
+        if(w_error < 20) w_error*=2;
         x = chassis.x_speed - y_error * speed_factor;
         y = chassis.y_speed - x_error * speed_factor;
         w = chassis.w_speed + w_error * speed_factor;

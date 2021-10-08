@@ -94,12 +94,14 @@ void Error_Handler(void);
 #define HW_S3_GPIO_Port GPIOD
 #define HW_S4_Pin GPIO_PIN_3
 #define HW_S4_GPIO_Port GPIOD
-#define HW_Height_Pin GPIO_PIN_4
-#define HW_Height_GPIO_Port GPIOD
-#define Side_HW2_Pin GPIO_PIN_7
-#define Side_HW2_GPIO_Port GPIOD
-#define Side_HW1_Pin GPIO_PIN_4
+#define HW_Height1_Pin GPIO_PIN_7
+#define HW_Height1_GPIO_Port GPIOD
+#define HW_Height2_Pin GPIO_PIN_4
+#define HW_Height2_GPIO_Port GPIOB
+#define Side_HW1_Pin GPIO_PIN_5
 #define Side_HW1_GPIO_Port GPIOB
+#define Side_HW2_Pin GPIO_PIN_9
+#define Side_HW2_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
