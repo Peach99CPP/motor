@@ -10,7 +10,7 @@ extern volatile uint32_t TIME_ISR_CNT;
 #define START_BYTE 0xff
 #define END_BYTE 0x99
 #define MAX_LINE 3
-#define BUFF_SIZE 9
+#define BUFF_SIZE 7
 #define LINE_DELAY (50 / 10)
 
 int dma_count, times_counts = 0;
@@ -28,8 +28,13 @@ pid_paramer_t track_pid_param = {
     .kp = 10,
     .ki = 0,
     .kd = 0,
-    .control_output_limit = 300};
-
+    .control_output_limit = 300 
+    };
+Track_RX_t track_rec ={
+    .rec_data = {0},
+    .current_index = 0,
+    .rec_flag = 0
+};
 void Clear_Line(trackbar_t *bar)
 {
     bar->line_flag = 0;
@@ -84,7 +89,7 @@ void track_bar_init(void) //相关的初始化函数
     x_rightbar.line_num = 0;
     x_rightbar.data.expect = 0;
     x_rightbar.if_switch = true;
-    HAL_UART_Receive_DMA(&TRACK_UART, track_dma[0], BUFF_SIZE);
+    __HAL_UART_ENABLE_IT(&TRACK_UART, UART_IT_RXNE);
 }
 
 /**********************************************************************
@@ -99,7 +104,7 @@ uint8_t get_avaiable_pos(void)
     //新版本
     for (uint8_t i = 0; i < MAX_LINE; ++i) //遍历数组index
     {
-        if (track_dma[i][0] == START_BYTE && track_dma[i][BUFF_SIZE-1] == END_BYTE) //满足协议设计
+        if (track_dma[i][0] == START_BYTE && track_dma[i][BUFF_SIZE - 1] == END_BYTE) //满足协议设计
         {
             return i;
         }
@@ -124,26 +129,25 @@ void track_decode(void)
 
     times_counts++;                   //总的处理次数，查看此 数据可以判断是否卡DMA
     dma_count--;                      //待处理数-1
-    uint8_t pos = get_avaiable_pos(); //获取可用index
     uint8_t led_num = 0;
     float track_value = 0, temp_val; //相关的变量声明
 
     //下面的和检验看情况开启
-    if ((uint8_t)(track_dma[pos][2] + track_dma[pos][4]+track_dma[pos][6]) == track_dma[pos][BUFF_SIZE-2]) //和校验
+    if ((uint8_t)(track_rec.rec_data[1] + track_rec.rec_data[3]  + track_rec.rec_data[5] ) == track_rec.rec_data[6] ) //和校验
     {
-        for (uint8_t bar_id = 1; bar_id <= BUFF_SIZE - 4; bar_id += 2)
+        for (uint8_t bar_id = 1; bar_id <= BUFF_SIZE - 2; bar_id += 2)
         {
             track_value = 0;
-            temp_val= 0;
+            temp_val = 0;
             led_num = 0;
             for (uint8_t i = 0; i < 8; ++i)
             {
-                temp_val = (bool)(((track_dma[pos][bar_id+1] << i) & 0x80)) * track_weight[i]; //根据灯亮与否及其权重得到反馈值
+                temp_val = (bool)(((track_rec.rec_data[bar_id ] << i) & 0x80)) * track_weight[i]; //根据灯亮与否及其权重得到反馈值
                 if (temp_val != 0)
                     led_num++; //计算亮的灯数量
                 track_value += temp_val;
             }
-            switch (track_dma[pos][bar_id]) //判断寻迹板ID
+            switch (track_rec.rec_data[bar_id-1]) //判断寻迹板ID
             {
             case 1:
                 y_bar.data.feedback = track_value; //赋值
@@ -200,46 +204,41 @@ void track_decode(void)
                 ;
             }
         }
-        memset(track_dma[pos], 0, sizeof(track_dma[pos])); //把用到的清0，等待下次被填充
     }
+    track_rec.rec_flag  = 0;//清除标志位，下一次接收可以进行
 }
 
-/**********************************************************************
-  * @Name    track_IT_handle
-  * @declaration : 接收完成中断
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
-void track_IT_handle(void)
+void Track_RX_IRQ(void)
 {
-    uint8_t pos = get_avaiable_pos(); //通过获取这个检查是否有被填充进去
-    if (pos != 0xff)
+    static uint8_t rec_data;
+    if (__HAL_UART_GET_IT(&TRACK_UART, UART_IT_RXNE))
     {
-        dma_count++;
-        dma_trans_pos = ((dma_trans_pos + 1) >= MAX_LINE) ? 0 : dma_trans_pos + 1; //此接收器接收完成，。换到空闲接收区进行接收
-        HAL_UART_Receive_DMA(&TRACK_UART, (uint8_t *)track_dma[dma_trans_pos], BUFF_SIZE);
-    }
-    //否则就在原缓冲区继续接收
-    else
-    {
-        memset(track_dma, 0, sizeof(track_dma)); //清空掉，作用不大，习惯为止
-        HAL_UART_Receive_DMA(&TRACK_UART, (uint8_t *)track_dma[dma_trans_pos], BUFF_SIZE);
-    }
-}
-
-/**********************************************************************
-  * @Name    HAL_UART_RxCpltCallback
-  * @declaration : 自行修改的接收完成中断函数
-  * @param   huart: [输入/出]  触发响应的串口
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-    if (huart == &TRACK_UART) //寻迹板对应的串口，为了移植性，后续会用结构体
-    {
-        track_IT_handle();
+        rec_data = TRACK_UART.Instance->RDR;
+        if (track_rec.rec_flag < 2)
+        {
+            if (rec_data == START_BYTE && track_rec.rec_flag == 0)
+            {
+                track_rec.rec_flag = 1;
+                return ;
+            }
+            if(track_rec.rec_flag ==  1)
+            {
+                if(rec_data ==  END_BYTE && track_rec.current_index == 7)
+                {
+                    track_rec.rec_flag = 2;
+                    dma_count++;
+                }
+                else
+                {
+                    track_rec.rec_data[track_rec.current_index++] = rec_data;
+                    if(track_rec.current_index >= MAX_TRACK_REC_SIZE ) 
+                    {
+                        track_rec.current_index = 0;
+                        track_rec.rec_flag =0;
+                    }
+                }
+            }
+        }
     }
 }
 

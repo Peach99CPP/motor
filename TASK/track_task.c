@@ -10,6 +10,6 @@ void track_scan(void const * argument)
         {
             track_decode();
         }
-          osDelay(5);
+          osDelay(1);
     }
 }

@@ -47,7 +47,6 @@ motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
-motor\main.o: ../Inc/dma.h
 motor\main.o: ../Inc/tim.h
 motor\main.o: ../Inc/usart.h
 motor\main.o: ../Inc/gpio.h

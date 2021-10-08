@@ -25,11 +25,20 @@
 #include "pid.h"
 #include "string.h"
 #define TRACK_UART  huart6
+#define MAX_TRACK_REC_SIZE   30
 typedef enum{
     forward_bar=0,
     left_bar,
     right_bar
 }track_id_t;
+
+typedef struct
+{
+    uint8_t rec_data[MAX_TRACK_REC_SIZE];
+    uint8_t rec_flag ;
+    uint8_t current_index;
+    
+}Track_RX_t;
 
 typedef struct
 {
@@ -40,6 +49,7 @@ typedef struct
     pid_data_t data;
     bool if_switch;
 } trackbar_t;
+void Track_RX_IRQ(void);
 void track_IT_handle(void);
 void track_bar_init(void);
 void track_decode(void);

@@ -2,7 +2,6 @@
 "motor\main.o"
 "motor\gpio.o"
 "motor\freertos.o"
-"motor\dma.o"
 "motor\tim.o"
 "motor\usart.o"
 "motor\stm32f7xx_it.o"
