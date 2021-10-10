@@ -13,7 +13,7 @@
 #include "atk_imu.h"
 #include "openmv.h"
 #include "servo.h"
-
+#include "general.h"
 #define Height_HW1 5
 #define RED_TARGET 1
 #define BLUE_TARGET 0
@@ -39,9 +39,9 @@ int VERTICAL = 5;
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
 #define HW_SWITCH(X) HW_Switch[(X)-1]  //0到3下标就是红外开关的位置
 
-#define Height_SWITCH(x) HW_Switch[(x) + 4-1] //高度的开关，第4和第5下标分配给高度红外
+#define Height_SWITCH(x) HW_Switch[(x) + 4 - 1] //高度的开关，第4和第5下标分配给高度红外
 
-#define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7 
+#define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7
 
 /**********************************************************************
   * @Name    Judge_Side
@@ -397,18 +397,30 @@ int Return_AdverseID(int id)
 ***********************************************************************/
 void MV_HW_Scan(int r_b, int dir, int enable_imu)
 {
-    int time_delay = 0;                                     //避免超时卡死的临时变量
-    Disable_StopSignal();                                   //此时不会停车
-    while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
-    {
-        time_delay += 10;
-        osDelay(10);
-    }
+    int time_delay = 0;   //避免超时卡死的临时变量
+    MV_Start();//开启Openmv
+    Disable_StopSignal(); //此时不会停车
+
     Set_IMUStatus(enable_imu); //设置陀螺仪状态
     if (dir == 5 || dir == 6)
     {
+        MV_SendCmd(1,r_b);
         Action_Gruop(11, 1);                                    //展开爪子
-        Judge_Side(r_b, dir); //裁决高度判断模式，根据参数给变量赋值 只在阶梯平台需要用到
+        Judge_Side(r_b, dir);                                   //裁决高度判断模式，根据参数给变量赋值 只在阶梯平台需要用到
+        while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
+        {
+            time_delay += 10;
+            osDelay(10);
+        }
+    }
+    else if (dir == 1 || dir == 2)//条形平台
+    {
+        Openmv_Scan_Bar(1, r_b);
+        while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
+        {
+            time_delay += 10;
+            osDelay(10);
+        }
     }
     /*1 2为正前方， 5 6为左右侧*/
     if (dir == 1) //使用左边的红外来完成任务
@@ -416,19 +428,20 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
         set_speed(MIN_, 0, 0);
         while (Get_HW_Status(dir) == false)
             osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
-        set_speed(0,0,0);
-dir1_Start_Symbol:
+        set_speed(0, 0, 0);
+    dir1_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on) //当未收到MV停止信号或红外开持续导通时
         {
             if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
-                set_speed(MIN_, VERTICAL, 0);           //一边走一边贴边
+                set_speed(MIN_ * 0.6, VERTICAL, 0);         //一边走一边贴边
             else
-                set_speed(MIN_, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
+                set_speed(MIN_ * 0.6, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
             osDelay(5);
         }
         set_speed(0, 0, 0);            //停车
         if (Get_HW_Status(dir) == off) //判断退出上述循环的原因，如果是红外触发的，说明此时到达边界，扫描结束，退出函数
         {
+            Openmv_Scan_Bar(0, 1);
             Exit_Height_Upadte();
             return;
         }
@@ -447,8 +460,8 @@ dir1_Start_Symbol:
         set_speed(-MIN_, 0, 0); //横向移动
         while (Get_HW_Status(dir) == false)
             osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
-        set_speed(0,0,0);
-dir2_Start_Symbol:
+        set_speed(0, 0, 0);
+    dir2_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
         {
             if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
@@ -460,6 +473,7 @@ dir2_Start_Symbol:
         set_speed(0, 0, 0);
         if (Get_HW_Status(dir) == off)
         {
+            Openmv_Scan_Bar(0, 1);
             Exit_Height_Upadte();
             return;
         }
@@ -476,13 +490,14 @@ dir2_Start_Symbol:
     else if (dir == 5)
     {
         Start_HeightUpdate(); //开始更新高度信息的任务
-dir5_Start_Symbol:
+    dir5_Start_Symbol:
         set_speed(VERTICAL, MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
             osDelay(5);
         set_speed(0, 0, 0);
         if (Get_Side_Switch(1) == off)
         {
+            Action_Gruop(4,1);//收起机械臂
             Exit_Height_Upadte();
             return;
         }
@@ -498,13 +513,14 @@ dir5_Start_Symbol:
     else if (dir == 6)
     {
         Start_HeightUpdate(); //开始更新高度信息的任务
-dir6_Start_Symbol:
+    dir6_Start_Symbol:
         set_speed(VERTICAL, -MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on)
             osDelay(5);
         set_speed(0, 0, 0);            //停车再说
         if (Get_Side_Switch(2) == off) //是边缘的红外导致的停车
         {
+            Action_Gruop(4,1);//收起机械臂
             Exit_Height_Upadte(); //结束任务
             return;               //退出
         }
@@ -517,6 +533,8 @@ dir6_Start_Symbol:
             goto dir6_Start_Symbol; //回到开头位置
         }
     }
+    
+    MV_Stop();//停止处理响应
 }
 
 /**********************************************************************
@@ -581,8 +599,7 @@ Closing:
         //任务调度
         osDelay(10);
 
-    }
-    while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
+    } while (flag1 == off || flag2 == off); //只有两个都接通，才退出该循环
     osDelay(500);
     if (flag1 == off || flag2 == off)
     {
@@ -667,8 +684,7 @@ RECLOSE:
         if (status == err)
             Start_Read_Switch(); //防止此时任务退出而卡死在循环里
         osDelay(20);             //任务调度
-    }
-    while (status == on);        //直到开关断开，此时说明到达边界
+    } while (status == on);      //直到开关断开，此时说明到达边界
     set_speed(0, 0, 0);          //停车
 }
 

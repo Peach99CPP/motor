@@ -11,6 +11,7 @@
 "motor\openmv.o"
 "motor\qr_code.o"
 "motor\servo.o"
+"motor\general.o"
 "motor\chassis.o"
 "motor\motor.o"
 "motor\time_cnt.o"

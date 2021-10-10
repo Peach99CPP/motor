@@ -13,6 +13,8 @@
 #include "atk_imu.h"
 #include "read_status.h"
 #include "servo.h"
+#include "general.h"
+
 /****各个调试模式的开关*****/
 
 #define DEBUG_MOTOR 0   //调试电机
@@ -56,20 +58,10 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void Set_InitYaw(int target)",
 #endif
 #if DEBUG_OPENMV == 1
-        (void *)MV_Start,
-        "void MV_Start(void)",
-        (void *)MV_Stop,
-        "void MV_Stop(void)",
-        (void *)MV_Scan_Low,
-        "void MV_Scan_Low(mvcolor_t color)",
-        (void *)MV_Scan_High,
-        "void MV_Scan_High(mvcolor_t color)",
-        (void *)MV_Scan_Bar,
-        "void MV_Scan_Bar(mvcolor_t color)",
+        (void *)Openmv_Scan_Bar,
+        "void Openmv_Scan_Bar(int status,int color)",
         (void *)MV_SendCmd,
         "void MV_SendCmd(const uint8_t event_id, const int param)",
-        (void *)MV_PID,
-        "void MV_PID(void)",
 #endif
 #if DEBUG_CHASSIS == 1
         /**底盘运动部分**/

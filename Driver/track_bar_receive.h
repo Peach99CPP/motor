@@ -26,6 +26,7 @@
 #include "string.h"
 #define TRACK_UART  huart6
 #define MAX_TRACK_REC_SIZE   30
+#define MAX_ROW_SIZE 6
 typedef enum{
     forward_bar=0,
     left_bar,
@@ -39,6 +40,12 @@ typedef struct
     uint8_t current_index;
     
 }Track_RX_t;
+
+typedef struct {
+    uint8_t rec_data[MAX_ROW_SIZE][MAX_TRACK_REC_SIZE];
+    uint8_t current_index;
+    uint8_t rec_flag;
+}Track_RXRows_t;
 
 typedef struct
 {
@@ -64,5 +71,5 @@ void Clear_Line(trackbar_t* bar);
 #endif
 
 
- 
+
 

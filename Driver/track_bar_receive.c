@@ -25,16 +25,42 @@ trackbar_t y_bar, x_leftbar, x_rightbar; //三个寻迹板
 //初始化PID参数
 pid_paramer_t track_pid_param = {
     .integrate_max = 50,
-    .kp = 10,
+    .kp = 15,
     .ki = 0,
     .kd = 0,
-    .control_output_limit = 300 
-    };
-Track_RX_t track_rec ={
-    .rec_data = {0},
+    .control_output_limit = 300};
+
+
+//初始化结构体
+Track_RXRows_t Track_Row = {
     .current_index = 0,
-    .rec_flag = 0
-};
+    .rec_flag = 0,
+    .rec_data = {0}};
+
+int Get_EmptyRow_ID(void)
+{
+    for (uint8_t i = 0; i < MAX_ROW_SIZE; ++i)
+    {
+        if (Track_Row.rec_data[i][0] == 0)
+        {
+            return i;
+        }
+    }
+    return 0X01;
+}
+
+int Get_AvaibleRow_ID(void)
+{
+    for (uint8_t i = 0; i < MAX_ROW_SIZE; ++i)
+    {
+        if (Track_Row.rec_data[i][0] == 0X01)
+        {
+            return i;
+        }
+    }
+    return 0XFF;//实在找不到了，随便返回一个，防止被卡死
+}
+
 void Clear_Line(trackbar_t *bar)
 {
     bar->line_flag = 0;
@@ -109,7 +135,7 @@ uint8_t get_avaiable_pos(void)
             return i;
         }
     }
-    return 0XFF; //一个都找不到，返回特殊值，在调用时判断返回值非错误值可以减少出错的可能
+    return 0X01; //一个都找不到，返回特殊值，在调用时判断返回值非错误值可以减少出错的可能
 }
 
 /**********************************************************************
@@ -122,123 +148,135 @@ uint8_t get_avaiable_pos(void)
 void track_decode(void)
 {
     /***相关宏定义****/
-#define EDGE_THRESHOLD 4 //在边缘数线模式下，几颗灯亮起时为有效计数
+#define EDGE_THRESHOLD 5 //在边缘数线模式下，几颗灯亮起时为有效计数
 #define NUM_THRESHOLD 6  //非边缘线计算下，判断到达线的数量
 #define MIN_NUM 2        //在压线之后，过线了才会计算一根线，根据灯的数量进行计数
 #define EDGE_VAL 7       //边缘数线状态下的循迹读回来的值
 
-    times_counts++;                   //总的处理次数，查看此 数据可以判断是否卡DMA
-    dma_count--;                      //待处理数-1
+    times_counts++; //总的处理次数，查看此 数据可以判断是否卡DMA
+    dma_count--;    //待处理数-1
     uint8_t led_num = 0;
+    uint8_t AVaiable_Row = Get_AvaibleRow_ID();
     float track_value = 0, temp_val; //相关的变量声明
-
-    //下面的和检验看情况开启
-    if ((uint8_t)(track_rec.rec_data[1] + track_rec.rec_data[3]  + track_rec.rec_data[5] ) == track_rec.rec_data[6] ) //和校验
+    if (AVaiable_Row != 0XFF)
     {
-        for (uint8_t bar_id = 1; bar_id <= BUFF_SIZE - 2; bar_id += 2)
+        //下面的和检验看情况开启
+        if ((uint8_t)(Track_Row.rec_data[AVaiable_Row][1] + Track_Row.rec_data[AVaiable_Row][3] + Track_Row.rec_data[AVaiable_Row][5]) == Track_Row.rec_data[AVaiable_Row][6]) //和校验
         {
-            track_value = 0;
-            temp_val = 0;
-            led_num = 0;
-            for (uint8_t i = 0; i < 8; ++i)
+            for (uint8_t bar_id = 1; bar_id <= BUFF_SIZE - 2; bar_id += 2)
             {
-                temp_val = (bool)(((track_rec.rec_data[bar_id ] << i) & 0x80)) * track_weight[i]; //根据灯亮与否及其权重得到反馈值
-                if (temp_val != 0)
-                    led_num++; //计算亮的灯数量
-                track_value += temp_val;
-            }
-            switch (track_rec.rec_data[bar_id-1]) //判断寻迹板ID
-            {
-            case 1:
-                y_bar.data.feedback = track_value; //赋值
-                y_bar.num = led_num;               //得到灯的数量
-                if (y_bar.num >= NUM_THRESHOLD || (edge_status[0] && y_bar.num >= EDGE_THRESHOLD && ABS(y_bar.data.feedback) >= EDGE_VAL))
+                track_value = 0;
+                temp_val = 0;
+                led_num = 0;
+                for (uint8_t i = 0; i < 8; ++i)
                 {
-                    /*有两种情况，
+                    temp_val = (bool)(((Track_Row.rec_data[AVaiable_Row][bar_id] << i) & 0x80)) * track_weight[i]; //根据灯亮与否及其权重得到反馈值
+                    if (temp_val != 0)
+                        led_num++; //计算亮的灯数量
+                    track_value += temp_val;
+                }
+                switch (Track_Row.rec_data[AVaiable_Row][bar_id - 1]) //判断寻迹板ID
+                {
+                case 1:
+                    y_bar.data.feedback = track_value; //赋值
+                    y_bar.num = led_num;               //得到灯的数量
+                    if (y_bar.num >= NUM_THRESHOLD || (edge_status[0] && y_bar.num >= EDGE_THRESHOLD && ABS(y_bar.data.feedback) >= EDGE_VAL))
+                    {
+                        /*有两种情况，
                 *一是当跑在非边缘时，此时灯的数量比较多
-                *二是在边缘跑时，此时灯数量较少且需要加多重判断
+                *二是在边缘跑时，此时灯数量较少且需要加多重判断，比如计算此时的反馈值，一般来说此时的反馈值会比较大。可以以此为判断条件
                 */
-                    y_bar.line_flag = 1; //此时到线上
-                }
-                if (edge_status[0] && y_bar.num >= EDGE_THRESHOLD && ABS(y_bar.data.feedback) >= EDGE_VAL) //边缘数线的情况下，特殊处理
-                    y_bar.data.feedback = 0;                                                               //要放在对线的判断之后；置0是为了防止此时发生偏移
-                if (y_bar.line_flag && y_bar.num <= MIN_NUM)
-                {
-                    //使用此机制为了避免因停留在线上而导致线的数量一直重复计数
-                    y_bar.line_flag = 0; //数线完成
-                    y_bar.line_num++;    //线数目加一
-                }
-                break;
-            case 2:
-                x_leftbar.data.feedback = track_value;
-                x_leftbar.num = led_num;
+                        y_bar.line_flag = 1; //此时到线上
+                    }
+                    if (edge_status[0] && y_bar.num >= EDGE_THRESHOLD && ABS(y_bar.data.feedback) >= EDGE_VAL) //边缘数线的情况下，特殊处理
+                        y_bar.data.feedback = 0;                                                               //要放在对线的判断之后；置0是为了防止此时发生偏移
+                    if (y_bar.line_flag && y_bar.num <= MIN_NUM)
+                    {
+                        //使用此机制为了避免因停留在线上而导致线的数量一直重复计数
+                        y_bar.line_flag = 0; //数线完成
+                        y_bar.line_num++;    //线数目加一
+                    }
+                    break;
+                case 2:
+                    x_leftbar.data.feedback = track_value;
+                    x_leftbar.num = led_num;
 
-                if (x_leftbar.num >= NUM_THRESHOLD || (edge_status[1] && x_leftbar.num >= EDGE_THRESHOLD && ABS(x_leftbar.data.feedback) >= EDGE_VAL))
-                {
-                    x_leftbar.line_flag = 1; //标记到了线上
+                    if (x_leftbar.num >= NUM_THRESHOLD || (edge_status[1] && x_leftbar.num >= EDGE_THRESHOLD && ABS(x_leftbar.data.feedback) >= EDGE_VAL))
+                    {
+                        x_leftbar.line_flag = 1; //标记到了线上
+                    }
+                    if (edge_status[1] && x_leftbar.num >= EDGE_THRESHOLD && ABS(x_leftbar.data.feedback) >= EDGE_VAL)
+                        x_leftbar.data.feedback = 0;
+                    if (x_leftbar.line_flag && x_leftbar.num <= MIN_NUM) //避免因为在线上停留而导致的重复计数问题
+                    {
+                        x_leftbar.line_flag = 0;
+                        x_leftbar.line_num++;
+                    }
+                    break;
+                case 3:
+                    x_rightbar.data.feedback = track_value;
+                    x_rightbar.num = led_num;
+                    if (x_rightbar.num >= NUM_THRESHOLD || (edge_status[2] && x_rightbar.num >= EDGE_THRESHOLD && ABS(x_rightbar.data.feedback) >= EDGE_VAL))
+                    {
+                        x_rightbar.line_flag = 1;
+                    }
+                    if (edge_status[2] && x_rightbar.num >= EDGE_THRESHOLD && ABS(x_rightbar.data.feedback) >= EDGE_VAL)
+                        x_leftbar.data.feedback = 0;
+                    if (x_rightbar.line_flag && x_rightbar.num <= MIN_NUM)
+                    {
+                        x_rightbar.line_flag = 0;
+                        x_rightbar.line_num++;
+                    }
+                    break;
+                default: //啥也不干
+                    ;
                 }
-                if (edge_status[1] && x_leftbar.num >= EDGE_THRESHOLD && ABS(x_leftbar.data.feedback) >= EDGE_VAL)
-                    x_leftbar.data.feedback = 0;
-                if (x_leftbar.line_flag && x_leftbar.num <= MIN_NUM) //避免因为在线上停留而导致的重复计数问题
-                {
-                    x_leftbar.line_flag = 0;
-                    x_leftbar.line_num++;
-                }
-                break;
-            case 3:
-                x_rightbar.data.feedback = track_value;
-                x_rightbar.num = led_num;
-                if (x_rightbar.num >= NUM_THRESHOLD || (edge_status[2] && x_rightbar.num >= EDGE_THRESHOLD && ABS(x_rightbar.data.feedback) >= EDGE_VAL))
-                {
-                    x_rightbar.line_flag = 1;
-                }
-                if (edge_status[2] && x_rightbar.num >= EDGE_THRESHOLD && ABS(x_rightbar.data.feedback) >= EDGE_VAL)
-                    x_leftbar.data.feedback = 0;
-                if (x_rightbar.line_flag && x_rightbar.num <= MIN_NUM)
-                {
-                    x_rightbar.line_flag = 0;
-                    x_rightbar.line_num++;
-                }
-                break;
-            default: //啥也不干
-                ;
             }
         }
+        memset(Track_Row.rec_data[AVaiable_Row], 0, sizeof(Track_Row.rec_data[AVaiable_Row])); //清除此位置的数据内容
     }
-    track_rec.rec_flag  = 0;//清除标志位，下一次接收可以进行
 }
 
 void Track_RX_IRQ(void)
 {
-    static uint8_t rec_data;
+    static uint8_t rec_data, row_id = 0;
     if (__HAL_UART_GET_IT(&TRACK_UART, UART_IT_RXNE))
     {
+
         rec_data = TRACK_UART.Instance->RDR;
-        if (track_rec.rec_flag < 2)
+        if (row_id != 0XFF)
         {
-            if (rec_data == START_BYTE && track_rec.rec_flag == 0)
+            if (Track_Row.rec_flag < 2)
             {
-                track_rec.rec_flag = 1;
-                return ;
-            }
-            if(track_rec.rec_flag ==  1)
-            {
-                if(rec_data ==  END_BYTE && track_rec.current_index == 7)
+                if (Track_Row.rec_flag == 0 && rec_data == START_BYTE)
                 {
-                    track_rec.rec_flag = 2;
-                    dma_count++;
+                    Track_Row.rec_flag = 1;
+                    return;
                 }
-                else
+                if (Track_Row.rec_flag == 1)
                 {
-                    track_rec.rec_data[track_rec.current_index++] = rec_data;
-                    if(track_rec.current_index >= MAX_TRACK_REC_SIZE ) 
+                    if (rec_data == END_BYTE && Track_Row.current_index == 7)
                     {
-                        track_rec.current_index = 0;
-                        track_rec.rec_flag =0;
+                        row_id = Get_EmptyRow_ID();  //更新存储位置
+                        dma_count++;                 //标记待处理数据的数量
+                        Track_Row.current_index = 0; //从头开始存储
+                        Track_Row.rec_flag = 0;      //状态位初始化
+                    }
+                    else
+                    {
+                        Track_Row.rec_data[row_id][Track_Row.current_index++] = rec_data;
+                        if (Track_Row.current_index >= MAX_TRACK_REC_SIZE)
+                        {
+                            //出现错误，触发重传
+                            Track_Row.current_index = 0;//从头开始接收
+                            Track_Row.rec_flag = 0; //状态位初始化
+                        }
                     }
                 }
             }
         }
+        else
+            row_id = Get_EmptyRow_ID(); //获取到了错误的ID号，执行更新措施
     }
 }
 
