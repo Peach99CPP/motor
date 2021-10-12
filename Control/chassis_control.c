@@ -186,8 +186,7 @@ void LineTask(void const *argument)
                 if_need_zero = 1;   //等会需要再转回来
                 turn_angle(1, 180); //先转弯到180度，然后再进行前进，因为只有正前方有循迹版
                 lines *= -1;
-                while (!get_turn_status())
-                    osDelay(1); //确保此时转弯完成，才进入下一阶段的行动
+                osDelay(1000);
             }
             Clear_Line(&y_bar); //重新初始化要用到的结构体
             do

@@ -82,7 +82,6 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -207,9 +206,9 @@ void USER_Init(void)
     track_bar_init();//循迹版的使能
     //开启外设用到的串口，后续移入到对应的函数
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);//调试信息
-    __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);//
-    __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
-    __HAL_UART_ENABLE_IT(&huart5, UART_IT_RXNE);
+    __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);//二维码的接收串口
+    __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);//openmv接收
+    __HAL_UART_ENABLE_IT(&huart5, UART_IT_RXNE);//舵控的接收
     Get_Time_Init();//系统时间
     ATK_IMU_Init();//陀螺仪初始化
     delay_init(&htim6, up_count);//使能delay
@@ -280,13 +279,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 #endif /* USE_FULL_ASSERT */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-
-
-
-
-
-
-
-
-
-

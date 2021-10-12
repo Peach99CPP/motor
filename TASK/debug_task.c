@@ -10,6 +10,7 @@
 #include "avoid_obs.h"
 #include "atk_imu.h"
 #include "track_bar_receive.h"
+#include "servo.h"
 #define DUBUG_MOTOR 0
 int if_OsRunning(void);
 void Set_OSRunningFlag(int status);
@@ -77,3 +78,15 @@ void Set_OSRunningFlag(int status)
     Os_RunningFlag = status;
 }
 
+void Goto_Warehouse(void)
+{
+    HWSwitch_Move(5,1);
+    move_slantly(3,100,1500);
+    turn_angle(1,-90);
+    osDelay(200);
+    direct_move(2,-1,0,1);
+    Wait_Switches(4);
+    Action_Gruop(13,1);
+    Kiss_Ass(1);
+    Action_Gruop(8,1);
+}

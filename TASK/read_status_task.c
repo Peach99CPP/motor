@@ -53,24 +53,24 @@ int VERTICAL = 5;
 ***********************************************************************/
 void Judge_Side(int color_mode, int dir)
 {
-    if (color_mode == Red_)
+    if (color_mode == Red_) //在红色场
     {
-        if (dir == 5)
+        if (dir == 5) //从右到左
         {
             Height_Mode = Medium_Head;
         }
-        if (dir == 6)
+        if (dir == 6) //从左到右
         {
             Height_Mode = Low_Head;
         }
     }
-    else if (color_mode == Blue_)
+    else if (color_mode == Blue_) //蓝色半场
     {
-        if (dir == 5)
+        if (dir == 5) //从右到左
         {
             Height_Mode = Low_Head;
         }
-        if (dir == 6)
+        if (dir == 6) //从左到右
         {
             Height_Mode = Medium_Head;
         }
@@ -90,7 +90,6 @@ void Start_HeightUpdate(void)
     if (Height_task_exit)
     {
         Height_task_exit = 0;
-        Current_Height = MediumHeight;
         osThreadDef(Height_UpadteTask, HeightUpdate_Task, osPriorityHigh, 0, 128);
         Height_UpadteTask = osThreadCreate(osThread(Height_UpadteTask), NULL);
     }
@@ -398,13 +397,13 @@ int Return_AdverseID(int id)
 void MV_HW_Scan(int r_b, int dir, int enable_imu)
 {
     int time_delay = 0;   //避免超时卡死的临时变量
-    MV_Start();//开启Openmv
+    MV_Start();           //开启Openmv
     Disable_StopSignal(); //此时不会停车
 
     Set_IMUStatus(enable_imu); //设置陀螺仪状态
-    if (dir == 5 || dir == 6)
+    if (dir == 5 || dir == 6)  //阶梯平台
     {
-        MV_SendCmd(1,r_b);
+        MV_SendCmd(1, r_b);                                     //向openmv发送颜色信号
         Action_Gruop(11, 1);                                    //展开爪子
         Judge_Side(r_b, dir);                                   //裁决高度判断模式，根据参数给变量赋值 只在阶梯平台需要用到
         while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
@@ -413,7 +412,7 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
             osDelay(10);
         }
     }
-    else if (dir == 1 || dir == 2)//条形平台
+    else if (dir == 1 || dir == 2) //条形平台
     {
         Openmv_Scan_Bar(1, r_b);
         while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
@@ -425,9 +424,11 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
     /*1 2为正前方， 5 6为左右侧*/
     if (dir == 1) //使用左边的红外来完成任务
     {
-        set_speed(MIN_, 0, 0);
         while (Get_HW_Status(dir) == false)
+        {
+            set_speed(MIN_, 0, 0);
             osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
+        }
         set_speed(0, 0, 0);
     dir1_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on) //当未收到MV停止信号或红外开持续导通时
@@ -457,9 +458,11 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
     }
     else if (dir == 2)
     {
-        set_speed(-MIN_, 0, 0); //横向移动
         while (Get_HW_Status(dir) == false)
-            osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
+        {
+            set_speed(-MIN_, 0, 0); //横向移动
+            osDelay(5);             //先移动到此时红外开始扫描到，防止下方直接被跳过
+        }
         set_speed(0, 0, 0);
     dir2_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
@@ -489,7 +492,11 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
     //只有在阶梯平台移动时需要使用高度信息，前面两个用于扫描阶梯平台
     else if (dir == 5)
     {
-        Start_HeightUpdate(); //开始更新高度信息的任务
+        while (Get_Side_Switch(1) == off)
+        {
+            set_speed(0, MIN_, 0);
+            osDelay(5); //避免开关卡死
+        }
     dir5_Start_Symbol:
         set_speed(VERTICAL, MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
@@ -497,7 +504,7 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
         set_speed(0, 0, 0);
         if (Get_Side_Switch(1) == off)
         {
-            Action_Gruop(4,1);//收起机械臂
+            Action_Gruop(4, 1); //收起机械臂
             Exit_Height_Upadte();
             return;
         }
@@ -512,7 +519,11 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
     }
     else if (dir == 6)
     {
-        Start_HeightUpdate(); //开始更新高度信息的任务
+        while (Get_Side_Switch(2) == off)
+        {
+            set_speed(0, -MIN_, 0);
+            osDelay(5); //避免开关卡死
+        }
     dir6_Start_Symbol:
         set_speed(VERTICAL, -MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on)
@@ -520,7 +531,7 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
         set_speed(0, 0, 0);            //停车再说
         if (Get_Side_Switch(2) == off) //是边缘的红外导致的停车
         {
-            Action_Gruop(4,1);//收起机械臂
+            Action_Gruop(4, 1);   //收起机械臂
             Exit_Height_Upadte(); //结束任务
             return;               //退出
         }
@@ -533,8 +544,147 @@ void MV_HW_Scan(int r_b, int dir, int enable_imu)
             goto dir6_Start_Symbol; //回到开头位置
         }
     }
-    
-    MV_Stop();//停止处理响应
+    MV_Stop(); //停止处理响应
+}
+
+/**********************************************************************
+  * @Name    QR_Scan
+  * @declaration :使用二维码进行阶梯平台的扫描
+  * @param   status: [输入/出]  是否开启
+**			 color: [输入/出]  要抓的颜色，用于判断高度  代表红色 2代表蓝色
+**			 dir: [输入/出]    方向
+  * @retval   :
+  * @author  peach99CPP
+***********************************************************************/
+void QR_Scan(int status, int color, int dir)
+{
+#define OPEN_Claws 1      //爪子对应的舵机，让爪子张开一点避免影响二维码扫描
+    int time_delay = 0;   //避免超时卡死的临时变量
+    Disable_StopSignal(); //可以开车了
+    if (status)           //使能状态
+    {
+        Set_QR_Status(1);                                       //在这里设置mv和二维码的工作状态
+        Set_IMUStatus(true);                                    //经测试，有陀螺仪跑的比较稳
+        Set_QR_Target(color);                                   //设置要抓的颜色
+        Judge_Side(color, dir);                                 //根据颜色和方向判断起始高度
+        Start_HeightUpdate();                                   //开始更新高度信息的任务
+        Action_Gruop(11, 1);                                    //升起爪子
+        while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
+        {
+            time_delay += 10;
+            osDelay(10);
+        }
+        time_delay = 0; //重新初始化参数
+        // Action_Gruop(OPEN_Claws, 1);                                     //todo 这里考虑使用对单个舵机进行控制，使爪子张开一定角度，避免干扰二维码扫码
+        // while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
+        // {
+        //     time_delay += 10;
+        //     osDelay(10);
+        // }
+        Set_QR_Status(1);     //开始对二维码的信息读取有反应
+        Start_HeightUpdate(); //开始更新高度信息的任务
+
+        if (dir == 5)
+        {
+            while (Get_Side_Switch(1) == off) //避免卡死
+            {
+                set_speed(0, MIN_, 0); //先给一个速度一直走 避免初始时开关直接没亮导致任务直接结束
+                osDelay(5);
+            }
+        QR_Scan5_Symbol:
+            set_speed(VERTICAL, MIN_, 0); //给一个平行和垂直的速度，一边紧贴着一边移动
+            while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
+                osDelay(5);
+            set_speed(0, 0, 0);
+            if (Get_Side_Switch(1) == off)
+            {
+                Action_Gruop(4, 1); //收起机械臂
+                Set_QR_Status(0);
+                Exit_Height_Upadte();
+                return;
+            }
+            else
+            {
+                while (Get_Servo_Flag() == false)
+                    osDelay(5);
+                Disable_StopSignal(); //清除停车标志位，此时可以开车
+                osDelay(100);         //没啥用，求个心安
+                goto QR_Scan5_Symbol;
+            }
+        }
+        else if (dir == 6)
+        {
+            while (Get_Side_Switch(2) == off)
+            {
+                set_speed(0, -MIN_, 0);
+                osDelay(5); //避免开关卡死
+            }
+        QR_Scan6_Symbol:
+            set_speed(VERTICAL, -MIN_, 0);
+            while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on)
+                osDelay(5);
+            set_speed(0, 0, 0);
+            if (Get_Side_Switch(2) == off)
+            {
+                Action_Gruop(4, 1); //收起机械臂
+                Set_QR_Status(0);   //避免误触发
+                Exit_Height_Upadte();
+                return;
+            }
+            else
+            {
+                while (Get_Servo_Flag() == false)
+                    osDelay(5);
+                Disable_StopSignal(); //清除停车标志位，此时可以开车
+                osDelay(100);         //没啥用，求个心安
+                goto QR_Scan6_Symbol;
+            }
+        }
+    }
+    else
+    {
+        Set_QR_Status(0);                                       //关闭二维码的信息处理
+        Action_Gruop(4, 1);                                     //收起机械臂
+        while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
+        {
+            time_delay += 10;
+            osDelay(10);
+        }
+    }
+}
+void Kiss_Ass(int dir)
+{
+    Set_IMUStatus(true);
+    if (dir == 1)
+    {
+        while (Get_HW_Status(dir + 2) == off)
+        {
+            set_speed(MIN_, 0, 0);
+            osDelay(5);
+        }
+        while (Get_HW_Status(dir + 2) == on)
+        {
+            set_speed(-MIN_ * 2, 0, 0);
+            osDelay(5);
+        }
+        set_speed(0, 0, 0);
+        //TODO 在此时运行倒下去的动作组，把东西倒下去F
+    }
+    else if (dir == 2)
+    {
+        while (Get_HW_Status(dir + 2) == off)
+        {
+            set_speed(-MIN_, 0, 0);
+            osDelay(5);
+        }
+        while (Get_HW_Status(dir + 2) == on)
+        {
+            set_speed(MIN_ * 2, 0, 0);
+            osDelay(5);
+        }
+        set_speed(0, 0, 0);
+        //TODO 在此时运行倒下去的动作组，把东西倒下去F
+    }
 }
 
 /**********************************************************************
@@ -739,7 +889,7 @@ void HWSwitch_Move(int dir, int enable_imu)
             osDelay(10);
     }
     set_speed(0, 0, 0);
-    osDelay(200);
+    osDelay(100);
 }
 
 /**********************************************************************

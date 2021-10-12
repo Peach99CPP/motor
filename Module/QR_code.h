@@ -20,6 +20,11 @@ typedef struct
 }QR_t;
 void QR_receive(void);
 void QR_decode(void);
+void Set_QR_Target(int color);
+void Set_QR_Status(int status);
+int Get_QRColor(void);
+void DeInit_QRColor(void);
+
 #endif
 
 

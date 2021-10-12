@@ -90,10 +90,12 @@ struct _m_usmart_nametab usmart_nametab[] =
         //    "void Set_SwitchParam(int main,int vertical)",
         (void *)HWSwitch_Move,
         "void HWSwitch_Move(int dir,int enable_imu)",
-        (void *)MV_HW,
-        "void MV_HW(int dir,int enable_imu)",
-        (void*)MV_HW_Scan,
+        (void *)MV_HW_Scan,
         "void MV_HW_Scan(int r_b,int dir, int enable_imu)",
+        (void *)QR_Scan,
+        "void QR_Scan(int status, int color, int dir)",
+        (void *)Kiss_Ass,
+        "void Kiss_Ass(int dir)",
 #endif
 #if Debug_Servo == 1
         (void *)Single_Control,

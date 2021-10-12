@@ -79,26 +79,26 @@ void QR_decode(void)
     }
     if ((QR.color == Target_Color) && Ennable_QR) //仅在设置了对其有响应才会执行 颜色要对 并且开启响应
     {
-
-        if (Get_Servo_Flag())
-        {
-            Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
-            switch (Get_Height())    //获取当前的高度信息，根据高度不同执行不同的动作组
+        
+            if (Get_Servo_Flag())
             {
-            case LowestHeight:
-                Action_Gruop(Lowest, 1);
-                break;
-            case MediumHeight:
-                Action_Gruop(Medium, 1);
-                break;
-            case HighestHeight:
-                Action_Gruop(Highest, 1);
-            default:
-                Action_Gruop(11, 1); //机械臂升起
+                 Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+                Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
+                switch (Get_Height())    //获取当前的高度信息，根据高度不同执行不同的动作组
+                {
+                case LowestHeight:
+                    Action_Gruop(Lowest, 1);
+                    break;
+                case MediumHeight:
+                    Action_Gruop(Medium, 1);
+                    break;
+                case HighestHeight:
+                    Action_Gruop(Highest, 1);
+                default:
+                    Action_Gruop(11, 1); //机械臂升起
+                }
             }
-        }
-
+        
         QR.color = init_status;
     }
     QR.rec_len = 0;                            //清除计数器

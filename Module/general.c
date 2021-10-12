@@ -14,3 +14,4 @@ void Openmv_Scan_Bar(int status,int color)
     }
 }
 
+
