@@ -11,13 +11,12 @@ int mv_param;
 static short mv_stop_flag = 0;
 mvrec_t mv_rec;
 mv_t MV =
-{
-    .mv_uart = &huart4,
-    .mv_cmd = {0},
-    .rec_buffer = {0},
-    .rec_len = 0,
-    .RX_Status = 0
-}; //初始化变量
+    {
+        .mv_uart = &huart4,
+        .mv_cmd = {0},
+        .rec_buffer = {0},
+        .rec_len = 0,
+        .RX_Status = 0}; //初始化变量
 
 /**********************************************************************
   * @Name    cmd_encode
@@ -162,38 +161,49 @@ void MV_Decode(void)
 #define Catch_ 1
 #define MVPID_THRESHOLD 10
 #define pid_p 0.5
-#define Ball_Signal 0x04
+#define Ball_Signal 0x01
+#define Rectangle_Signal 0x02
     if (Get_Servo_Flag()) //空闲，可以接收指令 此时openmv和舵控都准备好执行指令
     {
         if (mv_rec.event == Ball_Signal)
         {
             Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
             Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
-            //todo：调试模式下进行使用，用于测试是否收到了消息
-
-            if (mv_rec.param == ladder_type) //阶梯平台三种高度
+            switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
             {
-                switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
-                {
-                case LowestHeight:
-                    Action_Gruop(Lowest, 1);
-                    break;
-                case MediumHeight:
-                    Action_Gruop(Medium, 1);
-                    break;
-                case HighestHeight:
-                    Action_Gruop(Highest, 1);
-                default:
-                    Action_Gruop(11, 1); //机械臂升起
-                }
-            }
-            else if (mv_rec.param == bar_type)//是在条形平台上进行扫描的话，执行条形平台的任务
-            {
-                Action_Gruop(Bar, 1);
+            case LowestHeight:
+                Action_Gruop(Lowest, 1);
+                break;
+            case MediumHeight:
+                Action_Gruop(Medium, 1);
+                break;
+            case HighestHeight:
+                Action_Gruop(Highest, 1);
+            default:
+                Action_Gruop(11, 1); //机械臂升起
             }
         }
     }
+    else if (mv_rec.event == Rectangle_Signal)
+    {
+        Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+        Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
+        switch (Get_Height())
+        {
+        case LowestHeight:
+            Action_Gruop(17, 1);
+            break;
+        case MediumHeight:
+            Action_Gruop(19, 1);
+            break;
+        case HighestHeight:
+            Action_Gruop(18, 1);
+        default:
+            Action_Gruop(11, 1); //机械臂升起
+        }
+    }
 }
+
 
 /**********************************************************************
   * @Name    Get_Stop_Signal
@@ -207,8 +217,6 @@ int Get_Stop_Signal(void)
     return mv_stop_flag;
 }
 
-
-
 /**********************************************************************
   * @Name    Enable_StopSignal
   * @declaration :使能停车的标志位
@@ -220,8 +228,6 @@ void Enable_StopSignal(void)
 {
     mv_stop_flag = 1;
 }
-
-
 
 /**********************************************************************
   * @Name    Disable_StopSignal

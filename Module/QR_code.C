@@ -87,13 +87,13 @@ void QR_decode(void)
             switch (Get_Height())    //获取当前的高度信息，根据高度不同执行不同的动作组
             {
             case LowestHeight:
-                Action_Gruop(Lowest, 1);
+                Action_Gruop(17, 1);
                 break;
             case MediumHeight:
-                Action_Gruop(Medium, 1);
+                Action_Gruop(19, 1);
                 break;
             case HighestHeight:
-                Action_Gruop(Highest, 1);
+                Action_Gruop(18, 1);
             default:
                 Action_Gruop(11, 1); //机械臂升起
             }
@@ -152,8 +152,10 @@ void Set_QR_Status(int status)
 ***********************************************************************/
 void Set_QR_Target(int color)
 {
+    Ennable_QR = true;
     if (color != init_status)
     {
+
         if (color == 1)
             Target_Color = red;
         else if (color == 2)
