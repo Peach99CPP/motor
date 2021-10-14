@@ -13,13 +13,12 @@ QRcolor_t Target_Color = init_status;
 extern UART_HandleTypeDef huart3; //避免出现不必要的警告
 
 QR_t QR =
-{
-    .QR_uart = &huart3,
-    .rec_len = 0,
-    .RX_OK = 0,
-    .RX_data = {0},
-    .color = init_status
-}; //创建结构体并赋值=初值
+    {
+        .QR_uart = &huart3,
+        .rec_len = 0,
+        .RX_OK = 0,
+        .RX_data = {0},
+        .color = init_status}; //创建结构体并赋值=初值
 
 /**********************************************************************
   * @Name    QR_receive
@@ -57,13 +56,13 @@ void QR_decode(void)
 #define INF_INDEX 4
     //判断帧头帧尾是否检验通过
     if (QR.RX_data[0] == head_cmd[0] &&
-            QR.RX_data[1] == head_cmd[1] &&
-            QR.RX_data[2] == head_cmd[2] &&
-            QR.RX_data[3] == head_cmd[3] &&
-            QR.RX_data[BUFFER_END - 3] == tail_cmd[0] &&
-            QR.RX_data[BUFFER_END - 2] == tail_cmd[1] &&
-            QR.RX_data[BUFFER_END - 1] == tail_cmd[2] &&
-            QR.RX_data[BUFFER_END] == tail_cmd[3])
+        QR.RX_data[1] == head_cmd[1] &&
+        QR.RX_data[2] == head_cmd[2] &&
+        QR.RX_data[3] == head_cmd[3] &&
+        QR.RX_data[BUFFER_END - 3] == tail_cmd[0] &&
+        QR.RX_data[BUFFER_END - 2] == tail_cmd[1] &&
+        QR.RX_data[BUFFER_END - 1] == tail_cmd[2] &&
+        QR.RX_data[BUFFER_END] == tail_cmd[3])
     {
         //解析本次获得的数据
         if (QR.RX_data[INF_INDEX] == 'R' || QR.RX_data[INF_INDEX] == 'r')
@@ -82,9 +81,9 @@ void QR_decode(void)
 
         if (Get_Servo_Flag())
         {
-            Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
-            switch (Get_Height())    //获取当前的高度信息，根据高度不同执行不同的动作组
+            Disable_ServoFlag();  //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+            Enable_StopSignal();  //使能停车信号，让动作那边执行停车操作
+            switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
             {
             case LowestHeight:
                 Action_Gruop(17, 1);
@@ -95,7 +94,11 @@ void QR_decode(void)
             case HighestHeight:
                 Action_Gruop(18, 1);
             default:
-                Action_Gruop(11, 1); //机械臂升起
+                if (Get_IFUP() == false)
+                {
+                    Action_Gruop(11, 1); //机械臂升起
+                    Set_IFUP(true);
+                }
             }
         }
 

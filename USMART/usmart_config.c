@@ -49,13 +49,16 @@ struct _m_usmart_nametab usmart_nametab[] =
 #if DEBUG_TRACKER == 1
         (void *)set_track_pid,
         "void set_track_pid(int kp, int ki, int kd)",
+        (void *)track_status,
+        "void track_status(int id, int status)",
 #endif
 #if DEBUG_IMU == 1
         (void *)set_imu_param,
         "void set_imu_param(int p,int i,int d)",
-        /**陀螺仪部分**/
-        (void *)Set_InitYaw,
-        "void Set_InitYaw(int target)",
+        (void *)set_imu_status,
+        "void set_imu_status(int status)",
+
+/**陀螺仪部分**/
 #endif
 #if DEBUG_OPENMV == 1
         (void *)Openmv_Scan_Bar,
@@ -91,13 +94,13 @@ struct _m_usmart_nametab usmart_nametab[] =
         (void *)HWSwitch_Move,
         "void HWSwitch_Move(int dir,int enable_imu)",
         (void *)Brick_Mode,
-        "void Brick_Mode(int dir, int color)",
+        "void Brick_Mode(int dir, int color，int enable_imu)",
         (void *)MV_HW_Scan,
         "void MV_HW_Scan(int color, int dir, int enable_imu)",
         (void *)QR_Scan,
-        "void QR_Scan(int status, int color, int dir)",
+        "void QR_Scan(int status, int color, int dir, int enable_imu)",
         (void *)Kiss_Ass,
-        "void Kiss_Ass(int dir)",
+        "void Kiss_Ass(int dir,int enable_imu)",
 #endif
 #if Debug_Servo == 1
         (void *)Single_Control,
@@ -108,8 +111,8 @@ struct _m_usmart_nametab usmart_nametab[] =
         /****开关设置,一直是打开的***/
         (void *)set_imu_status,
         "void set_imu_status(int status)",
-        (void *)track_status,
-        "void track_status(int id, int status)",
+        (void *)Set_InitYaw,
+        "void Set_InitYaw(int target)",
         (void *)turn_angle,
         "void turn_angle(int mode ,int angle)",
         (void *)Global_Debug,

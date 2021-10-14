@@ -8,7 +8,7 @@
 #include "imu_pid.h"
 uint32_t time;
 
-#define LINE_FACTOR 150
+#define LINE_FACTOR 160
 
 #define MAX_SPEED 500
 #define MIN_SPEED 120
@@ -76,7 +76,7 @@ void direct_move(int direct, int line_num, int edge_if, int imu_if)
     static int delay_time;
     if (count_line_status) //确保上一个任务完成的情况下，再执行下一个任�???
     {
-START_LINE:
+    START_LINE:
         set_imu_status(imu_if);
         //使用任务创建的形式执行该函数
         if (direct == 1)
@@ -140,13 +140,13 @@ void LineTask(void const *argument)
                     {
                         osDelay(5); //y方向寻迹板有灯即可退出，后面开启循迹版即可通过循迹使得车身矫正
                     }
-                    goto EXIT_TASK; //任务结束
+                    Comfirm_Online(2); //向右直到上线
+                    goto EXIT_TASK;    //任务结束
                 }
                 speed_set = Limit_Speed(LINE_FACTOR * error); //普通情况下，直接对误差进行放大
                 set_speed(speed_set * error, 0, 0);
                 osDelay(5);
-            }
-            while (error >= 0);
+            } while (error >= 0);
         }
         else if (dir == 1 && lines < 0) //水平向左
         {
@@ -166,13 +166,13 @@ void LineTask(void const *argument)
                     {
                         osDelay(5);
                     }
+                    Comfirm_Online(1);
                     goto EXIT_TASK;
                 }
                 speed_set = Limit_Speed(LINE_FACTOR * error);
                 set_speed(-speed_set, 0, 0);
                 osDelay(5);
-            }
-            while (error >= 0);
+            } while (error >= 0);
         }
         else if (dir == 2)
         {
@@ -196,14 +196,14 @@ void LineTask(void const *argument)
                 {
                     set_speed(0, MIN_SPEED, 0);
                     while (x_leftbar.num == 0 && x_rightbar.num == 0)
-                        osDelay(5); //在没有达到路中间时，继续给一个小速度，直到水平循迹版上有灯。
+                        osDelay(5);    //在没有达到路中间时，继续给一个小速度，直到水平循迹版上有灯。
+                    Comfirm_Online(3); //继续移动直到上线
                     goto EXIT_TASK;
                 }
                 speed_set = Limit_Speed(LINE_FACTOR * error);
                 set_speed(0, speed_set, 0);
                 osDelay(5);
-            }
-            while (error >= 0);
+            } while (error >= 0);
         }
     }
 EXIT_TASK:
@@ -239,7 +239,7 @@ void move_by_encoder(int direct, int val)
     static int encoder_delay;
     if (encodermove_status) //上一个任务运行结束，才可以开始运行下一个任务，避免出错
     {
-START_ENCODER:
+    START_ENCODER:
         set_imu_status(true); //确保陀螺仪开启，试验性，不确定要不要
 
         en_dir = direct; //将参数传递给全局变量�???
@@ -412,17 +412,38 @@ void Comfirm_Online(int dir)
 #define LOW_SPEED_TO_CONFIRM 80
     if (dir == 1)
     {
-        set_speed(-LOW_SPEED_TO_CONFIRM, 0, 0);
-        while (Get_Trcker_Num(&y_bar) <= 2)
-            osDelay(10);
+        if (Get_Trcker_Num(&y_bar) <= 2)
+        {
+            set_speed(-LOW_SPEED_TO_CONFIRM, 0, 0);
+            while (Get_Trcker_Num(&y_bar) <= 2)
+                osDelay(10);
+            set_speed(0, 0, 0);
+            track_status(1, 1);
+            osDelay(500);
+        }
     }
     else if (dir == 2)
     {
-        set_speed(LOW_SPEED_TO_CONFIRM, 0, 0);
-        while (Get_Trcker_Num(&y_bar) <= 2)
-            osDelay(10);
+        if (Get_Trcker_Num(&y_bar) <= 2)
+        {
+            set_speed(LOW_SPEED_TO_CONFIRM, 0, 0);
+            while (Get_Trcker_Num(&y_bar) <= 2)
+                osDelay(10);
+            set_speed(0, 0, 0);
+            track_status(1, 1);
+            osDelay(500);
+        }
     }
-    set_speed(0, 0, 0);
-    track_status(1, 1);
-    osDelay(1000);
+    else if (dir == 3)
+    {
+        if (Get_Trcker_Num(&x_leftbar) <= 2 && Get_Trcker_Num(&x_rightbar) <= 2)
+        {
+            set_speed(0, LOW_SPEED_TO_CONFIRM, 0);
+            while (Get_Trcker_Num(&x_leftbar) <= 2 && Get_Trcker_Num(&x_rightbar) <= 2)
+                osDelay(10);
+            set_speed(0, 0, 0);
+            track_status(1, 1);
+            osDelay(500);
+        }
+    }
 }

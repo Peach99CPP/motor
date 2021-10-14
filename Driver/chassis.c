@@ -138,16 +138,15 @@ void chassis_synthetic_control(void)
     else
         speed_factor = 1;
 
-    if (Get_IMUStatus())
-    {
-        //陀螺仪开启时的巡线模式，已测试通过
-        w_error = imu_correct_val();
-        if(w_error < 20) w_error*=2;
-        x = chassis.x_speed - y_error * speed_factor;
-        y = chassis.y_speed - x_error * speed_factor;
-        w = chassis.w_speed + w_error * speed_factor;
+    //陀螺仪开启时的巡线模式，已测试通过
+    w_error = imu_correct_val();
+    if (fabs(w_error) < 20)
+        w_error *= 2;
+    x = chassis.x_speed - y_error * speed_factor;
+    y = chassis.y_speed - x_error * speed_factor;
+    w = chassis.w_speed + w_error * speed_factor;
 
-        /***************************************
+    /***************************************
                 1*************2
                  *************
                  *************
@@ -155,33 +154,10 @@ void chassis_synthetic_control(void)
                  *************
                 3*************4
         ****************************************/
-        motor_target[1] = 0.707f * y + 0.707f * x - Radius_[1] * w;
-        motor_target[2] = -0.707f * y + 0.707f * x - Radius_[2] * w;
-        motor_target[3] = 0.707f * y - 0.707f * x - Radius_[3] * w;
-        motor_target[4] = -0.707f * y - 0.707f * x - Radius_[4] * w;
-    }
-    else
-    {
-        //陀螺仪关闭状态下的巡线
-        //经测试，效果不好，弃用
-        x = chassis.x_speed;
-        y = chassis.y_speed;
-        w = chassis.w_speed;
-        /***************************************
-                1*************2
-                 *************
-                 *************
-                 *************
-                 *************
-                3*************4
-        ****************************************/
-        //调试内容
-        //乘上speed_factor的原因在于在高速时动态增强控制效果
-        motor_target[1] = 0.707f * y + 0.707f * x - Radius_[1] * w + speed_factor * (y_error + x_error);
-        motor_target[2] = -0.707f * y + 0.707f * x - Radius_[2] * w + speed_factor * (y_error + x_error);
-        motor_target[3] = 0.707f * y - 0.707f * x - Radius_[3] * w + speed_factor * (y_error + x_error);
-        motor_target[4] = -0.707f * y - 0.707f * x - Radius_[4] * w + speed_factor * (y_error + x_error);
-    }
+    motor_target[1] = 0.707f * y + 0.707f * x - Radius_[1] * w;
+    motor_target[2] = -0.707f * y + 0.707f * x - Radius_[2] * w;
+    motor_target[3] = 0.707f * y - 0.707f * x - Radius_[3] * w;
+    motor_target[4] = -0.707f * y - 0.707f * x - Radius_[4] * w;
 
     //再来一个限幅操作，避免单边速度过高导致控制效果不理想
     for (i = 1; i <= 4; ++i) //找出最大值
@@ -217,12 +193,11 @@ void chassis_synthetic_control(void)
             control_val[i] = -MAX_CONTROL_VAL;
         set_motor(i, control_val[i]);
     }
-    if (debug_motor_id >= 1)//循迹状态下
+    if (debug_motor_id >= 1) //循迹状态下
     {
-       printf("%.2f  %.2f %.2f %.2f ", motor_data[debug_motor_id].feedback, motor_data[debug_motor_id].expect,\
-       motor_data[debug_motor_id].control_output,motor_data[debug_motor_id].integrate\
-       );
-//        printf("%.2f  %.2f %.2f %.2f ",motor_data[1].feedback,motor_data[2].feedback,motor_data[3].feedback,motor_data[4].feedback);
+        printf("%.2f  %.2f %.2f %.2f ", motor_data[debug_motor_id].feedback, motor_data[debug_motor_id].expect,
+               motor_data[debug_motor_id].control_output, motor_data[debug_motor_id].integrate);
+        //        printf("%.2f  %.2f %.2f %.2f ",motor_data[1].feedback,motor_data[2].feedback,motor_data[3].feedback,motor_data[4].feedback);
         printf("\r\n");
     }
 }

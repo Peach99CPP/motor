@@ -167,8 +167,8 @@ void MV_Decode(void)
     {
         if (mv_rec.event == Ball_Signal)
         {
-            Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
+            Disable_ServoFlag();  //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+            Enable_StopSignal();  //使能停车信号，让动作那边执行停车操作
             switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
             {
             case LowestHeight:
@@ -180,7 +180,11 @@ void MV_Decode(void)
             case HighestHeight:
                 Action_Gruop(Highest, 1);
             default:
-                Action_Gruop(11, 1); //机械臂升起
+                if (Get_IFUP() == false)
+                {
+                    Action_Gruop(11, 1); //机械臂升起
+                    Set_IFUP(true);
+                }
             }
         }
     }
@@ -199,11 +203,14 @@ void MV_Decode(void)
         case HighestHeight:
             Action_Gruop(18, 1);
         default:
-            Action_Gruop(11, 1); //机械臂升起
+            if (Get_IFUP() == false)
+            {
+                Action_Gruop(11, 1); //机械臂升起
+                Set_IFUP(true);
+            }
         }
     }
 }
-
 
 /**********************************************************************
   * @Name    Get_Stop_Signal

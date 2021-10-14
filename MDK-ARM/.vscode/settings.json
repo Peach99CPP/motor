@@ -8,6 +8,7 @@
         "compare": "c",
         "cstddef": "c",
         "type_traits": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "task.h": "c"
     }
 }

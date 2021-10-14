@@ -23,6 +23,7 @@
 
 #include "main.h"
 #include "usart.h"
+#include <stdbool.h>
 
 #define MAX_SERVO_SIZE 100
 #define MAX_SERVO_REC_SIZE 20
@@ -50,6 +51,8 @@ void Servo_RX_IRQ(void);
 void Enable_ServoFlag(void);
 void Disable_ServoFlag(void);
 
+bool Get_IFUP(void);
+void Set_IFUP(bool status);
 extern ServoControler_t servo_controler;
 extern uint8_t mv_rec_flag ;
 #endif

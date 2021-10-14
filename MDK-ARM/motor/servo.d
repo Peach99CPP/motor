@@ -36,6 +36,7 @@ motor\servo.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 motor\servo.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 motor\servo.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
 motor\servo.o: ../Inc/usart.h
+motor\servo.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\servo.o: ..\Driver\uart_handle.h
 motor\servo.o: ..\Driver\motor.h
 motor\servo.o: ..\Control\tim_control.h
@@ -44,7 +45,6 @@ motor\servo.o: ..\Driver\time_cnt.h
 motor\servo.o: ..\Driver\time_cnt.h
 motor\servo.o: ..\Driver\motor.h
 motor\servo.o: ..\Driver\uart_handle.h
-motor\servo.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\servo.o: ..\Math\pid.h
 motor\servo.o: ../Inc/tim.h
 motor\servo.o: ..\Driver\delay.h

@@ -25,7 +25,7 @@ trackbar_t y_bar, x_leftbar, x_rightbar; //三个寻迹板
 //初始化PID参数
 pid_paramer_t track_pid_param = {
     .integrate_max = 50,
-    .kp = 15,
+    .kp = 12,
     .ki = 0,
     .kd = 0,
     .control_output_limit = 300};

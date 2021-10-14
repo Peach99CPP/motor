@@ -40,35 +40,46 @@ void Startdebug(void const *argument)
 
 void Global_Debug(void)
 {
-    move_slantly(2, 150, 2500);
-    Comfirm_Online(1);
-    direct_move(2, 3, 1, 1);
-    while (!get_count_line_status())
-        osDelay(10);
-    osDelay(500);
-    move_by_encoder(1, 20);
-    while (!get_enocdermove_status())
-        osDelay(10);
-    osDelay(500);
-    move_slantly(1, 150, 1150);
+   move_by_encoder(2, 60);
+    direct_move(2, 3, 0, 1);
+    track_status(1, 0);
+    track_status(2, 0);
     Wait_Switches(1);
     Set_InitYaw(0);
     HWSwitch_Move(1, 1);
+    MV_HW_Scan(1, 1, 1);
+    turn_angle(1, 180);
+    direct_move(2, 1, 0, 1);
+    direct_move(1, 1, 1, 1);
+    direct_move(2, 1, 1, 1);
+    move_slantly(1, 120, 1500);
+    Wait_Switches(3);
+    Set_InitYaw(0);
+    HWSwitch_Move(5, 1);
+    move_slantly(3, 120, 1500);
+    turn_angle(1, -90);
+    osDelay(1000);
+    direct_move(2, -1, 0, 1);
+    Wait_Switches(4);
+    Set_InitYaw(180);
+    Action_Gruop(13, 1);
+    osDelay(1000);
+    Action_Gruop(8, 1);
+    osDelay(1000);
+    Action_Gruop(12, 1);
+    osDelay(1000);
+    Action_Gruop(7, 1);
+    osDelay(1000);
+    move_by_encoder(2, 10);
+    turn_angle(1, 180);
+    osDelay(1000);
     Wait_Switches(1);
     Set_InitYaw(0);
     HWSwitch_Move(2, 1);
-    move_by_encoder(2, -200);
-    while (!get_enocdermove_status())
-        osDelay(10);
-    turn_angle(1, 180);
-    while (!get_turn_status())
-        osDelay(10);
-    osDelay(300);
-    direct_move(2, 3, 0, 1);
-    while (!get_count_line_status())
-        osDelay(10);
-    osDelay(500);
-    turn_angle(1, 180);
+    move_by_encoder(1, -55);
+    track_status(1, 0);
+    track_status(2, 0);
+    Wait_Switches(1);
 }
 int if_OsRunning(void)
 {
@@ -81,13 +92,5 @@ void Set_OSRunningFlag(int status)
 
 void Goto_Warehouse(void)
 {
-    HWSwitch_Move(5,1);
-    move_slantly(3,100,1500);
-    turn_angle(1,-90);
-    osDelay(200);
-    direct_move(2,-1,0,1);
-    Wait_Switches(4);
-    Action_Gruop(13,1);
-    Kiss_Ass(1);
-    Action_Gruop(8,1);
+    ;
 }

@@ -37,6 +37,7 @@ motor\qr_code.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
 motor\qr_code.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 motor\qr_code.o: ..\Module\servo.h
 motor\qr_code.o: ../Inc/usart.h
+motor\qr_code.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\qr_code.o: ..\Module\openmv.h
 motor\qr_code.o: ..\Driver\uart_handle.h
 motor\qr_code.o: ..\Driver\motor.h
@@ -46,7 +47,6 @@ motor\qr_code.o: ..\Driver\time_cnt.h
 motor\qr_code.o: ..\Driver\time_cnt.h
 motor\qr_code.o: ..\Driver\motor.h
 motor\qr_code.o: ..\Driver\uart_handle.h
-motor\qr_code.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\qr_code.o: ..\Math\pid.h
 motor\qr_code.o: ../Inc/tim.h
 motor\qr_code.o: ..\Driver\delay.h

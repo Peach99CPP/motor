@@ -1,11 +1,8 @@
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'motor'
-compiling general.c...
-..\Module\general.c(7): warning:  #223-D: function "osDelay" declared implicitly
-          osDelay(100);
-..\Module\general.c: 1 warning, 0 errors
+compiling Wait_BackInf.c...
 linking...
-Program Size: Code=45520 RO-data=2192 RW-data=1236 ZI-data=21012  
+Program Size: Code=45444 RO-data=2200 RW-data=1236 ZI-data=21012  
 FromELF: creating hex file...
-"motor\motor.axf" - 0 Error(s), 1 Warning(s).
-Build Time Elapsed:  00:00:11
+"motor\motor.axf" - 0 Error(s), 0 Warning(s).
+Build Time Elapsed:  00:00:08

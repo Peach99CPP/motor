@@ -10,8 +10,15 @@ ServoControler_t servo_controler =
     .rec_index = 0
 };
 
-
-
+bool if_up = false;
+void Set_IFUP(bool status)
+{
+    if_up = status;
+}
+bool Get_IFUP(void)
+{
+    return if_up;
+}
 /**********************************************************************
   * @Name    Servo_Rx_Deinit
   * @declaration :重新初始化接收数组的下标
