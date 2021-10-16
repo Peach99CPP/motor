@@ -69,3 +69,6 @@ motor\read_status_task.o: ..\Module\openmv.h
 motor\read_status_task.o: ..\Module\servo.h
 motor\read_status_task.o: ..\Module\general.h
 motor\read_status_task.o: ..\Module\QR_code.h
+motor\read_status_task.o: ..\Driver\track_bar_receive.h
+motor\read_status_task.o: ..\TASK\Wait_BackInf.h
+motor\read_status_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h

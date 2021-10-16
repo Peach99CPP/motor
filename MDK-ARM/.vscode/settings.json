@@ -9,6 +9,7 @@
         "cstddef": "c",
         "type_traits": "c",
         "xutility": "c",
-        "task.h": "c"
+        "task.h": "c",
+        "*.orig": "c"
     }
 }

@@ -22,7 +22,6 @@ void Startdebug(void const *argument)
     Set_OSRunningFlag(true);
     Start_Read_Switch();
     avoid_keep();
-    Start_HeightUpdate();
 #if DUBUG_MOTOR == 1
     track_status(1, 0);
     track_status(2, 0);

@@ -1,11 +1,11 @@
 /* ************************************************************
-  *
-  * FileName   : read_status.c
-  * Version    : v1.0
-  * Author     : peach99CPP
-  * Date       : 2021-09-12
-  * Description:
-  ******************************************************************************
+ *
+ * FileName   : read_status.c
+ * Version    : v1.0
+ * Author     : peach99CPP
+ * Date       : 2021-09-12
+ * Description:
+ ******************************************************************************
  */
 #include "read_status.h "
 
@@ -14,6 +14,9 @@
 #include "openmv.h"
 #include "servo.h"
 #include "general.h"
+#include "track_bar_receive.h"
+#include "Wait_BackInf.h"
+
 #define Height_HW1 5
 #define RED_TARGET 1
 #define BLUE_TARGET 0
@@ -35,16 +38,16 @@ bool QR_Brick = false; //是否位于三种高度 模式
 short swicth_status[8]; //开关状态，只在内部进行赋值
 short HW_Switch[10];    //红外开关的状态
 int MIN_ = 60;
-int VERTICAL = 5;
+int VERTICAL = 10;
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
-#define HW_SWITCH(X) HW_Switch[(X)-1]  //0到3下标就是红外开关的位置
+#define HW_SWITCH(X) HW_Switch[(X)-1]  // 0到3下标就是红外开关的位置
 
 #define Height_SWITCH(x) HW_Switch[(x) + 4 - 1] //高度的开关，第4和第5下标分配给高度红外
 
 #define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7
 
-void Set_QR_Mode(bool if_on)
+void Set_NeedUp(bool if_on)
 {
     QR_Brick = if_on;
 }
@@ -52,6 +55,7 @@ void Inf_Servo_Height(int now_height)
 {
     if (QR_Brick)
     {
+        set_speed(0, 0, 0);
         if (now_height == LowestHeight)
             ;
         else if (now_height == MediumHeight)
@@ -61,13 +65,13 @@ void Inf_Servo_Height(int now_height)
     }
 }
 /**********************************************************************
-  * @Name    Judge_Side
-  * @declaration :
-  * @param   color_mode: [输入/出]
-**			 dir: [输入/出]
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Judge_Side
+ * @declaration :
+ * @param   color_mode: [输入/出]
+ **			 dir: [输入/出]
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void Judge_Side(int dir)
 {
     if (dir == 5)
@@ -81,12 +85,12 @@ void Judge_Side(int dir)
 }
 
 /**********************************************************************
-  * @Name    Start_HeightUpdate
-  * @declaration :
-  * @param   None
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Start_HeightUpdate
+ * @declaration :
+ * @param   None
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void Start_HeightUpdate(void)
 {
     Height_Flag = 0;
@@ -99,12 +103,12 @@ void Start_HeightUpdate(void)
 }
 
 /**********************************************************************
-  * @Name    HeightUpdate_Task
-  * @declaration :
-  * @param   argument: [输入/出]
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    HeightUpdate_Task
+ * @declaration :
+ * @param   argument: [输入/出]
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void HeightUpdate_Task(void const *argument)
 {
     Height_Flag = 0;
@@ -117,7 +121,7 @@ void HeightUpdate_Task(void const *argument)
             Height_id = 2;
             while (!Height_task_exit)
             {
-                if (Get_Height_Switch(Height_id) == on && Height_Flag == 0&& Get_Servo_Flag() == true)
+                if (Get_Height_Switch(Height_id) == on && Height_Flag == 0 && Get_Servo_Flag() == true)
                 {
                     Height_Flag = 1;
                     Current_Height = HighestHeight;
@@ -162,24 +166,24 @@ void HeightUpdate_Task(void const *argument)
 }
 
 /**********************************************************************
-  * @Name    Exit_Height_Upadte
-  * @declaration :
-  * @param   None
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Exit_Height_Upadte
+ * @declaration :
+ * @param   None
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void Exit_Height_Upadte(void)
 {
     Height_task_exit = 1;
 }
 
 /**********************************************************************
-  * @Name    Start_Read_Switch
-  * @declaration : 启动轻触开关任务
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Start_Read_Switch
+ * @declaration : 启动轻触开关任务
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Start_Read_Switch(void)
 {
     if (read_task_exit)
@@ -196,12 +200,12 @@ void Start_Read_Switch(void)
 }
 
 /**********************************************************************
-  * @Name    Read_Swicth
-  * @declaration : 任务函数实现核心函数
-  * @param   argument: [输入/出] 无意义
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Read_Swicth
+ * @declaration : 任务函数实现核心函数
+ * @param   argument: [输入/出] 无意义
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Read_Swicth(void const *argument)
 {
     while (!read_task_exit)
@@ -295,24 +299,24 @@ void Read_Swicth(void const *argument)
 }
 
 /**********************************************************************
-  * @Name    Exit_Swicth_Read
-  * @declaration : 退出查询开关状态的任务
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Exit_Swicth_Read
+ * @declaration : 退出查询开关状态的任务
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Exit_Swicth_Read(void)
 {
     read_task_exit = 1; //此变量为1 将使得任务函数循环条件不满足
 }
 
 /**********************************************************************
-  * @Name    Get_Switch_Status
-  * @declaration : 获取指定ID开关的通断状态
-  * @param   id: [输入/出] 电机编号（1-8）
-  * @retval   : 该开关的通断状态
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Get_Switch_Status
+ * @declaration : 获取指定ID开关的通断状态
+ * @param   id: [输入/出] 电机编号（1-8）
+ * @retval   : 该开关的通断状态
+ * @author  peach99CPP
+ ***********************************************************************/
 int Get_Switch_Status(int id)
 {
     if (read_task_exit)
@@ -324,12 +328,12 @@ int Get_Switch_Status(int id)
 }
 
 /**********************************************************************
-  * @Name    Get_HW_Status
-  * @declaration :获取指定ID号红外开关的状态
-  * @param   id: [输入/出] 红外开关编号
-  * @retval   : 状态
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Get_HW_Status
+ * @declaration :获取指定ID号红外开关的状态
+ * @param   id: [输入/出] 红外开关编号
+ * @retval   : 状态
+ * @author  peach99CPP
+ ***********************************************************************/
 int Get_HW_Status(int id)
 {
     // todo当有开关数量更新时记得修改此处的值
@@ -339,12 +343,12 @@ int Get_HW_Status(int id)
 }
 
 /**********************************************************************
-  * @Name    Get_Side_Switch
-  * @declaration :获取侧边边界开关的状态
-  * @param   id: [输入/出] 开关编号
-  * @retval   : 状态  扫到了就为on
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Get_Side_Switch
+ * @declaration :获取侧边边界开关的状态
+ * @param   id: [输入/出] 开关编号
+ * @retval   : 状态  扫到了就为on
+ * @author  peach99CPP
+ ***********************************************************************/
 int Get_Side_Switch(int id)
 {
     if (id < 1 || id > 2) // todo当有开关数量更新时记得修改此处的值
@@ -354,28 +358,28 @@ int Get_Side_Switch(int id)
 int Get_Height_Switch(int id)
 {
     if (id < 1 || id > 2)
-        return off; //todo 记得在更新元器件数量后更新次此处的限制范围
+        return off; // todo 记得在更新元器件数量后更新次此处的限制范围
     return Height_SWITCH(id);
 }
 
 /**********************************************************************
-  * @Name    Get_Height
-  * @declaration : 获取此时高度以计算应该调用的动作组编号
-  * @param   None
-  * @retval   : 动作组编号
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Get_Height
+ * @declaration : 获取此时高度以计算应该调用的动作组编号
+ * @param   None
+ * @retval   : 动作组编号
+ * @author  peach99CPP
+ ***********************************************************************/
 int Get_Height(void)
 {
     return Current_Height;
 }
 /**********************************************************************
-  * @Name    Return_AdverseID
-  * @declaration : 获取相对的开关编号
-  * @param   id: [输入/出] 当前的开关编号
-  * @retval   : 同侧的相对编号
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Return_AdverseID
+ * @declaration : 获取相对的开关编号
+ * @param   id: [输入/出] 当前的开关编号
+ * @retval   : 同侧的相对编号
+ * @author  peach99CPP
+ ***********************************************************************/
 int Return_AdverseID(int id)
 {
     if (id == 1)
@@ -403,8 +407,8 @@ int Return_AdverseID(int id)
 ***********************************************************************/
 void MV_HW_Scan(int color, int dir, int enable_imu)
 {
-    int time_delay = 0;   //避免超时卡死的临时变量
-    Set_QR_Mode(false);   //禁止高度变换
+#define Wait_Servo_Done 6000  //等待动作组完成的最大等待时间
+    Set_NeedUp(false);    //禁止高度变换
     MV_Start();           //开启Openmv
     Disable_StopSignal(); //此时不会停车
 
@@ -412,24 +416,17 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
     if (dir == 5 || dir == 6)  //阶梯平台的球
     {
         osDelay(100);
-        MV_SendCmd(1, color);                                   //向openmv发送颜色信号
-        Action_Gruop(11, 1);                                    //展开爪子
-        Judge_Side(dir);                                        //裁决高度判断模式，根据参数给变量赋值 只在阶梯平台需要用到
-        while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
-        {
-            time_delay += 10;
-            osDelay(10);
-        }
+        MV_SendCmd(1, color); //向openmv发送颜色信号
+        Action_Gruop(11, 1);  //展开爪子
+        Set_IFUP(true);
+        Judge_Side(dir); //裁决高度判断模式，根据参数给变量赋值 只在阶梯平台需要用到
+        Wait_Servo_Signal(5000);
         Start_HeightUpdate();
     }
     else if (dir == 1 || dir == 2) //条形平台
     {
-        Openmv_Scan_Bar(1, color);                              //让OPENMV开始执行条形平台任务
-        while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
-        {
-            time_delay += 10;
-            osDelay(10);
-        }
+        Openmv_Scan_Bar(1, color); //让OPENMV开始执行条形平台任务
+        Wait_Servo_Signal(5000);
     }
     /*1 2为正前方， 5 6为左右侧*/
     if (dir == 1) //使用左边的红外来完成任务
@@ -444,9 +441,9 @@ dir1_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on) //当未收到MV停止信号或红外开持续导通时
         {
             if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
-                set_speed(MIN_ * 0.6, VERTICAL, 0);         //一边走一边贴边
+                set_speed(MIN_ * 0.8, VERTICAL, 0);         //一边走一边贴边
             else
-                set_speed(MIN_ * 0.6, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
+                set_speed(MIN_ * 0.8, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
             osDelay(5);
         }
         set_speed(0, 0, 0);            //停车
@@ -459,8 +456,7 @@ dir1_Start_Symbol:
         else
         {
             //是因为收到MV抓球的信号而停止，等到动作组执行完毕后继续扫描，只单次响应
-            while (Get_Servo_Flag() == false)
-                osDelay(5);
+            Wait_Servo_Signal(Wait_Servo_Done);
             Disable_StopSignal(); //清除停车标志位，此时可以开车
             osDelay(100);         //没啥用，求个心安
             goto dir1_Start_Symbol;
@@ -492,8 +488,7 @@ dir2_Start_Symbol:
         }
         else
         {
-            while (Get_Servo_Flag() == false)
-                osDelay(5);
+            Wait_Servo_Signal(Wait_Servo_Done);
             Disable_StopSignal(); //清除停车标志位，此时可以开车
             osDelay(100);         //没啥用，求个心安
             goto dir2_Start_Symbol;
@@ -515,14 +510,14 @@ dir5_Start_Symbol:
         if (Get_Side_Switch(1) == off)
         {
             Action_Gruop(4, 1); //收起机械臂
+            Set_IFUP(false);
             Exit_Height_Upadte();
             MV_Stop(); //停止处理响应
             return;
         }
         else
         {
-            while (Get_Servo_Flag() == false)
-                osDelay(5);
+            Wait_Servo_Signal(Wait_Servo_Done);
             Disable_StopSignal(); //清除停车标志位，此时可以开车
             osDelay(100);         //没啥用，求个心安
             goto dir5_Start_Symbol;
@@ -542,53 +537,58 @@ dir6_Start_Symbol:
         set_speed(0, 0, 0);            //停车再说
         if (Get_Side_Switch(2) == off) //是边缘的红外导致的停车
         {
-            Action_Gruop(4, 1);   //收起机械臂
+            Action_Gruop(4, 1); //收起机械臂
+            Set_IFUP(false);
             Exit_Height_Upadte(); //结束任务
             MV_Stop();            //停止处理响应
             return;               //退出
         }
         else
         {
-            while (Get_Servo_Flag() == false) //当上一个动作组未运行结束时，卡在这里
-                osDelay(5);
+            Wait_Servo_Signal(Wait_Servo_Done);
             Disable_StopSignal();   //清除停车标志位，此时可以开车
             osDelay(100);           //没啥用，求个心安
             goto dir6_Start_Symbol; //回到开头位置
         }
     }
 }
-void Brick_Mode(int dir, int color)
+
+/**********************************************************************
+ * @Name    Brick_Mode
+ * @declaration :抓取矩形的函数
+ * @param   dir: [输入/出]  方向 以到哪边为准
+ **			 color: [输入/出]  要抓的颜色
+ **			 enable_imu: [输入/出] 陀螺仪使能开关
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
+void Brick_Mode(int dir, int color, int enable_imu)
 {
-    int time_delay = 0;                                     //避免超时卡死的临时变量
-    Set_QR_Mode(false);                                     //开启二维码模式
-    MV_Start();                                             //开启Openmv
-    Disable_StopSignal();                                   //此时不会停车
-    Set_QR_Target(1);                                       //开启二维码的扫描
-    MV_SendCmd(2, color);                                   //让mv开始阶梯扫描任务，扫描矩形
-    Action_Gruop(11, 1);                                    //展开机械臂
-    Judge_Side(dir);                                        //判断起始高度
-    while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
-    {
-        time_delay += 10;
-        osDelay(10);
-    }
-    time_delay = 0;                                         //重置计数器
-    Inf_Servo_Height(Current_Height);                       //让舵控根据当前高度调整
-    while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
-    {
-        time_delay += 10;
-        osDelay(10);
-    }
+    //初赛模式
+    Set_NeedUp(false);         //开启二维码模式 todo初赛没有二维码，先关闭避免造成干扰
+    Set_IMUStatus(enable_imu); //设置陀螺仪开启状态
+    Disable_StopSignal();      //此时不会停车
+    Set_QR_Target(0);          //开启二维码的扫描
+    Action_Gruop(11, 1);       //展开机械臂
+    Set_IFUP(true);            //标记此时机械臂已经展开
+    Judge_Side(dir);           //判断起始高度
+    Wait_Servo_Signal(5000);
+    MV_Start();                //开启Openmv
+    osDelay(100);              //给MV处理的时间 否则容易造成消息的丢失
+    MV_SendCmd(2, color);      //让mv开始阶梯扫描任务，扫描矩形
+    Inf_Servo_Height(Current_Height); //让舵控根据当前高度调整 初赛时使用
+    Wait_Servo_Signal(5000);
     Start_HeightUpdate(); //开始更新高度
-    if (dir == 5)
+    Disable_StopSignal();
+    if (dir == 5)         //从左往右
     {
-        while (Get_Side_Switch(1) == off)
+        while (Get_Side_Switch(1) == off) //先移动到开关检测到东西  正常情况 此句不会执行
         {
-            set_speed(0, MIN_, 0);
-            osDelay(5); //避免开关卡死
+            set_speed(0, MIN_, 0); //单纯给一个水平速度
+            osDelay(5);            //避免开关卡死
         }
 Brick_dir5:
-        while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
+        while (!Get_Stop_Signal()  && Get_Side_Switch(1) == on)
         {
             set_speed(VERTICAL, MIN_, 0);
             osDelay(5);
@@ -597,17 +597,17 @@ Brick_dir5:
         if (Get_Side_Switch(1) == off)
         {
             Action_Gruop(4, 1); //收起机械臂
+            Set_IFUP(false);
             Exit_Height_Upadte();
             Set_QR_Status(false);
+            MV_Stop();
             return;
         }
         else
         {
-            while (Get_Servo_Flag() == false) //等待当前舵机执行完成
-                osDelay(5);
+            Wait_Servo_Signal(Wait_Servo_Done);
             Inf_Servo_Height(Current_Height); //让舵机到对应的高度
-            while (Get_Servo_Flag() == false)
-                osDelay(5);
+            Wait_Servo_Signal(Wait_Servo_Done);
             Disable_StopSignal(); //清除停车标志位，此时可以开车
             osDelay(100);         //没啥用，求个心安
             goto Brick_dir5;
@@ -621,7 +621,7 @@ Brick_dir5:
             osDelay(5); //避免开关卡死
         }
 Brick_dir6:
-        while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on)
+        while (!Get_Stop_Signal() && Get_Side_Switch(2) == on)
         {
             set_speed(VERTICAL, -MIN_, 0);
             osDelay(5);
@@ -629,18 +629,16 @@ Brick_dir6:
         set_speed(0, 0, 0);
         if (Get_Side_Switch(2) == off)
         {
-            Action_Gruop(4, 1); //收起机械臂
-            Exit_Height_Upadte();
-            Set_QR_Status(false);
+            Action_Gruop(4, 1);   //收起机械臂
+            Set_IFUP(false);      //标记机械臂此时已经收起
+            Exit_Height_Upadte(); //退出高度更新任务
+            Set_QR_Status(false); //关闭对二维码的响应
+                        MV_Stop();
             return;
         }
         else
         {
-            while (Get_Servo_Flag() == false) //等待当前舵机执行完成
-                osDelay(5);
-            Inf_Servo_Height(Current_Height); //让舵机到对应的高度
-            while (Get_Servo_Flag() == false)
-                osDelay(5);
+            Wait_Servo_Signal(Wait_Servo_Done);
             Disable_StopSignal(); //清除停车标志位，此时可以开车
             osDelay(100);         //没啥用，求个心安
             goto Brick_dir6;
@@ -648,15 +646,15 @@ Brick_dir6:
     }
 }
 /**********************************************************************
-  * @Name    QR_Scan
-  * @declaration :使用二维码进行阶梯平台的扫描
-  * @param   status: [输入/出]  是否开启
-**			 color: [输入/出]  要抓的颜色，用于判断高度  代表红色 2代表蓝色
-**			 dir: [输入/出]    方向
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
-void QR_Scan(int status, int color, int dir)
+ * @Name    QR_Scan
+ * @declaration :使用二维码进行阶梯平台的扫描
+ * @param   status: [输入/出]  是否开启
+ **			 color: [输入/出]  要抓的颜色，用于判断高度  代表红色 2代表蓝色
+ **			 dir: [输入/出]    方向
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
+void QR_Scan(int status, int color, int dir, int enable_imu)
 {
 #define OPEN_Claws 1      //爪子对应的舵机，让爪子张开一点避免影响二维码扫描
     int time_delay = 0;   //避免超时卡死的临时变量
@@ -664,7 +662,7 @@ void QR_Scan(int status, int color, int dir)
     if (status)           //使能状态
     {
         Set_QR_Status(true);                                    //在这里设置mv和二维码的工作状态
-        Set_IMUStatus(true);                                    //经测试，有陀螺仪跑的比较稳
+        Set_IMUStatus(enable_imu);                              //经测试，有陀螺仪时容易导致卡死
         Set_QR_Target(color);                                   //设置要抓的颜色
         Judge_Side(dir);                                        //根据颜色判断起始高度
         Action_Gruop(11, 1);                                    //升起爪子
@@ -751,9 +749,9 @@ QR_Scan6_Symbol:
         }
     }
 }
-void Kiss_Ass(int dir)
+void Kiss_Ass(int dir, int enable_imu)
 {
-    Set_IMUStatus(true);
+    Set_IMUStatus(enable_imu); //测试一下不适用陀螺仪的运行状态
     if (dir == 1)
     {
         while (Get_HW_Status(dir + 2) == off)
@@ -767,7 +765,7 @@ void Kiss_Ass(int dir)
             osDelay(5);
         }
         set_speed(0, 0, 0);
-        //TODO 在此时运行倒下去的动作组，把东西倒下去F
+        // TODO 在此时运行倒下去的动作组，把东西倒下去F
     }
     else if (dir == 2)
     {
@@ -782,17 +780,17 @@ void Kiss_Ass(int dir)
             osDelay(5);
         }
         set_speed(0, 0, 0);
-        //TODO 在此时运行倒下去的动作组，把东西倒下去F
+        // TODO 在此时运行倒下去的动作组，把东西倒下去F
     }
 }
 
 /**********************************************************************
-  * @Name    Wait_Switches
-  * @declaration :碰撞轻触开关的实现全过程
-  * @param   dir: [输入/出]
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Wait_Switches
+ * @declaration :碰撞轻触开关的实现全过程
+ * @param   dir: [输入/出]
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Wait_Switches(int dir)
 {
     /*关于运行时速度的变量,不宜过高否则不稳定*/
@@ -802,7 +800,8 @@ void Wait_Switches(int dir)
     if (read_task_exit)
         Start_Read_Switch();
 
-    Set_IMUStatus(false); //关闭陀螺仪,否则设置w速度无意义
+    track_status(1, 0); //关闭循迹版，避免造成方向上的影响
+    track_status(2, 0);
 
     short flag1, flag2, x_pn, y_pn;
     int w1, w2, w1_factor, w2_factor;
@@ -843,6 +842,8 @@ Closing:
             Start_Read_Switch(); //防止此时任务未启动导致卡死循环
             continue;
         }
+        if (flag1 == on || flag2 == on) //当有开关触碰到时，关闭陀螺仪
+            Set_IMUStatus(false);       //关闭陀螺仪,否则设置w速度无意义
         /*下面这一句语句，只在单个开关开启时会有作用*/
         w_speed_set(Switch_Factor * (flag1 * w1_factor + flag2 * w2_factor));
         //任务调度
@@ -862,16 +863,55 @@ switch_exit:
     //    Exit_Swicth_Read(); //用完了就关闭任务
     set_speed(0, 0, 0); //开关
     /*******本来这里应该接一个矫正陀螺仪，但是会降低程序的灵活性，所以不添加。在调用本程序之后，自己操作陀螺仪*******/
-    //todo：调用完函数根据实际需要进行陀螺仪角度的修正
+    // todo：调用完函数根据实际需要进行陀螺仪角度的修正
 }
 
 /**********************************************************************
-  * @Name    Single_Switch
-  * @declaration :检测单边开关
-  * @param   switch_id: [输入/出]  开关号 1-8
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    HWSwitch_Move
+ * @declaration : 单独使用红外来移动到平台的一侧
+ * @param   dir: [输入/出]  贴边移动的方向
+ **			 enable_imu: [输入/出]  是否使能陀螺仪
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
+void HWSwitch_Move(int dir, int enable_imu)
+{
+    Set_IMUStatus(enable_imu);
+    if (dir == 1)
+    {
+        set_speed(-MIN_, VERTICAL, 0);
+        while (Get_HW_Status(dir) == on)
+            osDelay(10);
+    }
+    else if (dir == 2)
+    {
+        set_speed(MIN_, VERTICAL, 0);
+        while (Get_HW_Status(dir) == on)
+            osDelay(10);
+    }
+    else if (dir == 5)
+    {
+        set_speed(VERTICAL, MIN_, 0);
+        while (Get_Side_Switch(1) == on)
+            osDelay(10);
+    }
+    else if (dir == 6)
+    {
+        set_speed(VERTICAL, -MIN_, 0);
+        while (Get_Side_Switch(2) == on)
+            osDelay(10);
+    }
+    set_speed(0, 0, 0);
+    osDelay(100);
+}
+
+/**********************************************************************
+ * @Name    Single_Switch
+ * @declaration :检测单边开关
+ * @param   switch_id: [输入/出]  开关号 1-8
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Single_Switch(int switch_id)
 {
     //    Set_IMUStatus(false); //直接抵着墙撞击，无需陀螺仪稳定角度
@@ -940,82 +980,16 @@ RECLOSE:
 }
 
 /**********************************************************************
-  * @Name    Set_SwitchParam
-  * @declaration : 调试所用途的函数接口
-  * @param   main: [输入/出] 主要速度，沿着边沿移动的速度
-**			 vertical: [输入/出]  垂直与边沿的速度，来确保紧贴的状态
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Set_SwitchParam
+ * @declaration : 调试所用途的函数接口
+ * @param   main: [输入/出] 主要速度，沿着边沿移动的速度
+ **			 vertical: [输入/出]  垂直与边沿的速度，来确保紧贴的状态
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void Set_SwitchParam(int main, int vertical)
 {
     //调试速度的API
     MIN_ = main;         //沿着板子水平方向的速度
     VERTICAL = vertical; //垂直板子的速度，确保紧贴着。
-}
-
-/**********************************************************************
-  * @Name    HWSwitch_Move
-  * @declaration : 单独使用红外来移动到平台的一侧
-  * @param   dir: [输入/出]  贴边移动的方向
-**			 enable_imu: [输入/出]  是否使能陀螺仪
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
-void HWSwitch_Move(int dir, int enable_imu)
-{
-    Set_IMUStatus(enable_imu);
-    if (dir == 1)
-    {
-        set_speed(-MIN_, VERTICAL, 0);
-        while (Get_HW_Status(dir) == on)
-            osDelay(10);
-    }
-    else if (dir == 2)
-    {
-        set_speed(MIN_, VERTICAL, 0);
-        while (Get_HW_Status(dir) == on)
-            osDelay(10);
-    }
-    else if (dir == 5)
-    {
-        set_speed(VERTICAL, MIN_, 0);
-        while (Get_Side_Switch(1) == on)
-            osDelay(10);
-    }
-    else if (dir == 6)
-    {
-        set_speed(VERTICAL, -MIN_, 0);
-        while (Get_Side_Switch(2) == on)
-            osDelay(10);
-    }
-    set_speed(0, 0, 0);
-    osDelay(100);
-}
-
-/**********************************************************************
-  * @Name    MV_HW
-  * @declaration :
-  * @param   dir: [输入/出] 使用MV和红外来扫描，已经被MV_HW_Scan函数取代
-**			 enable_imu: [输入/出]  是否使能陀螺仪
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
-void MV_HW(int dir, int enable_imu)
-{
-    Set_IMUStatus(enable_imu);
-    if (dir == 1)
-    {
-        set_speed(-MIN_, VERTICAL, 0);
-        while (Get_HW_Status(dir) == on && Get_Stop_Signal() == false)
-            osDelay(10);
-    }
-    else if (dir == 2)
-    {
-        set_speed(MIN_, VERTICAL, 0);
-        while (Get_HW_Status(dir) == on && Get_Stop_Signal() == false)
-            osDelay(10);
-    }
-    set_speed(0, 0, 0);
-    osDelay(100);
 }

@@ -4,25 +4,29 @@
 
 #include "read_status.h"
 
+#include "uart_handle.h"
+
 #define STOP_SIGNAL 0XAABB
 short Handle_Flag = 0;
 int mv_param;
 
-static short mv_stop_flag = 0;
+int temp_ = 0;
+short mv_stop_flag = 0;
 mvrec_t mv_rec;
 mv_t MV =
-    {
-        .mv_uart = &huart4,
-        .mv_cmd = {0},
-        .rec_buffer = {0},
-        .rec_len = 0,
-        .RX_Status = 0}; //初始化变量
+{
+    .mv_uart = &huart4,
+    .mv_cmd = {0},
+    .rec_buffer = {0},
+    .rec_len = 0,
+    .RX_Status = 0
+}; //初始化变量
 
 /**********************************************************************
   * @Name    cmd_encode
   * @declaration : 根据协议编码发送的内容
-  * @param   event_id: [输入/出]  时间的类型
-**			 param: [输入/出] 参数
+  * @param   event_id: [输入/出]  事件的类型
+**			 param: [输入/出]     参数，16位数字
   * @retval   :
   * @author  peach99CPP
 ***********************************************************************/
@@ -44,8 +48,8 @@ void cmd_encode(const uint8_t event_id, int param)
     MV.mv_cmd[0] = START_BYTE; //帧头
     MV.mv_cmd[1] = event_id;   //触发的事件id
     MV.mv_cmd[2] = pos_flag;
-    MV.mv_cmd[3] = l_byte;                                           //参数高8位
-    MV.mv_cmd[4] = h_byte;                                           //参数低8位
+    MV.mv_cmd[3] = l_byte;                                           //参数低8位
+    MV.mv_cmd[4] = h_byte;                                           //参数高8位
     MV.mv_cmd[5] = (uint8_t)(event_id + pos_flag + h_byte + l_byte); //和校验
     MV.mv_cmd[6] = END_BYTE;                                         //帧尾
 }
@@ -161,37 +165,62 @@ void MV_Decode(void)
 #define Catch_ 1
 #define MVPID_THRESHOLD 10
 #define pid_p 0.5
-#define Ball_Signal 0x04
+#define Ball_Signal 0x01
+#define Rectangle_Signal 0x02
     if (Get_Servo_Flag()) //空闲，可以接收指令 此时openmv和舵控都准备好执行指令
     {
         if (mv_rec.event == Ball_Signal)
         {
-            Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
-            //todo：调试模式下进行使用，用于测试是否收到了消息
-
-            if (mv_rec.param == ladder_type) //阶梯平台三种高度
+            Disable_ServoFlag();  //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+            Enable_StopSignal();  //使能停车信号，让动作那边执行停车操作
+            switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
             {
-                switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
+            case LowestHeight:
+                Action_Gruop(Lowest, 1);
+                break;
+            case MediumHeight:
+                Action_Gruop(Medium, 1);
+                break;
+            case HighestHeight:
+                Action_Gruop(Highest, 1);
+            default:
+                if (Get_IFUP() == false)
                 {
-                case LowestHeight:
-                    Action_Gruop(Lowest, 1);
-                    break;
-                case MediumHeight:
-                    Action_Gruop(Medium, 1);
-                    break;
-                case HighestHeight:
-                    Action_Gruop(Highest, 1);
-                default:
                     Action_Gruop(11, 1); //机械臂升起
+                    Set_IFUP(true);
                 }
             }
-            else if (mv_rec.param == bar_type)//是在条形平台上进行扫描的话，执行条形平台的任务
+        }
+            else if (mv_rec.event == Rectangle_Signal)
+    {
+        Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+        Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
+        printf("快点停车\r\n");
+        int height = Get_Height();
+        switch (height)
+        {
+        case LowestHeight:
+            Action_Gruop(14, 1);
+            temp_ = 1;
+            break;
+        case MediumHeight:
+            Action_Gruop(16, 1);
+            temp_ = 1;
+            break;
+        case HighestHeight:
+            Action_Gruop(15, 1);
+            temp_ = 1;
+            break;
+        default:
+            if (Get_IFUP() == false)
             {
-                Action_Gruop(Bar, 1);
+                Action_Gruop(11, 1); //机械臂升起
+                Set_IFUP(true);
             }
         }
     }
+    }
+
 }
 
 /**********************************************************************
@@ -206,8 +235,6 @@ int Get_Stop_Signal(void)
     return mv_stop_flag;
 }
 
-
-
 /**********************************************************************
   * @Name    Enable_StopSignal
   * @declaration :使能停车的标志位
@@ -219,8 +246,6 @@ void Enable_StopSignal(void)
 {
     mv_stop_flag = 1;
 }
-
-
 
 /**********************************************************************
   * @Name    Disable_StopSignal

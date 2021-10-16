@@ -2,13 +2,12 @@
 #include "uart_handle.h"
 uint8_t mv_rec_flag = 1; //初始状态，可以直接执行舵控指令
 ServoControler_t servo_controler =
-{
-    .uart = &huart5,
-    .current_index = 0,
-    .cmd_buffer = {0},
-    .rec_buffer = {0},
-    .rec_index = 0
-};
+    {
+        .uart = &huart5,
+        .current_index = 0,
+        .cmd_buffer = {0},
+        .rec_buffer = {0},
+        .rec_index = 0};
 
 bool if_up = false;
 void Set_IFUP(bool status)
@@ -20,23 +19,23 @@ bool Get_IFUP(void)
     return if_up;
 }
 /**********************************************************************
-  * @Name    Servo_Rx_Deinit
-  * @declaration :重新初始化接收数组的下标
-  * @param   None
-  * @retval   :无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Servo_Rx_Deinit
+ * @declaration :重新初始化接收数组的下标
+ * @param   None
+ * @retval   :无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Servo_Rx_Deinit(void)
 {
     servo_controler.rec_index = 0;
 }
 /**********************************************************************
-  * @Name    Error_Report
-  * @declaration : 进行错误报告
-  * @param   type: [输入/出]  错误类型
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Error_Report
+ * @declaration : 进行错误报告
+ * @param   type: [输入/出]  错误类型
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Error_Report(int type)
 {
     if (type == 1)
@@ -48,12 +47,12 @@ void Error_Report(int type)
 }
 
 /**********************************************************************
-  * @Name    Cmd_Convert
-  * @declaration : 将传入的参数编码成单个数字格式
-  * @param   cmd: [输入/出]
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Cmd_Convert
+ * @declaration : 将传入的参数编码成单个数字格式
+ * @param   cmd: [输入/出]
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Cmd_Convert(int cmd)
 {
     short temp_num[5] = {0}, index = 0;
@@ -73,15 +72,13 @@ void Cmd_Convert(int cmd)
     return;
 }
 
-
-
 /**********************************************************************
-  * @Name    Servo_Uart_Send
-  * @declaration :串口数据发送函数
-  * @param   None
-  * @retval   :无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Servo_Uart_Send
+ * @declaration :串口数据发送函数
+ * @param   None
+ * @retval   :无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Servo_Uart_Send(void)
 {
     if (servo_controler.current_index == 0)
@@ -96,19 +93,17 @@ void Servo_Uart_Send(void)
     servo_controler.current_index = 0;
 }
 
-
-
 /**********************************************************************
-  * @Name    Single_Control
-  * @declaration :  控制单个舵机转动的函数
-  * @param   id: [输入/出]  电机编号
-**			 control_mode: [输入/出]  控制模式，目前共三种，看下方的注释
-**			 angle: [输入/出]       目标角度（根据控制模式不同，有不同的输入范围
-**			 time: [输入/出]   用多少时间来执行
-**			 delay: [输入/出]  执行结束后延迟多久
-  * @retval   :   无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Single_Control
+ * @declaration :  控制单个舵机转动的函数
+ * @param   id: [输入/出]  电机编号
+ **			 control_mode: [输入/出]  控制模式，目前共三种，看下方的注释
+ **			 angle: [输入/出]       目标角度（根据控制模式不同，有不同的输入范围
+ **			 time: [输入/出]   用多少时间来执行
+ **			 delay: [输入/出]  执行结束后延迟多久
+ * @retval   :   无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Single_Control(int id, int control_mode, int angle, int time, int delay)
 {
     if (id > 24 || control_mode > 3 || servo_controler.current_index != 0)
@@ -163,16 +158,14 @@ void Single_Control(int id, int control_mode, int angle, int time, int delay)
     Servo_Uart_Send();
 }
 
-
-
 /**********************************************************************
-  * @Name    Action_Gruop
-  * @declaration :控制舵控执行动作组
-  * @param   id: [输入/出]  动作组编号
-**			 times: [输入/出]  执行次数
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Action_Gruop
+ * @declaration :控制舵控执行动作组
+ * @param   id: [输入/出]  动作组编号
+ **			 times: [输入/出]  执行次数
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void Action_Gruop(int id, int times)
 {
 
@@ -192,15 +185,13 @@ void Action_Gruop(int id, int times)
     Servo_Uart_Send();
 }
 
-
-
 /**********************************************************************
-  * @Name    Servo_RX_IRQ
-  * @declaration : 舵控的中断处理函数
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Servo_RX_IRQ
+ * @declaration : 舵控的中断处理函数
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Servo_RX_IRQ(void)
 {
     if (__HAL_UART_GET_IT(servo_controler.uart, UART_IT_RXNE))
@@ -219,44 +210,92 @@ void Servo_RX_IRQ(void)
     }
 }
 
-
-
 /**********************************************************************
-  * @Name    Get_Servo_Flag
-  * @declaration :获取舵控运行状态
-  * @param   None
-  * @retval   : 舵机运行结束为1 否则为0
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Get_Servo_Flag
+ * @declaration :获取舵控运行状态
+ * @param   None
+ * @retval   : 舵机运行结束为1 否则为0
+ * @author  peach99CPP
+ ***********************************************************************/
 int Get_Servo_Flag(void)
 {
     return mv_rec_flag;
 }
 
-
-
 /**********************************************************************
-  * @Name    Enable_ServoFlag
-  * @declaration :使能舵机标志位，表明此时舵机运行结束
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Enable_ServoFlag
+ * @declaration :使能舵机标志位，表明此时舵机运行结束
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Enable_ServoFlag(void)
 {
     mv_rec_flag = 1;
 }
 
-
-
 /**********************************************************************
-  * @Name    Disable_ServoFlag
-  * @declaration : 清除舵机标志位，说明此时多斤正在运行中
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Disable_ServoFlag
+ * @declaration : 清除舵机标志位，说明此时多斤正在运行中
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Disable_ServoFlag(void)
 {
     mv_rec_flag = 0;
+}
+/****以下是具体实现函数****/
+#include "Wait_BackInf.h"
+#include "cmsis_os.h"
+#include "chassis.h"
+#define Wait_Time 3000
+
+void Wait_Servo_Signal(long wait_time_num)
+{
+    Start_CountTime(wait_time_num);
+    while (Get_Servo_Flag() == false && !Get_TimeResult()) //未超时的时候
+    {
+        set_speed(0, 0, 0);
+        osDelay(10);
+    }
+    Exit_CountTime();
+}
+void Lateral_infrared(int status)
+{
+    if (status)
+    {
+        Action_Gruop(13, 1);
+        Start_CountTime(Wait_Time);
+        while (Get_Servo_Flag() == false && !Get_TimeResult()) //未超时的时候
+            osDelay(10);
+        Exit_CountTime();
+    }
+    else
+    {
+        Action_Gruop(12, 1);
+        Start_CountTime(Wait_Time);
+        while (Get_Servo_Flag() == false && !Get_TimeResult()) //未超时的时候
+            osDelay(10);
+        Exit_CountTime();
+    }
+}
+void Ass_Door(int status)
+{
+    if (status)
+    {
+        Action_Gruop(8, 1);
+        Start_CountTime(Wait_Time);
+        while (Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
+            osDelay(10);
+        Exit_CountTime();
+    }
+    else
+    {
+        Action_Gruop(7, 1);
+        Start_CountTime(Wait_Time);
+        while (Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
+            osDelay(10);
+        Exit_CountTime();
+    }
 }

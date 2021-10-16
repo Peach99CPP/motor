@@ -4,19 +4,23 @@
 
 #include "read_status.h"
 
+#include "uart_handle.h"
+
 #define STOP_SIGNAL 0XAABB
 short Handle_Flag = 0;
 int mv_param;
 
-static short mv_stop_flag = 0;
+int temp_ = 0;
+short mv_stop_flag = 0;
 mvrec_t mv_rec;
 mv_t MV =
-    {
-        .mv_uart = &huart4,
-        .mv_cmd = {0},
-        .rec_buffer = {0},
-        .rec_len = 0,
-        .RX_Status = 0}; //初始化变量
+{
+    .mv_uart = &huart4,
+    .mv_cmd = {0},
+    .rec_buffer = {0},
+    .rec_len = 0,
+    .RX_Status = 0
+}; //初始化变量
 
 /**********************************************************************
   * @Name    cmd_encode
@@ -169,6 +173,8 @@ void MV_Decode(void)
         {
             Disable_ServoFlag();  //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
             Enable_StopSignal();  //使能停车信号，让动作那边执行停车操作
+            printf("要抓球\r\n");
+            temp_++;
             switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
             {
             case LowestHeight:
@@ -187,29 +193,36 @@ void MV_Decode(void)
                 }
             }
         }
-    }
-    else if (mv_rec.event == Rectangle_Signal)
-    {
-        Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-        Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
-        switch (Get_Height())
+        else if (mv_rec.event == Rectangle_Signal)
         {
-        case LowestHeight:
-            Action_Gruop(17, 1);
-            break;
-        case MediumHeight:
-            Action_Gruop(19, 1);
-            break;
-        case HighestHeight:
-            Action_Gruop(18, 1);
-        default:
-            if (Get_IFUP() == false)
+            Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
+            printf("快点停车\r\n");
+            int height = Get_Height();
+            switch (height)
             {
-                Action_Gruop(11, 1); //机械臂升起
-                Set_IFUP(true);
+            case LowestHeight:
+                Action_Gruop(14, 1);
+                temp_ = 1;
+                break;
+            case MediumHeight:
+                Action_Gruop(15, 1);
+                temp_ = 1;
+                break;
+            case HighestHeight:
+                Action_Gruop(16, 1);
+                temp_ = 1;
+                break;
+            default:
+                if (Get_IFUP() == false)
+                {
+                    Action_Gruop(11, 1); //机械臂升起
+                    Set_IFUP(true);
+                }
             }
         }
     }
+
 }
 
 /**********************************************************************

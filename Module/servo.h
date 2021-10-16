@@ -51,6 +51,10 @@ void Servo_RX_IRQ(void);
 void Enable_ServoFlag(void);
 void Disable_ServoFlag(void);
 
+void Wait_Servo_Signal(long wait_time_num);
+void Ass_Door(int status);
+void Lateral_infrared(int status);
+
 bool Get_IFUP(void);
 void Set_IFUP(bool status);
 extern ServoControler_t servo_controler;

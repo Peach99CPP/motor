@@ -103,6 +103,10 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void Kiss_Ass(int dir,int enable_imu)",
 #endif
 #if Debug_Servo == 1
+        (void*)Ass_Door,
+        "void Ass_Door(int status)",
+        (void*)Lateral_infrared,
+        "void Lateral_infrared(int status)",
         (void *)Single_Control,
         "void Single_Control(int id, int control_mode, int angle, int  time, int delay)",
         (void *)Action_Gruop,
