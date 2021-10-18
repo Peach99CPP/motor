@@ -39,7 +39,7 @@ void Startdebug(void const *argument)
 
 void Global_Debug(void)
 {
-   move_by_encoder(2, 60);
+    move_by_encoder(2, 60);
     direct_move(2, 3, 0, 1);
     track_status(1, 0);
     track_status(2, 0);
@@ -79,6 +79,18 @@ void Global_Debug(void)
     track_status(1, 0);
     track_status(2, 0);
     Wait_Switches(1);
+}
+void Go_Home(int color)
+{
+    if (color != 1 && color != 2)
+        return;
+    move_by_encoder(2, -80);
+    if (color == 1)
+        turn_angle(1, 90);
+    else
+        turn_angle(1, -90);
+    direct_move(2, 2, 0, 1);
+    move_by_encoder(2, 20);
 }
 int if_OsRunning(void)
 {

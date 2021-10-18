@@ -168,52 +168,47 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>servo_controler.rec_buffer</ItemText>
+          <ItemText>HW_Switch</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>HW_Switch</ItemText>
+          <ItemText>Track_Row</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Track_Row</ItemText>
+          <ItemText>HW_Switch</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>HW_Switch</ItemText>
+          <ItemText>chassis</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>chassis</ItemText>
+          <ItemText>Current_Height</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Current_Height</ItemText>
+          <ItemText>temp_</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>mv_rec.event</ItemText>
+          <ItemText>CountTimeTask_Exit</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>temp_</ItemText>
+          <ItemText>mv_rec_flag</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Height_id</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Height_Flag</ItemText>
+          <ItemText>mv_stop_flag</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -225,60 +220,30 @@
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>imu_data.feedback</ItemText>
+          <ItemText>times_counts</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>times_counts</ItemText>
+          <ItemText>distance</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>distance</ItemText>
+          <ItemText>swicth_status</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>swicth_status</ItemText>
+          <ItemText>MV.rec_buffer</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>2</WinNumber>
-          <ItemText>MV.rec_buffer</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>2</WinNumber>
           <ItemText>chassis</ItemText>
         </Ww>
         <Ww>
-          <count>7</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>y_bar</ItemText>
-        </Ww>
-        <Ww>
-          <count>8</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>x_rightbar</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>x_leftbar</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>\\motor\../Driver/track_bar_receive.c\y_bar</ItemText>
-        </Ww>
-        <Ww>
-          <count>11</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>Track_Row</ItemText>
-        </Ww>
-        <Ww>
-          <count>12</count>
+          <count>6</count>
           <WinNumber>2</WinNumber>
           <ItemText>QR</ItemText>
         </Ww>

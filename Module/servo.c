@@ -174,7 +174,7 @@ void Action_Gruop(int id, int times)
         Error_Report(2);
         return;
     }
-    Disable_ServoFlag();
+    Disable_ServoFlag();//标记舵控此时运行中
     //设置动作组编号
     servo_controler.cmd_buffer[servo_controler.current_index++] = 'G';
     Cmd_Convert(id);
@@ -245,22 +245,41 @@ void Disable_ServoFlag(void)
 {
     mv_rec_flag = 0;
 }
+
 /****以下是具体实现函数****/
 #include "Wait_BackInf.h"
 #include "cmsis_os.h"
 #include "chassis.h"
 #define Wait_Time 3000
 
+/**********************************************************************
+ * @Name    Wait_Servo_Signal
+ * @declaration :等待函数信号
+ * @param   wait_time_num: [输入/出] 超时值
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Wait_Servo_Signal(long wait_time_num)
 {
-    Start_CountTime(wait_time_num);
-    while (Get_Servo_Flag() == false && !Get_TimeResult()) //未超时的时候
+    if (Get_CountTimeExit())
     {
-        set_speed(0, 0, 0);
-        osDelay(10);
+        Start_CountTime(wait_time_num);
+        while (Get_Servo_Flag() == false && !Get_TimeResult()) //未超时的时候
+        {
+            set_speed(0, 0, 0); //等待过程中是停车的
+            osDelay(10);
+        }
+        Exit_CountTime(); //退出等待任务
     }
-    Exit_CountTime();
 }
+
+/**********************************************************************
+ * @Name    Lateral_infrared
+ * @declaration : 侧面红外的开关
+ * @param   status: [输入/出] 展开或者收起
+ * @retval   :无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Lateral_infrared(int status)
 {
     if (status)
@@ -280,13 +299,21 @@ void Lateral_infrared(int status)
         Exit_CountTime();
     }
 }
+
+/**********************************************************************
+ * @Name    Ass_Door
+ * @declaration : 开启倒球的开关
+ * @param   status: [输入/出]  开关或者关闭
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Ass_Door(int status)
 {
     if (status)
     {
         Action_Gruop(8, 1);
         Start_CountTime(Wait_Time);
-        while (Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
+        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
             osDelay(10);
         Exit_CountTime();
     }
@@ -294,7 +321,61 @@ void Ass_Door(int status)
     {
         Action_Gruop(7, 1);
         Start_CountTime(Wait_Time);
-        while (Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
+        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
+            osDelay(10);
+        Exit_CountTime();
+    }
+}
+
+/**********************************************************************
+ * @Name    Baffle_Control
+ * @declaration : 控制挡板
+ * @param   up_dowm: [输入/出]  升起或者降落
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
+void Baffle_Control(int up_dowm)
+{
+    if (up_dowm) //升起
+    {
+        Action_Gruop(9, 1);                            //升起
+        Start_CountTime(Wait_Time);                    //升起挡板
+        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
+            osDelay(10);
+        Exit_CountTime();
+    }
+    else
+    {
+        Action_Gruop(10, 1);
+        Start_CountTime(Wait_Time);
+        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
+            osDelay(10);
+        Exit_CountTime();
+    }
+}
+
+/**********************************************************************
+ * @Name    Different_Dir
+ * @declaration : 不同方向的方向
+ * @param   if_left: [输入/出]  左或者右
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
+void Different_Dir(int if_left)
+{
+    if (if_left)
+    {
+        Action_Gruop(10, 1);
+        Start_CountTime(Wait_Time);
+        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
+            osDelay(10);
+        Exit_CountTime();
+    }
+    else
+    {
+        Action_Gruop(10, 1);
+        Start_CountTime(Wait_Time);
+        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
             osDelay(10);
         Exit_CountTime();
     }

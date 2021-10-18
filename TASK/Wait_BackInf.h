@@ -21,4 +21,5 @@ bool Get_TimeResult(void);             //获取计时结果
 void Start_CountTime(long timelength); //开始计时
 void Exit_CountTime(void);                 //强制退出计时器
 
+int Get_CountTimeExit(void);
 #endif

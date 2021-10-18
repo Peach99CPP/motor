@@ -22,7 +22,7 @@
 #define DEBUG_IMU 1     //调试陀螺仪
 #define DEBUG_CHASSIS 1 //底盘运动
 #define DEBUG_SWITCH 1  //轻触开关、红外开关
-#define DEBUG_OPENMV 1  //openmv通讯
+#define DEBUG_OPENMV 1  // openmv通讯
 #define Debug_Servo 1   //舵控通讯
 extern void Global_Debug(void);
 /******将显示界面变得更加整洁****/
@@ -93,20 +93,23 @@ struct _m_usmart_nametab usmart_nametab[] =
         //    "void Set_SwitchParam(int main,int vertical)",
         (void *)HWSwitch_Move,
         "void HWSwitch_Move(int dir,int enable_imu)",
-        (void *)Brick_Mode,
-        "void Brick_Mode(int dir, int color，int enable_imu)",
         (void *)MV_HW_Scan,
         "void MV_HW_Scan(int color, int dir, int enable_imu)",
+        (void*)Brick_QR_Mode,
+        "void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)",
         (void *)QR_Scan,
         "void QR_Scan(int status, int color, int dir, int enable_imu)",
         (void *)Kiss_Ass,
         "void Kiss_Ass(int dir,int enable_imu)",
 #endif
 #if Debug_Servo == 1
-        (void*)Ass_Door,
+
+        (void *)Ass_Door,
         "void Ass_Door(int status)",
-        (void*)Lateral_infrared,
+        (void *)Lateral_infrared,
         "void Lateral_infrared(int status)",
+        (void *)Baffle_Control,
+        "void Baffle_Control(int up_dowm)",
         (void *)Single_Control,
         "void Single_Control(int id, int control_mode, int angle, int  time, int delay)",
         (void *)Action_Gruop,

@@ -6,9 +6,9 @@
 /**********************************************************************
   * @Name    Openmv_Scan_Bar
   * @declaration :开启OPENMV扫描条形平台
-  * @param   status: [输入/出]  开始还是结束
+  * @param   status: [输入/出]  开始还是结�?
 **			 color: [输入/出] 要抓的颜色，反馈给mv
-  * @retval   : 无
+  * @retval   : �?
   * @author  peach99CPP
 ***********************************************************************/
 void Openmv_Scan_Bar(int status, int color)
@@ -26,5 +26,6 @@ void Openmv_Scan_Bar(int status, int color)
         Action_Gruop(6, 1);
     }
 }
+
 
 

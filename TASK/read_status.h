@@ -57,7 +57,7 @@ void Single_Switch(int switch_id);
 void HWSwitch_Move(int dir, int enable_imu); //使用红外开关进行移动
 void Set_SwitchParam(int main, int vertical);
 void MV_HW_Scan(int color, int dir, int enable_imu);
-void Brick_Mode(int dir, int color,int enable_imu);
+void Brick_QR_Mode(int dir, int color, int QR, int imu_enable);
 void Start_HeightUpdate(void);
 void QR_Scan(int status, int color, int dir, int enable_imu);
 void Kiss_Ass(int dir,int enable_imu);

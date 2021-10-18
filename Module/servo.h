@@ -54,7 +54,7 @@ void Disable_ServoFlag(void);
 void Wait_Servo_Signal(long wait_time_num);
 void Ass_Door(int status);
 void Lateral_infrared(int status);
-
+void Baffle_Control(int up_dowm);
 bool Get_IFUP(void);
 void Set_IFUP(bool status);
 extern ServoControler_t servo_controler;
