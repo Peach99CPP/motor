@@ -54,9 +54,10 @@ void Set_NeedUp(bool if_on)
 }
 void Inf_Servo_Height(int now_height)
 {
-    if (QR_Brick)
+    if (QR_Brick )
     {
         set_speed(0, 0, 0);
+        while(Get_Servo_Flag() ==  false) osDelay(5);
         if (now_height == LowestHeight)
             ;
         else if (now_height == MediumHeight)

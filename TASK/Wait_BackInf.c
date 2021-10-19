@@ -70,12 +70,9 @@ void CountTimeTaskFunc(void const *argument)
     OverTimeFlag = 1; //标志此时已经超时
     osDelay(10);
   }
-  if (OverTimeHandle != NULL)
-  {
-    Deinit_Time();               //重新初始化相关变量
-    vTaskDelete(NULL); //删除任务
-    OverTimeHandle = NULL;
-  }
+  Deinit_Time();     //重新初始化相关变量
+  vTaskDelete(NULL); //删除任务
+  OverTimeHandle = NULL;
 }
 
 /**********************************************************************
