@@ -145,7 +145,7 @@ void turn_angle(int mode, int angle)
     }
 
 }
-int get_turn_status(void)
+int Get_Turn_Status(void)
 {
     return if_completed;
 }

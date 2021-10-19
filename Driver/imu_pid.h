@@ -34,8 +34,8 @@ typedef enum
     absolute 
 }angle_mode;
 
-float  imu_correct_val(void);
-void turn_angle(int mode ,int angle);
+float imu_correct_val(void);
+void Turn_angle(int mode, int angle, int track_enabled);
 void set_imu_angle(int angle);
 void set_imu_param(int p,int i,int d);
 void set_imu_status(int status);

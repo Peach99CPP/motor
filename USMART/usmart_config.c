@@ -120,10 +120,10 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void set_imu_status(int status)",
         (void *)Set_InitYaw,
         "void Set_InitYaw(int target)",
-        (void *)turn_angle,
-        "void turn_angle(int mode ,int angle)",
+        (void *)Turn_angle,
+        "Turn_angle(int mode, int angle, int track_enabled)",
         (void *)Global_Debug,
-        "void  Global_Debug(void)",
+        "void Global_Debug(void)",
 
 };
 ///////////////////////////////////END///////////////////////////////////////////////

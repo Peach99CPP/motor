@@ -1,10 +1,11 @@
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'motor'
-compiling Wait_BackInf.c...
 compiling read_status_task.c...
-compiling servo.c...
+..\TASK\read_status_task.c(53): warning:  #47-D: incompatible redefinition of macro "Wait_Servo_Done"  (declared at line 44)
+  #define Wait_Servo_Done 6000 //等待动作组完成的最大等待时间
+..\TASK\read_status_task.c: 1 warning, 0 errors
 linking...
-Program Size: Code=59376 RO-data=2356 RW-data=1352 ZI-data=21088  
+Program Size: Code=59176 RO-data=2364 RW-data=1352 ZI-data=21088  
 FromELF: creating hex file...
-"motor\motor.axf" - 0 Error(s), 0 Warning(s).
-Build Time Elapsed:  00:00:06
+"motor\motor.axf" - 0 Error(s), 1 Warning(s).
+Build Time Elapsed:  00:00:04

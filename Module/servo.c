@@ -365,7 +365,7 @@ void Different_Dir(int if_left)
 {
     if (if_left)
     {
-        Action_Gruop(10, 1);
+        Action_Gruop(10, 1);//todo 具体哪个动作组还没确定，等待确定
         Start_CountTime(Wait_Time);
         while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
             osDelay(10);

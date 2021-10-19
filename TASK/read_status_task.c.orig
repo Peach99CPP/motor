@@ -407,7 +407,6 @@ int Return_AdverseID(int id)
 ***********************************************************************/
 void MV_HW_Scan(int color, int dir, int enable_imu)
 {
-#define Wait_Servo_Done 6000  //等待动作组完成的最大等待时间
     Set_NeedUp(false);    //禁止高度变换
     MV_Start();           //开启Openmv
     Disable_StopSignal(); //此时不会停车

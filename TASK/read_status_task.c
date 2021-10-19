@@ -41,6 +41,8 @@ short HW_Switch[10];    //红外开关的状态
 int MIN_ = 60;
 int VERTICAL = 10;
 
+#define Wait_Servo_Done 10000 //等待动作组完成的最大等待时间
+
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
 #define HW_SWITCH(X) HW_Switch[(X)-1]  // 0到3下标就是红外开关的位置
 
@@ -48,24 +50,35 @@ int VERTICAL = 10;
 
 #define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7
 
+
 void Set_NeedUp(bool if_on)
 {
     QR_Brick = if_on;
 }
+
 void Inf_Servo_Height(int now_height)
 {
-    if (QR_Brick )
+    if (QR_Brick) //在复赛决赛部分需要
     {
-        set_speed(0, 0, 0);
-        while(Get_Servo_Flag() ==  false) osDelay(5);
-        if (now_height == LowestHeight)
-            ;
+        set_speed(0, 0, 0);                 //先停车
+        Wait_Servo_Signal(Wait_Servo_Done); //等待上一个命令完成
+        if (now_height == LowestHeight)     //根据当前高度进行角度的更新操作
+        {
+            Action_Gruop(21, 1);                //运行动作组
+            Wait_Servo_Signal(Wait_Servo_Done); //等待运行结束
+        }
         else if (now_height == MediumHeight)
-            ;
+        {
+            Action_Gruop(23, 1);
+            Wait_Servo_Signal(Wait_Servo_Done);
+        }
         else if (now_height == HighestHeight)
-            ;
+        {
+            Action_Gruop(22, 1);
+            Wait_Servo_Signal(Wait_Servo_Done);
+        }
         else
-            osDelay(1);
+            osDelay(1); //初始状态
     }
 }
 /**********************************************************************
@@ -412,10 +425,9 @@ int Return_AdverseID(int id)
 ***********************************************************************/
 void MV_HW_Scan(int color, int dir, int enable_imu)
 {
-#define Wait_Servo_Done 10000 //等待动作组完成的最大等待时间
-    Set_NeedUp(false);        //禁止高度变换
-    MV_Start();               //开启Openmv
-    Disable_StopSignal();     //此时不会停车
+    Set_NeedUp(false);    //禁止高度变换
+    MV_Start();           //开启Openmv
+    Disable_StopSignal(); //此时不会停车
 
     Set_IMUStatus(enable_imu); //设置陀螺仪状态
     if (dir == 5 || dir == 6)  //阶梯平台的球
@@ -456,6 +468,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
         {
             Openmv_Scan_Bar(0, 1);
             Exit_Height_Upadte();
+            Wait_Servo_Signal(Wait_Servo_Done);
             return;
         }
         else
@@ -489,6 +502,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
         {
             Openmv_Scan_Bar(0, 1);
             Exit_Height_Upadte();
+            Wait_Servo_Signal(Wait_Servo_Done);
             return;
         }
         else
@@ -518,6 +532,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
             Set_IFUP(false);
             Exit_Height_Upadte();
             MV_Stop(); //停止处理响应
+            Wait_Servo_Signal(Wait_Servo_Done);
             return;
         }
         else
@@ -548,7 +563,8 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
             Set_IFUP(false);
             Exit_Height_Upadte(); //结束任务
             MV_Stop();            //停止处理响应
-            return;               //退出
+            Wait_Servo_Signal(Wait_Servo_Done);
+            return; //退出
         }
         else
         {
@@ -593,6 +609,7 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
                 Set_IFUP(false);
                 Exit_Height_Upadte();
                 MV_Stop(); //停止处理响应
+                Wait_Servo_Signal(Wait_Servo_Done);
                 return;
             }
             else
@@ -623,7 +640,8 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
                 Set_IFUP(false);
                 Exit_Height_Upadte(); //结束任务
                 MV_Stop();            //停止处理响应
-                return;               //退出
+                Wait_Servo_Signal(Wait_Servo_Done);
+                return; //退出
             }
             else
             {
