@@ -50,3 +50,16 @@ motor\avoid_obs_func.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 motor\avoid_obs_func.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
 motor\avoid_obs_func.o: ..\Driver\delay.h
 motor\avoid_obs_func.o: ../Inc/tim.h
+motor\avoid_obs_func.o: ..\Driver\chassis.h
+motor\avoid_obs_func.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+motor\avoid_obs_func.o: ..\Driver\motor.h
+motor\avoid_obs_func.o: ..\Control\tim_control.h
+motor\avoid_obs_func.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+motor\avoid_obs_func.o: ..\Driver\time_cnt.h
+motor\avoid_obs_func.o: ..\Driver\time_cnt.h
+motor\avoid_obs_func.o: ..\Driver\motor.h
+motor\avoid_obs_func.o: ..\Driver\uart_handle.h
+motor\avoid_obs_func.o: ../Inc/usart.h
+motor\avoid_obs_func.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+motor\avoid_obs_func.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+motor\avoid_obs_func.o: ..\Math\pid.h

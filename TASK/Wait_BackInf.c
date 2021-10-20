@@ -1,8 +1,9 @@
 #include "Wait_BackInf.h "
+#include "uart_handle.h"
 long wait_time = 0, now_time; //计时器
 bool OverTimeFlag = 1;        //会否超时的标志
 
-osThreadId OverTimeHandle;                    //任务句柄
+osThreadId OverTimeHandle = NULL;             //任务句柄
 void CountTimeTaskFunc(void const *argument); //任务实现函数
 bool CountTimeTask_Exit = 1;                  //是否退出
 
@@ -40,19 +41,21 @@ void Deinit_Time(void)
  ***********************************************************************/
 void Start_CountTime(long timelength) //开始任务
 {
-  if (CountTimeTask_Exit) //当上一个任务运行结束时
+  if (CountTimeTask_Exit && OverTimeHandle == NULL) //当上一个任务运行结束时
   {
-    CountTimeTask_Exit = 0;                                                //设置退出标志
-    now_time = 0;                                                          //清零当前计时器
-    OverTimeFlag = 0;                                                      //清除超时标志位
-    wait_time = timelength;                                                //输入要等待的时间，单位ms
+    CountTimeTask_Exit = 0; //设置退出标志
+    now_time = 0;           //清零当前计时器
+    OverTimeFlag = 0;       //清除超时标志位
+    wait_time = timelength;//输入要等待的时间，单位ms
     osThreadDef(CountTimeTask, CountTimeTaskFunc, osPriorityHigh, 0, 256); //定义任务结构体
     OverTimeHandle = osThreadCreate(osThread(CountTimeTask), NULL);        //创建任务
   }
+  else 
+  printf("计时任务开启失败\r\n");
 }
 
 /**********************************************************************
- * @Name    CountTimeTask
+ * @Name    CountTimeTaskFunc
  * @declaration :任务实现函数
  * @param   argument: [输入/出] 无
  * @retval   : 无
@@ -70,9 +73,9 @@ void CountTimeTaskFunc(void const *argument)
     OverTimeFlag = 1; //标志此时已经超时
     osDelay(10);
   }
-  Deinit_Time();     //重新初始化相关变量
-  vTaskDelete(NULL); //删除任务
-  OverTimeHandle = NULL;
+  Deinit_Time();         //重新初始化相关变量
+  OverTimeHandle = NULL; //运行结束  将句柄置空
+  vTaskDelete(NULL);     //删除任务
 }
 
 /**********************************************************************

@@ -8,7 +8,7 @@ int debug_speed = 0;
 pid_data_t motor_data[5];
 pid_paramer_t motor_param;
 //积分限幅放宽，尝试让车更具有动力
-float param_[5] = {3500,
+float param_[5] = {4000,
                    9900,
                    130,
                    80,

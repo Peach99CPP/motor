@@ -49,3 +49,17 @@ motor\wait_backinf.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 motor\wait_backinf.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\wait_backinf.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 motor\wait_backinf.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+motor\wait_backinf.o: ..\Driver\uart_handle.h
+motor\wait_backinf.o: ../Inc/usart.h
+motor\wait_backinf.o: ..\Driver\motor.h
+motor\wait_backinf.o: ..\Control\tim_control.h
+motor\wait_backinf.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+motor\wait_backinf.o: ..\Driver\time_cnt.h
+motor\wait_backinf.o: ..\Driver\time_cnt.h
+motor\wait_backinf.o: ..\Driver\motor.h
+motor\wait_backinf.o: ..\Driver\uart_handle.h
+motor\wait_backinf.o: ..\Math\pid.h
+motor\wait_backinf.o: ../Inc/tim.h
+motor\wait_backinf.o: ..\Driver\delay.h
+motor\wait_backinf.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+motor\wait_backinf.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

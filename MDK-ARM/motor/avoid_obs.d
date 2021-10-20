@@ -52,3 +52,15 @@ motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\avoid_obs.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
+motor\avoid_obs.o: ..\Driver\chassis.h
+motor\avoid_obs.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+motor\avoid_obs.o: ..\Driver\motor.h
+motor\avoid_obs.o: ..\Control\tim_control.h
+motor\avoid_obs.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+motor\avoid_obs.o: ..\Driver\motor.h
+motor\avoid_obs.o: ..\Driver\uart_handle.h
+motor\avoid_obs.o: ../Inc/usart.h
+motor\avoid_obs.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+motor\avoid_obs.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+motor\avoid_obs.o: ..\Math\pid.h
+motor\avoid_obs.o: ..\Control\chassis_control.h

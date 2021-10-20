@@ -66,3 +66,5 @@ motor\chassis_control.o: ..\Control\chassis_control.h
 motor\chassis_control.o: ..\Driver\track_bar_receive.h
 motor\chassis_control.o: ..\Driver\imu_pid.h
 motor\chassis_control.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+motor\chassis_control.o: ..\TASK\Wait_BackInf.h
+motor\chassis_control.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h

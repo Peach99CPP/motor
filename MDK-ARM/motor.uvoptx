@@ -198,22 +198,12 @@
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CountTimeTask_Exit</ItemText>
+          <ItemText>count_line_status</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>mv_rec_flag</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>mv_stop_flag</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>if_completed</ItemText>
+          <ItemText>encodermove_status</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

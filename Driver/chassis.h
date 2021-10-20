@@ -33,6 +33,9 @@ void speed_variation(float x_var, float y_var, float w_var);
 void set_speed (int x, int y, int w);
 void set_chassis_status(bool status);
 void chassis_synthetic_control(void);
+
+void Wait_OKInf(int type,long wait_time);
+
 float get_chassis_speed(char dir);
 
 

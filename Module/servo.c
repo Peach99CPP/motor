@@ -174,7 +174,7 @@ void Action_Gruop(int id, int times)
         Error_Report(2);
         return;
     }
-    Disable_ServoFlag();//标记舵控此时运行中
+    Disable_ServoFlag(); //标记舵控此时运行中
     //设置动作组编号
     servo_controler.cmd_buffer[servo_controler.current_index++] = 'G';
     Cmd_Convert(id);
@@ -261,22 +261,20 @@ void Disable_ServoFlag(void)
  ***********************************************************************/
 void Wait_Servo_Signal(long wait_time_num)
 {
-    if (Get_CountTimeExit())
+    long temp_time = 100;
+    osDelay(temp_time);
+    while (Get_Servo_Flag() == false && temp_time < wait_time_num)
     {
-        Start_CountTime(wait_time_num);
-        while (Get_Servo_Flag() == false && !Get_TimeResult()) //未超时的时候
-        {
-            set_speed(0, 0, 0); //等待过程中是停车的
-            osDelay(10);
-        }
-        Exit_CountTime(); //退出等待任务
+        set_speed(0, 0, 0); //等待过程中是停车的
+        temp_time += 5;
+        osDelay(5);
     }
 }
 
 /**********************************************************************
  * @Name    Lateral_infrared
  * @declaration : 侧面红外的开关
- * @param   status: [输入/出] 展开或者收起
+ * @param   status: [输入/出] 展开或者收起 1展开 0收起
  * @retval   :无
  * @author  peach99CPP
  ***********************************************************************/
@@ -285,18 +283,12 @@ void Lateral_infrared(int status)
     if (status)
     {
         Action_Gruop(13, 1);
-        Start_CountTime(Wait_Time);
-        while (Get_Servo_Flag() == false && !Get_TimeResult()) //未超时的时候
-            osDelay(10);
-        Exit_CountTime();
+        Wait_Servo_Signal(Wait_Time);
     }
     else
     {
         Action_Gruop(12, 1);
-        Start_CountTime(Wait_Time);
-        while (Get_Servo_Flag() == false && !Get_TimeResult()) //未超时的时候
-            osDelay(10);
-        Exit_CountTime();
+        Wait_Servo_Signal(Wait_Time);
     }
 }
 
@@ -312,18 +304,12 @@ void Ass_Door(int status)
     if (status)
     {
         Action_Gruop(8, 1);
-        Start_CountTime(Wait_Time);
-        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
-            osDelay(10);
-        Exit_CountTime();
+        Wait_Servo_Signal(Wait_Time);
     }
     else
     {
         Action_Gruop(7, 1);
-        Start_CountTime(Wait_Time);
-        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
-            osDelay(10);
-        Exit_CountTime();
+        Wait_Servo_Signal(Wait_Time);
     }
 }
 
@@ -339,18 +325,12 @@ void Baffle_Control(int up_dowm)
     if (up_dowm) //升起
     {
         Action_Gruop(9, 1);                            //升起
-        Start_CountTime(Wait_Time);                    //升起挡板
-        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
-            osDelay(10);
-        Exit_CountTime();
+       Wait_Servo_Signal(Wait_Time);
     }
     else
     {
         Action_Gruop(10, 1);
-        Start_CountTime(Wait_Time);
-        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
-            osDelay(10);
-        Exit_CountTime();
+       Wait_Servo_Signal(Wait_Time);
     }
 }
 
@@ -365,18 +345,12 @@ void Different_Dir(int if_left)
 {
     if (if_left)
     {
-        Action_Gruop(10, 1);//todo 具体哪个动作组还没确定，等待确定
-        Start_CountTime(Wait_Time);
-        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
-            osDelay(10);
-        Exit_CountTime();
+        Action_Gruop(10, 1); // todo 具体哪个动作组还没确定，等待确定
+        Wait_Servo_Signal(Wait_Time);
     }
     else
     {
         Action_Gruop(10, 1);
-        Start_CountTime(Wait_Time);
-        while (!Get_Servo_Flag() && !Get_TimeResult()) //未超时的时候
-            osDelay(10);
-        Exit_CountTime();
+       Wait_Servo_Signal(Wait_Time);
     }
 }
