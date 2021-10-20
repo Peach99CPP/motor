@@ -459,7 +459,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
     {
         while (Get_HW_Status(dir) == false)
         {
-            set_speed(MIN_, 0, 0);
+            set_speed(-MIN_, 0, 0);
             osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
         }
         set_speed(0, 0, 0);
@@ -493,7 +493,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
     {
         while (Get_HW_Status(dir) == false)
         {
-            set_speed(-MIN_, 0, 0); //横向移动
+            set_speed(MIN_, 0, 0); //横向移动
             osDelay(5);             //先移动到此时红外开始扫描到，防止下方直接被跳过
         }
         set_speed(0, 0, 0);
@@ -501,9 +501,9 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
         {
             if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
-                set_speed(-MIN_, VERTICAL, 0);              //一边走一边贴边
+                set_speed(-MIN_*0.8, VERTICAL, 0);              //一边走一边贴边
             else
-                set_speed(-MIN_, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
+                set_speed(-MIN_*0.8, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
             osDelay(5);
         }
         set_speed(0, 0, 0);

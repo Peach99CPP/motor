@@ -3,7 +3,7 @@
 <title>Static Call Graph - [motor\motor.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image motor\motor.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu Oct 21 00:47:56 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu Oct 21 00:54:12 2021
 <BR><P>
 <H3>Maximum Stack Usage =        380 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -784,9 +784,9 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[166]"></a>__aeabi_memclr</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, rt_memclr.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_Uart_Send
+<BR><BR>[Called By]<UL><LI><a href="#[164]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_IRQ
+<LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_Uart_Send
 <LI><a href="#[17e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;QR_decode
-<LI><a href="#[164]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_IRQ
 <LI><a href="#[185]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Read_Switch
 <LI><a href="#[1d7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_decode
 </UL>
@@ -1275,8 +1275,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[19c]"></a>Get_Time_Period</STRONG> (Thumb, 64 bytes, Stack size 0 bytes, time_cnt.o(i.Get_Time_Period))
-<BR><BR>[Called By]<UL><LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_control
-<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_callback
+<BR><BR>[Called By]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_callback
+<LI><a href="#[1a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_control
 </UL>
 
 <P><STRONG><a name="[f8]"></a>Get_Trcker_Num</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, track_bar_receive.o(i.Get_Trcker_Num))
@@ -1347,11 +1347,11 @@ Global Symbols
 <P><STRONG><a name="[133]"></a>HAL_GPIO_Init</STRONG> (Thumb, 484 bytes, Stack size 24 bytes, stm32f7xx_hal_gpio.o(i.HAL_GPIO_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = HAL_GPIO_Init
 </UL>
-<BR>[Called By]<UL><LI><a href="#[152]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
+<BR>[Called By]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_callback
+<LI><a href="#[152]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
 <LI><a href="#[13e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_MspPostInit
 <LI><a href="#[131]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IC_MspInit
 <LI><a href="#[16a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_GPIO_Init
-<LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_callback
 </UL>
 
 <P><STRONG><a name="[128]"></a>HAL_GPIO_ReadPin</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, stm32f7xx_hal_gpio.o(i.HAL_GPIO_ReadPin))
@@ -1384,8 +1384,8 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = HAL_Init &rArr; HAL_InitTick &rArr; HAL_TIM_Base_Init &rArr; HAL_TIM_Base_MspInit &rArr; HAL_NVIC_SetPriority &rArr; __NVIC_SetPriority
 </UL>
 <BR>[Calls]<UL><LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_NVIC_SetPriorityGrouping
-<LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_InitTick
 <LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_MspInit
+<LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_InitTick
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1427,13 +1427,13 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[116]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__NVIC_SetPriority
 <LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__NVIC_GetPriorityGrouping
 </UL>
-<BR>[Called By]<UL><LI><a href="#[152]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
+<BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_MspInit
+<LI><a href="#[152]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
 <LI><a href="#[131]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IC_MspInit
 <LI><a href="#[11f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_MspInit
 <LI><a href="#[16a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_GPIO_Init
 <LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Time_Init
 <LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_InitTick
-<LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_MspInit
 </UL>
 
 <P><STRONG><a name="[110]"></a>HAL_NVIC_SetPriorityGrouping</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, stm32f7xx_hal_cortex.o(i.HAL_NVIC_SetPriorityGrouping))
@@ -1912,7 +1912,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[165]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_rec_decode
 </UL>
 
-<P><STRONG><a name="[10]"></a>MV_HW_Scan</STRONG> (Thumb, 866 bytes, Stack size 40 bytes, read_status_task.o(i.MV_HW_Scan))
+<P><STRONG><a name="[10]"></a>MV_HW_Scan</STRONG> (Thumb, 930 bytes, Stack size 40 bytes, read_status_task.o(i.MV_HW_Scan))
 <BR><BR>[Stack]<UL><LI>Max Depth = 240 + Unknown Stack Size
 <LI>Call Chain = MV_HW_Scan &rArr; Start_HeightUpdate &rArr; osThreadCreate &rArr; xTaskCreate &rArr; pvPortMalloc &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
