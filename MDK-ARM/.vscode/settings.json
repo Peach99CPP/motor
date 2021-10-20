@@ -10,6 +10,8 @@
         "type_traits": "c",
         "xutility": "c",
         "task.h": "c",
-        "*.orig": "c"
+        "*.orig": "c",
+        "tuple": "c",
+        "utility": "c"
     }
 }

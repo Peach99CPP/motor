@@ -46,6 +46,8 @@ int Get_Stop_Signal(void);
 void Disable_StopSignal(void);
 void Enable_StopSignal(void);
 
+void OpenMV_ChangeRoi(int roi);
+
 void MV_Decode(void);
 void MV_SendOK(void);
 void MV_PID(void);

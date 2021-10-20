@@ -79,6 +79,9 @@ void direct_move(int direct, int line_num, int edge_if, int imu_if)
     START_LINE:
         set_imu_status(imu_if);
         //浣跨敤浠诲姟鍒涘缓鐨勫舰寮忔墽琛岃鍑芥�?
+        Clear_Line(&y_bar);
+        Clear_Line(&x_rightbar);
+        Clear_Line(&x_leftbar);
         if (direct == 1)
         {
             if (edge_if)
@@ -183,8 +186,8 @@ void LineTask(void const *argument)
             if (lines < 0)
             {
                 // todo 璁板緱妫€鏌ユ墽琛屽�? 锛屾湁娌℃湁鏈€缁堝洖鍒板垵濮嬭搴�?
-                if_need_zero = 1;   //绛変細闇€瑕佸啀杞洖鏉�?
-                Turn_angle(1, 180,0); //鍏堣浆寮埌180搴︼紝鐒跺悗鍐嶈繘琛屽墠杩涳紝鍥犱负鍙湁姝ｅ墠鏂规湁寰抗鐗�
+                if_need_zero = 1;      //绛変細闇€瑕佸啀杞洖鏉�?
+                Turn_angle(1, 180, 0); //鍏堣浆寮埌180搴︼紝鐒跺悗鍐嶈繘琛屽墠杩涳紝鍥犱负鍙湁姝ｅ墠鏂规湁寰抗鐗�
                 lines *= -1;
             }
             Clear_Line(&y_bar); //閲嶆柊鍒濆鍖栬鐢ㄥ埌鐨勭粨鏋勪綋
@@ -211,9 +214,9 @@ EXIT_TASK:
     //寮€鍚袱涓柟鍚戠殑寰抗
 
     //鍏抽棴寰抗鐗堬紝鍚庨潰鍐嶆寜闇€寮€鍚�?
-    if (if_need_zero)       //鍒ゆ柇鏄惁闇€瑕佽浆鍥炲師鏉ョ殑瑙掑害
-        Turn_angle(1, 180,1); //杞洖鍘熸潵鐨勮搴�?
-    else 
+    if (if_need_zero)          //鍒ゆ柇鏄惁闇€瑕佽浆鍥炲師鏉ョ殑瑙掑害
+        Turn_angle(1, 180, 1); //杞洖鍘熸潵鐨勮搴�?
+    else
     {
         y_bar.if_switch = true;
         x_leftbar.if_switch = true;
@@ -268,8 +271,8 @@ void move_by_encoder(int direct, int val)
 }
 void EncoderTask(void const *argument)
 {
-#define ENOCDER_DIVIDE_FACTOR 50
-#define ENCODE_THRESHOLD 2
+#define ENOCDER_DIVIDE_FACTOR 50.0
+#define ENCODE_THRESHOLD 0.5
 #define ENCODER_FACTOR 8
     clear_motor_data();
     time = TIME_ISR_CNT; //鑾峰彇绯荤粺鏃堕�?
@@ -284,12 +287,12 @@ void EncoderTask(void const *argument)
             en_val *= -1;
             while (1) //鏈埌杈剧洰锟�???
             {
-                if ((TIME_ISR_CNT - time > 50) && ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)) < ENCODE_THRESHOLD)
-                    goto Encoder_Exit;                                       //瓒呮椂澶勭悊锛岄伩鍏嶅崱锟�???
-                bias = -ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)); //寰楀埌宸拷?
-                variation = bias * ENCODER_FACTOR;                           //璁＄畻寰楀嚭杈撳嚭鍊笺€侾锟�???
-                variation = Limit_Speed(variation);                          //鍒嗛厤鏈€浣庨€熷害锛岄伩鍏嶅崱锟�???
-                set_speed(variation, 0, 0);                                  //鍒嗛厤閫熷害
+                if ((TIME_ISR_CNT - time > 50) && ((double)en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)) < ENCODE_THRESHOLD) //��������
+                    goto Encoder_Exit;                                                                                         //瓒呮椂澶勭悊锛岄伩鍏嶅崱锟�???
+                bias = -((double)en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR));                                              //寰楀埌宸拷?
+                variation = bias * ENCODER_FACTOR;                                                                             //璁＄畻寰楀嚭杈撳嚭鍊笺€侾锟�???
+                variation = Limit_Speed(variation);                                                                            //鍒嗛厤鏈€浣庨€熷害锛岄伩鍏嶅崱锟�???
+                set_speed(variation, 0, 0);                                                                                    //鍒嗛厤閫熷害
 
                 osDelay(5); //缁欎换鍔¤皟搴﹀唴鏍稿垏鎹㈢殑鏈轰細
             }
@@ -299,9 +302,9 @@ void EncoderTask(void const *argument)
             //鍚戝彸涓烘
             while (1)
             {
-                if ((TIME_ISR_CNT - time > 50) && ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)) < ENCODE_THRESHOLD)
+                if ((TIME_ISR_CNT - time > 50) && ((double)en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)) < ENCODE_THRESHOLD)
                     goto Encoder_Exit;
-                bias = ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR));
+                bias = ((double)en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR));
                 variation = bias * ENCODER_FACTOR;
                 variation = Limit_Speed(variation);
                 set_speed(variation, 0, 0);
@@ -324,9 +327,9 @@ void EncoderTask(void const *argument)
             pn = 1;
         while (1) //鍚屼�?
         {
-            if ((TIME_ISR_CNT - time > 50) && ABS(en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)) < ENCODE_THRESHOLD)
+            if ((TIME_ISR_CNT - time > 50) && ((double)en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR)) < ENCODE_THRESHOLD)
                 goto Encoder_Exit;
-            bias = fabs(ABS(en_val) - (encoder_sum / ENOCDER_DIVIDE_FACTOR));
+            bias = fabs((double)en_val - (encoder_sum / ENOCDER_DIVIDE_FACTOR));
             variation = bias * ENCODER_FACTOR;
             variation = Limit_Speed(variation);
             set_speed(0, variation * pn, 0);

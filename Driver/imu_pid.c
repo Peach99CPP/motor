@@ -43,7 +43,7 @@ float imu_correct_val(void)
 {
     static float now_angle;//过程变量，为避免重复声明，使用静态变量
     //判断此时转弯的状态
-    if(fabs(angle_limit(imu.get_angle() - imu.target_angle))<0.5) if_completed = 1;
+    if(fabs(angle_limit(imu.get_angle() - imu.target_angle)) < 0.5) if_completed = 1;
     else if_completed = 0 ;
 
     if(! imu.enable_switch ) return 0; //未使能则直接返回0，不做修改
@@ -122,7 +122,7 @@ void set_imu_status(int status)
   * @retval   : 无
   * @author  peach99CPP
 ***********************************************************************/
-void Turn_angle(int mode, int angle,int track_enabled)
+void Turn_angle(int mode, int angle, int track_enabled)
 {
     if(imu.enable_switch)
     {
@@ -136,18 +136,19 @@ void Turn_angle(int mode, int angle,int track_enabled)
             imu.target_angle = angle;
         while(!get_turn_status()) osDelay(2);//转动结束再退出该函数
         //开两秒循迹后关闭
-        if(track_enabled){
-        x_leftbar.if_switch  = true;
-        x_rightbar.if_switch = true;
-        y_bar.if_switch = true;
-        osDelay(2000);
-        x_leftbar.if_switch  = false;
-        x_rightbar.if_switch = false;
-        y_bar.if_switch = false;
+        if(track_enabled)
+        {
+            x_leftbar.if_switch  = true;
+            x_rightbar.if_switch = true;
+            y_bar.if_switch = true;
+            osDelay(2000);
+            x_leftbar.if_switch  = false;
+            x_rightbar.if_switch = false;
+            y_bar.if_switch = false;
         }
     }
-      else 
-      printf("陀螺仪未开启,无法转弯\r\n");
+    else
+        printf("陀螺仪未开启,无法转弯\r\n");
 
 }
 int get_turn_status(void)

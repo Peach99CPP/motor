@@ -41,7 +41,7 @@ short HW_Switch[10];    //红外开关的状态
 int MIN_ = 60;
 int VERTICAL = 10;
 
-#define Wait_Servo_Done 10000 //等待动作组完成的最大等待时间
+#define Wait_Servo_Done 20000 //等待动作组完成的最大等待时间
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
 #define HW_SWITCH(X) HW_Switch[(X)-1]  // 0到3下标就是红外开关的位置
@@ -50,6 +50,26 @@ int VERTICAL = 10;
 
 #define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7
 
+/**********************************************************************
+ * @Name    Return_AdverseID
+ * @declaration : 获取相对的开关编号
+ * @param   id: [输入/出] 当前的开关编号
+ * @retval   : 同侧的相对编号
+ * @author  peach99CPP
+ ***********************************************************************/
+int Return_AdverseID(int id)
+{
+    if (id == 1)
+        return 2;
+    else if (id == 2)
+        return 1;
+    else if (id == 5)
+        return 6;
+    else if (id == 6)
+        return 5;
+    else
+        return 1; //避免出错，返回0容易引起数组越界 todo最好在此分支增加一个错误报告的打印数据
+}
 
 void Set_NeedUp(bool if_on)
 {
@@ -114,7 +134,7 @@ void Start_HeightUpdate(void)
     {
         Height_task_exit = 0;
         Height_Flag = 0;
-        osThreadDef(Height_UpadteTask, HeightUpdate_Task, osPriorityHigh, 0, 256);
+        osThreadDef(Height_UpadteTask, HeightUpdate_Task, osPriorityNormal, 0, 256);
         Height_UpadteTask = osThreadCreate(osThread(Height_UpadteTask), NULL);
     }
 }
@@ -129,6 +149,7 @@ void Start_HeightUpdate(void)
 void HeightUpdate_Task(void const *argument)
 {
     Height_Flag = 0;
+    static short temp_roi_chnage_flag=1;
     // todo 后续增加参数或者其他赋值的变量来指定使用哪个红外（使用双高度红外的情况下）
     while (!Height_task_exit)
     {
@@ -140,7 +161,6 @@ void HeightUpdate_Task(void const *argument)
                 if (Get_Height_Switch(Height_id) == on && Height_Flag == 0 && Get_Servo_Flag() == true)
                 {
                     Height_Flag = 1;
-                    Set_IMUStatus(false); // todo测试代码 记得移除
                     Current_Height = HighestHeight;
                     Inf_Servo_Height(Current_Height);
                 }
@@ -152,17 +172,19 @@ void HeightUpdate_Task(void const *argument)
                         Inf_Servo_Height(Current_Height);
                     }
                 }
-                osDelay(5);
+                osDelay(1);
             }
         }
         else if (Current_Height == MediumHeight)
         {
-            Height_id = 1;
+            Height_id = 2; // todo临时修改
+            OpenMV_ChangeRoi(1);
             while (!Height_task_exit)
             {
-                if (Get_Height_Switch(Height_id) == on && Height_Flag == 0 && Get_Servo_Flag() == true)
+                if (Get_Servo_Flag() == true && Get_Height_Switch(Height_id) == on && Height_Flag == 0)
                 {
                     Height_Flag = 1;
+                    Height_id = 1; // todo 此处需要检查下
                     Current_Height = HighestHeight;
                     Inf_Servo_Height(Current_Height);
                 }
@@ -173,8 +195,14 @@ void HeightUpdate_Task(void const *argument)
                         Current_Height = LowestHeight;
                         Inf_Servo_Height(Current_Height);
                     }
+                    if (Get_Height_Switch(2) == on && temp_roi_chnage_flag == 1)
+                    {
+                        temp_roi_chnage_flag =0;
+                        OpenMV_ChangeRoi(2);
+                    }
                 }
-                osDelay(5);
+
+                osDelay(1);
             }
         }
         osDelay(5);
@@ -391,26 +419,7 @@ int Get_Height(void)
 {
     return Current_Height;
 }
-/**********************************************************************
- * @Name    Return_AdverseID
- * @declaration : 获取相对的开关编号
- * @param   id: [输入/出] 当前的开关编号
- * @retval   : 同侧的相对编号
- * @author  peach99CPP
- ***********************************************************************/
-int Return_AdverseID(int id)
-{
-    if (id == 1)
-        return 2;
-    else if (id == 2)
-        return 1;
-    else if (id == 5)
-        return 6;
-    else if (id == 6)
-        return 5;
-    else
-        return 1; //避免出错，返回0容易引起数组越界 todo最好在此分支增加一个错误报告的打印数据
-}
+
 /**********************************************************************
   * @Name    MV_HW_Scan
   * @declaration :利用MV 舵控 联动对阶梯平台进行扫描并抓取

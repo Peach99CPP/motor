@@ -14,22 +14,21 @@ int temp_ = 0;
 short mv_stop_flag = 0;
 mvrec_t mv_rec;
 mv_t MV =
-{
-    .mv_uart = &huart4,
-    .mv_cmd = {0},
-    .rec_buffer = {0},
-    .rec_len = 0,
-    .RX_Status = 0
-}; //初始化变量
+    {
+        .mv_uart = &huart4,
+        .mv_cmd = {0},
+        .rec_buffer = {0},
+        .rec_len = 0,
+        .RX_Status = 0}; //初始化变量
 
 /**********************************************************************
-  * @Name    cmd_encode
-  * @declaration : 根据协议编码发送的内容
-  * @param   event_id: [输入/出]  事件的类型
-**			 param: [输入/出]     参数，16位数字
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    cmd_encode
+ * @declaration : 根据协议编码发送的内容
+ * @param   event_id: [输入/出]  事件的类型
+ **			 param: [输入/出]     参数，16位数字
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void cmd_encode(const uint8_t event_id, int param)
 {
     static uint8_t pos_flag;
@@ -61,12 +60,12 @@ void MV_SendCmd(const uint8_t event_id, const int param)
 }
 
 /**********************************************************************
-  * @Name    MV_IRQ
-  * @declaration :  openmv通讯的中断处理函数
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_IRQ
+ * @declaration :  openmv通讯的中断处理函数
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_IRQ(void)
 {
     if (MV.RX_Status < 2) //未接收完成
@@ -101,12 +100,12 @@ void MV_IRQ(void)
 }
 
 /**********************************************************************
-  * @Name    MV_rec_decode
-  * @declaration : 判断接收完成后，对接收的内容进行解码
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_rec_decode
+ * @declaration : 判断接收完成后，对接收的内容进行解码
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_rec_decode(void)
 {
     static int pn = 1; //正负标志符
@@ -130,36 +129,36 @@ void MV_rec_decode(void)
 /****上面是底层实现，下面是上层的应用****/
 
 /**********************************************************************
-  * @Name    MV_PID
-  * @declaration :让MV返回PID信号
-  * @param   None
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_PID
+ * @declaration :让MV返回PID信号
+ * @param   None
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_PID(void)
 {
     MV_SendCmd(2, 0);
 }
 
 /**********************************************************************
-  * @Name    MV_SendOK
-  * @declaration :向openmv发送OK信号
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_SendOK
+ * @declaration :向openmv发送OK信号
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_SendOK(void)
 {
     MV_SendCmd(4, 0);
 }
 
 /**********************************************************************
-  * @Name    MV_Decode
-  * @declaration :根据自己定义的参数含义执行命令
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_Decode
+ * @declaration :根据自己定义的参数含义执行命令
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_Decode(void)
 {
 #define Catch_ 1
@@ -171,18 +170,23 @@ void MV_Decode(void)
     {
         if (mv_rec.event == Ball_Signal)
         {
-            Disable_ServoFlag();  //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-            Enable_StopSignal();  //使能停车信号，让动作那边执行停车操作
+            Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
+            printf("要抓球\r\n");
             switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
             {
             case LowestHeight:
                 Action_Gruop(Lowest, 1);
+                temp_++;
                 break;
             case MediumHeight:
                 Action_Gruop(Medium, 1);
+                temp_++;
                 break;
             case HighestHeight:
                 Action_Gruop(Highest, 1);
+                temp_++;
+                break;
             default:
                 if (Get_IFUP() == false)
                 {
@@ -191,130 +195,134 @@ void MV_Decode(void)
                 }
             }
         }
-            else if (mv_rec.event == Rectangle_Signal)
-    {
-        Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-        Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
-        printf("快点停车\r\n");
-        int height = Get_Height();
-        switch (height)
+        else if (mv_rec.event == Rectangle_Signal)
         {
-        case LowestHeight:
-            Action_Gruop(14, 1);
-            temp_ = 1;
-            break;
-        case MediumHeight:
-            Action_Gruop(16, 1);
-            temp_ = 1;
-            break;
-        case HighestHeight:
-            Action_Gruop(15, 1);
-            temp_ = 1;
-            break;
-        default:
-            if (Get_IFUP() == false)
+             Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
+            printf("扫到矩形\r\n");
+            int height = Get_Height();
+            switch (height)
             {
-                Action_Gruop(11, 1); //机械臂升起
-                Set_IFUP(true);
+            case LowestHeight:
+                Action_Gruop(14, 1);
+                temp_ += 1;
+                break;
+            case MediumHeight:
+                Action_Gruop(15, 1);
+                temp_ += 1;
+                break;
+            case HighestHeight:
+                Action_Gruop(16, 1);
+                temp_ += 1;
+                break;
+            default:
+                if (Get_IFUP() == false)
+                {
+                    Action_Gruop(11, 1); //机械臂升起
+                    Set_IFUP(true);
+                }
             }
         }
     }
-    }
-
 }
 
 /**********************************************************************
-  * @Name    Get_Stop_Signal
-  * @declaration :返回此时是否停止的信号
-  * @param   None
-  * @retval   : 是否应该停车，停车则为1
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Get_Stop_Signal
+ * @declaration :返回此时是否停止的信号
+ * @param   None
+ * @retval   : 是否应该停车，停车则为1
+ * @author  peach99CPP
+ ***********************************************************************/
 int Get_Stop_Signal(void)
 {
     return mv_stop_flag;
 }
 
 /**********************************************************************
-  * @Name    Enable_StopSignal
-  * @declaration :使能停车的标志位
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Enable_StopSignal
+ * @declaration :使能停车的标志位
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Enable_StopSignal(void)
 {
     mv_stop_flag = 1;
 }
 
 /**********************************************************************
-  * @Name    Disable_StopSignal
-  * @declaration : 清除停车标志位
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Disable_StopSignal
+ * @declaration : 清除停车标志位
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void Disable_StopSignal(void)
 {
     mv_stop_flag = 0;
 }
 
 /**********************************************************************
-  * @Name    MV_Start
-  * @declaration : Mv开始响应命令
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_Start
+ * @declaration : Mv开始响应命令
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_Start(void)
 {
     MV_SendCmd(0, 0);
 }
 
 /**********************************************************************
-  * @Name    MV_Scan_High
-  * @declaration :让MV扫描阶梯平台的高层
-  * @param   color: [输入/出] 要抓的球的颜色
-  * @retval   :无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_Scan_High
+ * @declaration :让MV扫描阶梯平台的高层
+ * @param   color: [输入/出] 要抓的球的颜色
+ * @retval   :无
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_Scan_High(mvcolor_t color)
 {
     MV_SendCmd(2, color);
 }
 
 /**********************************************************************
-  * @Name    MV_Scan_Low
-  * @declaration : 让MV扫描阶梯平台的中层及下层
-  * @param   color: [输入/出]  要抓的球的颜色
-  * @retval   :无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_Scan_Low
+ * @declaration : 让MV扫描阶梯平台的中层及下层
+ * @param   color: [输入/出]  要抓的球的颜色
+ * @retval   :无
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_Scan_Low(mvcolor_t color)
 {
     MV_SendCmd(1, color);
 }
 
 /**********************************************************************
-  * @Name    MV_Scan_Bar
-  * @declaration :让MV扫描条形平台
-  * @param   color: [输入/出]  要抓的球的颜色
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_Scan_Bar
+ * @declaration :让MV扫描条形平台
+ * @param   color: [输入/出]  要抓的球的颜色
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_Scan_Bar(mvcolor_t color)
 {
     MV_SendCmd(3, color);
 }
 
 /**********************************************************************
-  * @Name    MV_Stop
-  * @declaration : 向MV发送停止信号
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    MV_Stop
+ * @declaration : 向MV发送停止信号
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void MV_Stop(void)
 {
     MV_SendCmd(4, 0);
+}
+void OpenMV_ChangeRoi(int roi)
+{
+    MV_SendCmd(11, roi);
+    osDelay(100);
 }

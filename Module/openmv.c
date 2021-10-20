@@ -14,12 +14,13 @@ int temp_ = 0;
 short mv_stop_flag = 0;
 mvrec_t mv_rec;
 mv_t MV =
-    {
-        .mv_uart = &huart4,
-        .mv_cmd = {0},
-        .rec_buffer = {0},
-        .rec_len = 0,
-        .RX_Status = 0}; //初始化变量
+{
+    .mv_uart = &huart4,
+    .mv_cmd = {0},
+    .rec_buffer = {0},
+    .rec_len = 0,
+    .RX_Status = 0
+}; //初始化变量
 
 /**********************************************************************
  * @Name    cmd_encode
@@ -320,4 +321,9 @@ void MV_Scan_Bar(mvcolor_t color)
 void MV_Stop(void)
 {
     MV_SendCmd(4, 0);
+}
+void OpenMV_ChangeRoi(int roi)
+{
+    MV_SendCmd(11, roi);
+    osDelay(100);
 }

@@ -72,3 +72,4 @@ motor\debug_task.o: ..\Module\atk_imu.h
 motor\debug_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 motor\debug_task.o: ..\Driver\track_bar_receive.h
 motor\debug_task.o: ..\Module\servo.h
+motor\debug_task.o: ..\Module\openmv.h
