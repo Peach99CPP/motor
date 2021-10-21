@@ -14,7 +14,7 @@
 #include "read_status.h"
 #include "servo.h"
 #include "general.h"
-
+#include"avoid_obs.h"
 /****各个调试模式的开关*****/
 
 #define DEBUG_MOTOR 0   //调试电机
@@ -95,7 +95,7 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void HWSwitch_Move(int dir,int enable_imu)",
         (void *)MV_HW_Scan,
         "void MV_HW_Scan(int color, int dir, int enable_imu)",
-        (void*)Brick_QR_Mode,
+        (void *)Brick_QR_Mode,
         "void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)",
         (void *)QR_Scan,
         "void QR_Scan(int status, int color, int dir, int enable_imu)",
@@ -122,6 +122,8 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void Set_InitYaw(int target)",
         (void *)Turn_angle,
         "Turn_angle(int mode, int angle, int track_enabled)",
+        (void *)Wait_For_Avoid,
+        "void Wait_For_Avoid(int dir)",
         (void *)Global_Debug,
         "void Global_Debug(void)",
 

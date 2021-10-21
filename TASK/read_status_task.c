@@ -459,7 +459,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
     {
         while (Get_HW_Status(dir) == false)
         {
-            set_speed(-MIN_, 0, 0);
+            set_speed(MIN_, 0, 0);
             osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
         }
         set_speed(0, 0, 0);
@@ -493,7 +493,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
     {
         while (Get_HW_Status(dir) == false)
         {
-            set_speed(MIN_, 0, 0); //横向移动
+            set_speed(-MIN_, 0, 0); //横向移动
             osDelay(5);             //先移动到此时红外开始扫描到，防止下方直接被跳过
         }
         set_speed(0, 0, 0);

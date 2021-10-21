@@ -360,6 +360,9 @@ int Limit_Speed(int speed)
 void Comfirm_Online(int dir)
 {
 #define LOW_SPEED_TO_CONFIRM 80
+#define Track_Time 1000
+    track_status(1, 1);
+    track_status(2, 1);
     if (dir == 1)
     {
         if (Get_Trcker_Num(&y_bar) <= 2)
@@ -368,8 +371,7 @@ void Comfirm_Online(int dir)
             while (Get_Trcker_Num(&y_bar) <= 2)
                 osDelay(10);
             set_speed(0, 0, 0);
-            track_status(1, 1);
-            osDelay(500);
+            osDelay(Track_Time);
         }
     }
     else if (dir == 2)
@@ -380,8 +382,7 @@ void Comfirm_Online(int dir)
             while (Get_Trcker_Num(&y_bar) <= 2)
                 osDelay(10);
             set_speed(0, 0, 0);
-            track_status(1, 1);
-            osDelay(500);
+            osDelay(Track_Time);
         }
     }
     else if (dir == 3)
@@ -392,10 +393,11 @@ void Comfirm_Online(int dir)
             while (Get_Trcker_Num(&x_leftbar) <= 2 && Get_Trcker_Num(&x_rightbar) <= 2)
                 osDelay(10);
             set_speed(0, 0, 0);
-            track_status(1, 1);
-            osDelay(500);
+            osDelay(Track_Time);
         }
     }
+    track_status(1, 0);
+    track_status(1, 0);
 }
 void Wait_OKInf(int type, long wait_time)
 {
@@ -418,4 +420,5 @@ void Wait_OKInf(int type, long wait_time)
             osDelay(5);
         }
     }
+    osDelay(200);
 }

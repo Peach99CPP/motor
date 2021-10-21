@@ -76,3 +76,4 @@ motor\usmart_config.o: ..\TASK\read_status.h
 motor\usmart_config.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 motor\usmart_config.o: ..\Module\general.h
 motor\usmart_config.o: ..\Module\QR_code.h
+motor\usmart_config.o: ..\Driver\avoid_obs.h

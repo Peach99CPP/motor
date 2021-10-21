@@ -61,10 +61,8 @@ void Global_Debug(void)
     Set_InitYaw(0);
     HWSwitch_Move(1, 1);
     printf("定左侧完成\r\n");
-    MV_HW_Scan(1, 1, 1);
+    MV_HW_Scan(1, 2, 1);
     printf("条形完成\r\n");
-    move_by_encoder(2, -80);
-    Wait_OKInf(Encoder_Type, Wait_Dealy_MAX);
     Turn_angle(1, 180, 1);
     direct_move(2, 1, 0, 1);
     Wait_OKInf(Line_Type, Wait_Dealy_MAX);

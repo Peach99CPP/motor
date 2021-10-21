@@ -28,7 +28,7 @@ void start_avoid(void);
 void avoid_keep(void);
 void exit_avoid(void);
 
-void Wait_For_Avoid(void);
+void Wait_For_Avoid(int dir);
 extern uint16_t raw_data, distance;
 #endif
 

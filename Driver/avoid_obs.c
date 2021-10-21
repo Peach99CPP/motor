@@ -104,16 +104,31 @@ void start_avoid(void)
 }
 
 #define DISTANCE_THRESHOLD 0XDB
-void Wait_For_Avoid(void)
+#define AVOID_OBS_LOW_SPEED 120
+#include "chassis_control.h"
+
+//方向：1往左 2往右
+void Wait_For_Avoid(int dir)
 {
+    Comfirm_Online(dir);
     //蓝色半场的避障 经过初步测试
-    set_speed(0, 120, 0);
+    set_speed(0, AVOID_OBS_LOW_SPEED, 0);
     while (distance > 0XDB)
         osDelay(5);
+    set_speed(0, 0, 0);
+    osDelay(100);
     move_by_encoder(1, -15);
     Wait_OKInf(2, 5000);
     move_by_encoder(2, 70);
     Wait_OKInf(2, 5000);
     move_by_encoder(1, 15);
     Wait_OKInf(2, 5000);
+    if(dir ==1 )
+    {
+        Comfirm_Online(2);
+    }
+    else if(dir ==2)
+    {
+        Comfirm_Online(1);
+    }
 }
