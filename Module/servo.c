@@ -7,7 +7,8 @@ ServoControler_t servo_controler =
         .current_index = 0,
         .cmd_buffer = {0},
         .rec_buffer = {0},
-        .rec_index = 0};
+        .rec_index = 0 \
+        };
 
 bool if_up = false;
 void Set_IFUP(bool status)
@@ -324,13 +325,13 @@ void Baffle_Control(int up_dowm)
 {
     if (up_dowm) //ÉýÆð
     {
-        Action_Gruop(9, 1);                            //ÉýÆð
-       Wait_Servo_Signal(Wait_Time);
+        Action_Gruop(9, 1); //ÉýÆð
+        Wait_Servo_Signal(Wait_Time);
     }
     else
     {
         Action_Gruop(10, 1);
-       Wait_Servo_Signal(Wait_Time);
+        Wait_Servo_Signal(Wait_Time);
     }
 }
 
@@ -351,6 +352,6 @@ void Different_Dir(int if_left)
     else
     {
         Action_Gruop(10, 1);
-       Wait_Servo_Signal(Wait_Time);
+        Wait_Servo_Signal(Wait_Time);
     }
 }

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [motor\motor.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image motor\motor.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu Oct 21 19:51:38 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Sat Oct 30 18:36:56 2021
 <BR><P>
 <H3>Maximum Stack Usage =        380 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1898,7 +1898,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> chassis_control.o(.constdata)
 </UL>
-<P><STRONG><a name="[161]"></a>MV_Decode</STRONG> (Thumb, 264 bytes, Stack size 8 bytes, openmv.o(i.MV_Decode))
+<P><STRONG><a name="[161]"></a>MV_Decode</STRONG> (Thumb, 290 bytes, Stack size 8 bytes, openmv.o(i.MV_Decode))
 <BR><BR>[Stack]<UL><LI>Max Depth = 176 + Unknown Stack Size
 <LI>Call Chain = MV_Decode &rArr; Action_Gruop &rArr; Error_Report &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -2935,8 +2935,6 @@ Global Symbols
 <LI><a href="#[e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Wait_Servo_Signal
 <LI><a href="#[15c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OpenMV_ChangeRoi
 <LI><a href="#[19]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Set_InitYaw
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_scan
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_task
 <LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usmartscan
 <LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Wait_Switches
 <LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_HW_Scan
@@ -2959,6 +2957,8 @@ Global Symbols
 <LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Inf_Servo_Height
 <LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HeightUpdate_Task
 <LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_task
+<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_scan
+<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_task
 </UL>
 
 <P><STRONG><a name="[1b1]"></a>osKernelStart</STRONG> (Thumb, 10 bytes, Stack size 8 bytes, cmsis_os.o(i.osKernelStart))

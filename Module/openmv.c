@@ -14,13 +14,12 @@ int temp_ = 0;
 short mv_stop_flag = 0;
 mvrec_t mv_rec;
 mv_t MV =
-{
-    .mv_uart = &huart4,
-    .mv_cmd = {0},
-    .rec_buffer = {0},
-    .rec_len = 0,
-    .RX_Status = 0
-}; //初始化变量
+    {
+        .mv_uart = &huart4,
+        .mv_cmd = {0},
+        .rec_buffer = {0},
+        .rec_len = 0,
+        .RX_Status = 0}; //初始化变量
 
 /**********************************************************************
  * @Name    cmd_encode
@@ -167,6 +166,9 @@ void MV_Decode(void)
 #define pid_p 0.5
 #define Ball_Signal 0x01
 #define Rectangle_Signal 0x02
+#define BAR_Signal 0x11
+#define BAR_Action 12
+
     if (Get_Servo_Flag()) //空闲，可以接收指令 此时openmv和舵控都准备好执行指令
     {
         if (mv_rec.event == Ball_Signal)
@@ -223,6 +225,12 @@ void MV_Decode(void)
                     Set_IFUP(true);
                 }
             }
+        }
+        else if (mv_rec.event == BAR_Signal)
+        {
+            Disable_ServoFlag();
+            printf("条形平台拨球\r\n");
+            Action_Gruop(BAR_Action, 1);
         }
     }
 }
