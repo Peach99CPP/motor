@@ -28,11 +28,10 @@ int Os_RunningFlag = 0;
 void Startdebug(void const *argument)
 {
     Set_OSRunningFlag(true);
+    MV_Start();
     Start_Read_Switch();
     avoid_keep();
-    MV_Start();
     osDelay(100);
-    MV_SendCmd(3, 0);
 #if DUBUG_MOTOR == 1
     track_status(1, 0);
     track_status(2, 0);

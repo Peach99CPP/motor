@@ -531,9 +531,12 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
             osDelay(5); //避免开关卡死
         }
     dir5_Start_Symbol:
-        set_speed(VERTICAL, MIN_, 0);
+        
         while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
+        {
+            set_speed(VERTICAL, MIN_*0.5, 0);
             osDelay(5);
+        }
         set_speed(0, 0, 0);
         if (Get_Side_Switch(1) == off)
         {
@@ -590,12 +593,12 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
     Set_NeedUp(QR);       //禁止高度变换
     MV_Start();           //开启Openmv
     Disable_StopSignal(); //此时不会停车
-    osDelay(100);
+    osDelay(300);
     MV_SendCmd(2, color);
     Set_IMUStatus(imu_enable);
     if (dir == 5 || dir == 6)
     {
-        Action_Gruop(11, 1);
+        Action_Gruop(14, 1);
         Set_IFUP(true);
         Judge_Side(dir);
         Wait_Servo_Signal(5000);

@@ -207,15 +207,15 @@ void MV_Decode(void)
             switch (height)
             {
             case LowestHeight:
-                Action_Gruop(14, 1);
+                Action_Gruop(Lowest, 1);
                 temp_ += 1;
                 break;
             case MediumHeight:
-                Action_Gruop(15, 1);
+                Action_Gruop(Medium, 1);
                 temp_ += 1;
                 break;
             case HighestHeight:
-                Action_Gruop(16, 1);
+                Action_Gruop(Highest, 1);
                 temp_ += 1;
                 break;
             default:
@@ -228,9 +228,9 @@ void MV_Decode(void)
         }
         else if (mv_rec.event == BAR_Signal)
         {
-            Disable_ServoFlag();
+            Disable_ServoFlag();//只需要清除舵机标志位即可 不需要停车
             printf("条形平台拨球\r\n");
-            Action_Gruop(BAR_Action, 1);
+            Action_Gruop(BAR_Action, 1);//执行拨球动作组
         }
     }
 }
