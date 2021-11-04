@@ -10,16 +10,17 @@
 short Handle_Flag = 0;
 int mv_param;
 
-int temp_ = 0;
-short mv_stop_flag = 0;
-mvrec_t mv_rec;
-mv_t MV =
+int temp_ = 0;          //动作组计数器
+short mv_stop_flag = 0; //判断MV舵控的工作状态
+mvrec_t mv_rec;         // mv的结构体
+mv_t MV =               //为结构体赋初值
     {
         .mv_uart = &huart4,
         .mv_cmd = {0},
         .rec_buffer = {0},
         .rec_len = 0,
-        .RX_Status = 0}; //初始化变量
+        .RX_Status = 0 \
+        }; //初始化变量
 
 /**********************************************************************
  * @Name    cmd_encode
@@ -166,8 +167,14 @@ void MV_Decode(void)
 #define pid_p 0.5
 #define Ball_Signal 0x01
 #define Rectangle_Signal 0x02
+#define BAR_Signal 0x09
+#define BAR_Action 30
+
     if (Get_Servo_Flag()) //空闲，可以接收指令 此时openmv和舵控都准备好执行指令
     {
+        
+        if(mv_rec.event ==  BAR_Signal) 
+            printf("收到了条形平台的数据\r\n");
         if (mv_rec.event == Ball_Signal)
         {
             Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
@@ -197,22 +204,22 @@ void MV_Decode(void)
         }
         else if (mv_rec.event == Rectangle_Signal)
         {
-             Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-            Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
-            printf("扫到矩形\r\n");
+            Disable_ServoFlag();    //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+            Enable_StopSignal();    //使能停车信号，让动作那边执行停车操作
+            printf("扫到矩形\r\n"); //打印调试信息
             int height = Get_Height();
-            switch (height)
+            switch (height) //根据当前高度来执行不同的动作组
             {
             case LowestHeight:
-                Action_Gruop(14, 1);
+                Action_Gruop(Lowest, 1);
                 temp_ += 1;
                 break;
             case MediumHeight:
-                Action_Gruop(15, 1);
+                Action_Gruop(Medium, 1);
                 temp_ += 1;
                 break;
             case HighestHeight:
-                Action_Gruop(16, 1);
+                Action_Gruop(Highest, 1);
                 temp_ += 1;
                 break;
             default:
@@ -222,6 +229,13 @@ void MV_Decode(void)
                     Set_IFUP(true);
                 }
             }
+        }
+        else if (mv_rec.event == BAR_Signal) //自从修改爪子的形状之后  拨球的行为直接由舵控进行控制 因此需要对MV发回来的数据会进行解析处理
+        {
+            //主要区别在于此处不需要停车进行等待，所以只需清除舵控的标志位即可。
+            Disable_ServoFlag(); //只需要清除舵机标志位即可 不需要停车
+            printf("条形平台拨球\r\n");
+            Action_Gruop(BAR_Action, 1); //执行拨球动作组
         }
     }
 }

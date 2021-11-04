@@ -263,7 +263,7 @@ void Disable_ServoFlag(void)
 void Wait_Servo_Signal(long wait_time_num)
 {
     long temp_time = 100;
-    osDelay(temp_time);
+    osDelay(temp_time);//最小停留100ms 再看看后面有无停留需要
     while (Get_Servo_Flag() == false && temp_time < wait_time_num)
     {
         set_speed(0, 0, 0); //等待过程中是停车的

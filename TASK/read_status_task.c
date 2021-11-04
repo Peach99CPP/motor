@@ -71,7 +71,7 @@ int Return_AdverseID(int id)
         return 1; //避免出错，返回0容易引起数组越界 todo最好在此分支增加一个错误报告的打印数据
 }
 
-void Set_NeedUp(bool if_on)
+void Set_NeedUp(bool if_on)//在此处设置是否需要动态变换高度
 {
     QR_Brick = if_on;
 }
@@ -80,7 +80,7 @@ void Inf_Servo_Height(int now_height)
 {
     if (QR_Brick) //在复赛决赛部分需要
     {
-        set_speed(0, 0, 0);                 //先停车
+        set_speed(0, 0, 0);                 //先停车 todo  此处运行之后
         Wait_Servo_Signal(Wait_Servo_Done); //等待上一个命令完成
         if (now_height == LowestHeight)     //根据当前高度进行角度的更新操作
         {
@@ -565,7 +565,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
     dir6_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on) //为了多走一点路程，临时改为1号
         {
-            set_speed(VERTICAL, -MIN_ * 0.7, 0);
+            set_speed(VERTICAL*1.5, -MIN_*0.5, 0);
             osDelay(5);
         }
         set_speed(0, 0, 0);            //停车再说

@@ -53,3 +53,13 @@ motor\track_task.o: ..\Math\pid.h
 motor\track_task.o: ..\Driver\time_cnt.h
 motor\track_task.o: ..\Driver\time_cnt.h
 motor\track_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+motor\track_task.o: ..\Driver\uart_handle.h
+motor\track_task.o: ../Inc/usart.h
+motor\track_task.o: ..\Driver\motor.h
+motor\track_task.o: ..\Control\tim_control.h
+motor\track_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+motor\track_task.o: ..\Driver\motor.h
+motor\track_task.o: ..\Driver\uart_handle.h
+motor\track_task.o: ../Inc/tim.h
+motor\track_task.o: ..\Driver\delay.h
+motor\track_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

@@ -2,14 +2,23 @@
 #include "task.h"
 #include "cmsis_os.h"
 #include "track_bar_receive.h"
-void track_scan(void const * argument)
+#include "uart_handle.h"
+
+void track_scan(void const *argument)
 {
-    while(1)
+    static long counter = 0;
+    while (1)
     {
-        if(dma_count >0)
+        if (dma_count > 0)
         {
             track_decode();
         }
-          osDelay(1);
+        counter = counter > 65536 ? 0 : counter;
+        counter++;
+        if (counter % 100 == 0)
+        {
+            printf("%d\n", Get_Current_RowID());
+        }
+        osDelay(1);
     }
 }
