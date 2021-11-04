@@ -44,7 +44,6 @@ typedef struct
 {
     uint8_t rec_data[MAX_ROW_SIZE][MAX_TRACK_REC_SIZE];
     uint8_t current_index;
-    uint8_t rec_flag;
     uint8_t start_flag;
     uint8_t done_flag;
 } Track_RXRows_t;

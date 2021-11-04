@@ -35,7 +35,6 @@ pid_paramer_t track_pid_param = // pid参数
 Track_RXRows_t Track_Row =
     {
         .current_index = 0,
-        .rec_flag = 0,
         .done_flag = 0,
         .start_flag = 0,
         .rec_data = {0}};
@@ -98,13 +97,30 @@ int Get_EmptyRow_ID(int now_id)
  * @retval   : 装载了有效数据的下标
  * @author  peach99CPP
  ***********************************************************************/
-int Get_AvaibleRow_ID(void)
+int Get_AvaibleRow_ID(int now_row)
 {
-    for (uint8_t i = 0; i < MAX_ROW_SIZE; ++i)
+    //优先根据当前下标寻找
+    if (now_row == MAX_ROW_SIZE) //已经到达尽头
     {
-        if (Track_Row.rec_data[i][0] == 0X01)
+        now_row = 0;                                //那么下一个就是0
+        if (Track_Row.rec_data[now_row][0] == 0X01) //检查是否可用
+            return now_row;
+    }
+    else
+    {
+        //大部分数据
+        now_row += 1;                               //直接取下一位
+        if (Track_Row.rec_data[now_row][0] == 0X01) //判断是否已经装载了数据
+            return now_row;
+        else //上述方法未找到 被迫遍历
         {
-            return i;
+            for (uint8_t i = 0; i < MAX_ROW_SIZE; ++i) //从头遍历到尾
+            {
+                if (Track_Row.rec_data[i][0] == 0X01) //检查
+                {
+                    return i;
+                }
+            }
         }
     }
     return 0X01; //实在找不到了，随便返回一个，防止被卡死
@@ -196,10 +212,11 @@ void track_decode(void)
 #define MIN_NUM 2        //在压线之后，过线了才会计算一根线，根据灯的数量进行计数
 #define EDGE_VAL 7       //边缘数线状态下的循迹读回来的值
 
-    times_counts++; //总的处理次数，查看此 数据可以判断是否卡DMA
+    times_counts = times_counts> 65535?0:times_counts; //总的处理次数，查看此 数据可以判断是否卡DMA
     dma_count--;    //待处理数-1
     uint8_t led_num = 0;
-    uint8_t AVaiable_Row = Get_AvaibleRow_ID();
+    static uint8_t AVaiable_Row;
+    AVaiable_Row = Get_AvaibleRow_ID(AVaiable_Row);
     float track_value = 0, temp_val; //相关的变量声明
     if (AVaiable_Row != 0XFF)
     {

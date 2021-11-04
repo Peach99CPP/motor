@@ -3,7 +3,7 @@
 <title>Static Call Graph - [motor\motor.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image motor\motor.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu Nov 04 22:26:57 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu Nov 04 22:47:14 2021
 <BR><P>
 <H3>Maximum Stack Usage =        380 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -686,12 +686,12 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_synthetic_control
 <LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Report
 <LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_Decode
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_scan
 <LI><a href="#[1c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Global_Debug
 <LI><a href="#[1a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Turn_angle
 <LI><a href="#[1e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usmart_sys_cmd_exe
 <LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usmart_scan
 <LI><a href="#[1f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usmart_exe
+<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_scan
 </UL>
 
 <P><STRONG><a name="[c2]"></a>_printf_pre_padding</STRONG> (Thumb, 44 bytes, Stack size 16 bytes, _printf_pad.o(.text))
@@ -786,10 +786,10 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[167]"></a>__aeabi_memclr</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, rt_memclr.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Track_RX_IRQ
-<LI><a href="#[165]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_IRQ
-<LI><a href="#[e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_Uart_Send
+<BR><BR>[Called By]<UL><LI><a href="#[e6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_Uart_Send
 <LI><a href="#[17f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;QR_decode
+<LI><a href="#[18c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Track_RX_IRQ
+<LI><a href="#[165]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_IRQ
 <LI><a href="#[186]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Read_Switch
 <LI><a href="#[1d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_decode
 </UL>
@@ -1165,10 +1165,10 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = EncoderTask &rArr; vTaskDelete &rArr; prvDeleteTCB &rArr; vPortFree &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
-<LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_motor_data
 <LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_speed
 <LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskDelete
 <LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Limit_Speed
+<LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_motor_data
 <LI><a href="#[103]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_fabs
 <LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[100]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cdcmple
@@ -1213,7 +1213,7 @@ Global Symbols
 <LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;QR_Scan
 </UL>
 
-<P><STRONG><a name="[1d9]"></a>Get_AvaibleRow_ID</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, track_bar_receive.o(i.Get_AvaibleRow_ID))
+<P><STRONG><a name="[1d9]"></a>Get_AvaibleRow_ID</STRONG> (Thumb, 72 bytes, Stack size 0 bytes, track_bar_receive.o(i.Get_AvaibleRow_ID))
 <BR><BR>[Called By]<UL><LI><a href="#[1d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_decode
 </UL>
 
@@ -1283,8 +1283,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[19d]"></a>Get_Time_Period</STRONG> (Thumb, 64 bytes, Stack size 0 bytes, time_cnt.o(i.Get_Time_Period))
-<BR><BR>[Called By]<UL><LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_callback
-<LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_control
+<BR><BR>[Called By]<UL><LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_control
+<LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_callback
 </UL>
 
 <P><STRONG><a name="[fa]"></a>Get_Trcker_Num</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, track_bar_receive.o(i.Get_Trcker_Num))
@@ -1355,11 +1355,11 @@ Global Symbols
 <P><STRONG><a name="[134]"></a>HAL_GPIO_Init</STRONG> (Thumb, 484 bytes, Stack size 24 bytes, stm32f7xx_hal_gpio.o(i.HAL_GPIO_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = HAL_GPIO_Init
 </UL>
-<BR>[Called By]<UL><LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_callback
-<LI><a href="#[153]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
+<BR>[Called By]<UL><LI><a href="#[153]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
 <LI><a href="#[13f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_MspPostInit
 <LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IC_MspInit
 <LI><a href="#[16b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_GPIO_Init
+<LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_callback
 </UL>
 
 <P><STRONG><a name="[129]"></a>HAL_GPIO_ReadPin</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, stm32f7xx_hal_gpio.o(i.HAL_GPIO_ReadPin))
@@ -1392,8 +1392,8 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = HAL_Init &rArr; HAL_InitTick &rArr; HAL_TIM_Base_Init &rArr; HAL_TIM_Base_MspInit &rArr; HAL_NVIC_SetPriority &rArr; __NVIC_SetPriority
 </UL>
 <BR>[Calls]<UL><LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_NVIC_SetPriorityGrouping
-<LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_MspInit
 <LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_InitTick
+<LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_MspInit
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1435,13 +1435,13 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[117]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__NVIC_SetPriority
 <LI><a href="#[116]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__NVIC_GetPriorityGrouping
 </UL>
-<BR>[Called By]<UL><LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_MspInit
-<LI><a href="#[153]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
+<BR>[Called By]<UL><LI><a href="#[153]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
 <LI><a href="#[132]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IC_MspInit
 <LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_MspInit
 <LI><a href="#[16b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_GPIO_Init
 <LI><a href="#[105]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Time_Init
 <LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_InitTick
+<LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_MspInit
 </UL>
 
 <P><STRONG><a name="[111]"></a>HAL_NVIC_SetPriorityGrouping</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, stm32f7xx_hal_cortex.o(i.HAL_NVIC_SetPriorityGrouping))
@@ -2711,8 +2711,8 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = avoid_callback &rArr; distance_convert &rArr; __aeabi_dmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_Init
-<LI><a href="#[19d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Time_Period
 <LI><a href="#[19e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;distance_convert
+<LI><a href="#[19d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Time_Period
 </UL>
 <BR>[Called By]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI15_10_IRQHandler
 </UL>
@@ -2771,8 +2771,8 @@ Global Symbols
 <P><STRONG><a name="[fd]"></a>clear_motor_data</STRONG> (Thumb, 886 bytes, Stack size 8 bytes, motor.o(i.clear_motor_data))
 <BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = clear_motor_data &rArr; set_motor
 </UL>
-<BR>[Calls]<UL><LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_clear
-<LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_motor
+<BR>[Calls]<UL><LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_motor
+<LI><a href="#[1a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pid_clear
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EncoderTask
 </UL>
@@ -2899,9 +2899,9 @@ Global Symbols
 <P><STRONG><a name="[197]"></a>motor_init</STRONG> (Thumb, 396 bytes, Stack size 8 bytes, motor.o(i.motor_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = motor_init &rArr; HAL_TIM_IC_Start_IT &rArr; TIM_CCxChannelCmd
 </UL>
-<BR>[Calls]<UL><LI><a href="#[149]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
+<BR>[Calls]<UL><LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_motor
+<LI><a href="#[149]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_Start
 <LI><a href="#[135]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IC_Start_IT
-<LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_motor
 </UL>
 <BR>[Called By]<UL><LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USER_Init
 </UL>
@@ -2940,8 +2940,6 @@ Global Symbols
 <LI><a href="#[e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Wait_Servo_Signal
 <LI><a href="#[15c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OpenMV_ChangeRoi
 <LI><a href="#[19]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Set_InitYaw
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_scan
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_task
 <LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usmartscan
 <LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Wait_Switches
 <LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_HW_Scan
@@ -2964,6 +2962,8 @@ Global Symbols
 <LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Inf_Servo_Height
 <LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HeightUpdate_Task
 <LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;avoid_task
+<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_scan
+<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_task
 </UL>
 
 <P><STRONG><a name="[1b1]"></a>osKernelStart</STRONG> (Thumb, 10 bytes, Stack size 8 bytes, cmsis_os.o(i.osKernelStart))
@@ -3069,8 +3069,8 @@ Global Symbols
 <LI><a href="#[1d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;get_motor_channelA_ptr
 </UL>
 <BR>[Called By]<UL><LI><a href="#[197]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;motor_init
-<LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_motor_data
 <LI><a href="#[1a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;chassis_synthetic_control
+<LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;clear_motor_data
 </UL>
 
 <P><STRONG><a name="[b]"></a>set_speed</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, chassis.o(i.set_speed))
@@ -3098,8 +3098,8 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USER_Init
 </UL>
 
-<P><STRONG><a name="[1d8]"></a>track_decode</STRONG> (Thumb, 798 bytes, Stack size 24 bytes, track_bar_receive.o(i.track_decode))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = track_decode
+<P><STRONG><a name="[1d8]"></a>track_decode</STRONG> (Thumb, 842 bytes, Stack size 16 bytes, track_bar_receive.o(i.track_decode))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = track_decode
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_AvaibleRow_ID
 <LI><a href="#[167]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr
