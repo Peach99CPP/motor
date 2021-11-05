@@ -14,13 +14,12 @@ int temp_ = 0;          //动作组计数器
 short mv_stop_flag = 0; //判断MV舵控的工作状态
 mvrec_t mv_rec;         // mv的结构体
 mv_t MV =               //为结构体赋初值
-{
-    .mv_uart = &huart4,
-    .mv_cmd = {0},
-    .rec_buffer = {0},
-    .rec_len = 0,
-    .RX_Status = 0 \
-}; //初始化变量
+    {
+        .mv_uart = &huart4,
+        .mv_cmd = {0},
+        .rec_buffer = {0},
+        .rec_len = 0,
+        .RX_Status = 0}; //初始化变量
 
 /**********************************************************************
  * @Name    cmd_encode
@@ -169,10 +168,10 @@ void MV_Decode(void)
 #define Rectangle_Signal 0x02
 #define BAR_Signal 0x09
 #define BAR_Action 30
-
+#define MV_BACK 0x66
     if (Get_Servo_Flag()) //空闲，可以接收指令 此时openmv和舵控都准备好执行指令
     {
-        if(mv_rec.event ==  BAR_Signal)
+        if (mv_rec.event == BAR_Signal)
             printf("收到了条形平台的数据\r\n");
         if (mv_rec.event == Ball_Signal)
         {
@@ -235,6 +234,15 @@ void MV_Decode(void)
             Disable_ServoFlag(); //只需要清除舵机标志位即可 不需要停车
             printf("条形平台拨球\r\n");
             Action_Gruop(BAR_Action, 1); //执行拨球动作组
+        }
+        else if (mv_rec.event == MV_BACK)
+        {
+            if (mv_rec.param == 1)
+                printf("MV开始球\r\n");
+            else if (mv_rec.param == 2)
+                printf("MV开始矩形\r\n");
+            else if (mv_rec.param == 3)
+                printf("MV开始条形\r\n");
         }
     }
 }

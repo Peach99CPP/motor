@@ -17,6 +17,7 @@ motor\read_status_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/que
 motor\read_status_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 motor\read_status_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 motor\read_status_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+motor\read_status_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\read_status_task.o: ../Inc/main.h
 motor\read_status_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h
 motor\read_status_task.o: ../Inc/stm32f7xx_hal_conf.h
@@ -50,7 +51,6 @@ motor\read_status_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_
 motor\read_status_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 motor\read_status_task.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
 motor\read_status_task.o: ..\Driver\chassis.h
-motor\read_status_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 motor\read_status_task.o: ..\Driver\motor.h
 motor\read_status_task.o: ..\Control\tim_control.h
 motor\read_status_task.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

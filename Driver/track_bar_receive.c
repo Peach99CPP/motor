@@ -212,7 +212,7 @@ void track_decode(void)
 #define MIN_NUM 2        //在压线之后，过线了才会计算一根线，根据灯的数量进行计数
 #define EDGE_VAL 7       //边缘数线状态下的循迹读回来的值
 
-    times_counts = times_counts> 65535?0:times_counts; //总的处理次数，查看此 数据可以判断是否卡DMA
+    times_counts ++; //总的处理次数，查看此 数据可以判断是否卡DMA
     dma_count--;    //待处理数-1
     uint8_t led_num = 0;
     static uint8_t AVaiable_Row;

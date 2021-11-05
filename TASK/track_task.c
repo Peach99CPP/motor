@@ -15,10 +15,6 @@ void track_scan(void const *argument)
         }
         counter = counter > 65536 ? 0 : counter;
         counter++;
-        if (counter % 100 == 0)
-        {
-            printf("%d\n", Get_Current_RowID());
-        }
         osDelay(1);
     }
 }
