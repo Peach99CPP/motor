@@ -261,13 +261,16 @@ void HeightUpdate_Task(void const *argument)
                     Height_id = 1; // todo 此处需要检查下，因为一开始使用了临时的红外编号
                     Current_Height = HighestHeight;
                     Inf_Servo_Height(Current_Height);
+                    printf("\n************到达中间高度***************\n");
                 }
                 if (Height_Flag == 1 && Get_Servo_Flag() == true)
                 {
                     if (Get_Height_Switch(Height_id) == off)
                     {
                         Current_Height = LowestHeight;
+                        Height_Flag = 2;
                         Inf_Servo_Height(Current_Height);
+                        printf("\n************到达末端高度***************\n");
                     }
                     //以下在接收端经不被处理
                     if (Get_Height_Switch(2) == on && temp_roi_chnage_flag == 1)
