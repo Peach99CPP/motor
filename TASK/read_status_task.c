@@ -41,6 +41,8 @@ short HW_Switch[10];    //红外开关的状态
 int MIN_ = 60;
 int VERTICAL = 10;
 
+bool update_finish = true;
+
 #define Wait_Servo_Done 20000 //等待动作组完成的最大等待时间
 
 #define SWITCH(x) swicth_status[(x)-1] //为了直观判断开关编号
@@ -50,17 +52,81 @@ int VERTICAL = 10;
 
 #define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7
 
+/**********************************************************************
+ * @Name    Get_Update_Result
+ * @declaration :获取高度更新的结果
+ * @param   None
+ * @retval   : 是否更新完成
+ * @author  peach99CPP
+ ***********************************************************************/
+bool Get_Update_Result(void)
+{
+    return update_finish;
+}
+
+/**********************************************************************
+ * @Name    Set_Update_Status
+ * @declaration : 设置高度更新值
+ * @param   status: [输入/出]  设置后的状态
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
+void Set_Update_Status(bool status)
+{
+    update_finish = status;
+}
+
+/**********************************************************************
+ * @Name    Wait_Update_finish
+ * @declaration : 等待更新结束 用这个卡住任务 否则不会停车
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
+void Wait_Update_finish(void)
+{
+    while (Get_Update_Result() != true)
+    {
+        set_speed(0, 0, 0);
+        osDelay(1);
+    }
+}
+
+/**********************************************************************
+ * @Name    Set_NeedUp
+ * @declaration : 设置是否为二维码模式
+ * @param   if_on: [输入/出] 是或否
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
+void Set_NeedUp(bool if_on) //在此处设置是否需要动态变换高度
+{
+    QR_Brick = if_on;
+}
+/**********************************************************************
+ * @Name    Return_IFQR
+ * @declaration : 返回是否处于二维码工作模式
+ * @param   None
+ * @retval   : true则为二维码模式
+ * @author  peach99CPP
+ ***********************************************************************/
 bool Return_IFQR(void)
 {
     return QR_Brick;
 }
 
+/**********************************************************************
+ * @Name    QR_Mode_Height
+ * @declaration : 在二维码模式下执行高度变换
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 void QR_Mode_Height(void)
 {
     if (Return_IFQR())
     {
-        Inf_Servo_Height(Get_Height());//根据高度执行动作组
-        Wait_Servo_Signal(Wait_Servo_Done);//等待信号
+        Inf_Servo_Height(Get_Height()); //根据高度执行动作组
     }
 }
 /**********************************************************************
@@ -84,25 +150,25 @@ int Return_AdverseID(int id)
         return 1; //避免出错，返回0容易引起数组越界 todo最好在此分支增加一个错误报告的打印数据
 }
 
-void Set_NeedUp(bool if_on) //在此处设置是否需要动态变换高度
-{
-    QR_Brick = if_on;
-}
-
 void Inf_Servo_Height(int now_height)
 {
     if (Return_IFQR()) //在复赛决赛部分需要
     {
+        Set_Update_Status(false);
         set_speed(0, 0, 0);                 //先停车 todo  此处运行之后
         Wait_Servo_Signal(Wait_Servo_Done); //等待上一个命令完成
-        if (now_height == LowestHeight)     //根据当前高度进行角度的更新操作
-            Action_Gruop(toLowest, 1);      //运行动作组
+        printf("\n上一个动作组已经结束，开始变高度\n");
+        if (now_height == LowestHeight) //根据当前高度进行角度的更新操作
+            Action_Gruop(toLowest, 1);  //运行动作组
         else if (now_height == MediumHeight)
             Action_Gruop(toMedium, 1);
         else if (now_height == HighestHeight)
             Action_Gruop(toHighest, 1);
         else
-            osDelay(100); //初始状态 
+            osDelay(100);                   //初始状态
+        Wait_Servo_Signal(Wait_Servo_Done); //等待信号
+        printf("高度变换完成\r\n");
+        Set_Update_Status(true);
     }
 }
 /**********************************************************************
@@ -138,7 +204,7 @@ void Start_HeightUpdate(void)
     {
         Height_task_exit = 0;
         Height_Flag = 0;
-        osThreadDef(Height_UpadteTask, HeightUpdate_Task, osPriorityNormal, 0, 256);
+        osThreadDef(Height_UpadteTask, HeightUpdate_Task, osPriorityHigh, 0, 256);
         Height_UpadteTask = osThreadCreate(osThread(Height_UpadteTask), NULL);
     }
 }
@@ -167,6 +233,7 @@ void HeightUpdate_Task(void const *argument)
                 {
                     Height_Flag = 1;
                     Current_Height = HighestHeight;
+                    printf("\n************到达中间高度***************\n");
                     Inf_Servo_Height(Current_Height);
                 }
                 if (Height_Flag == 1 && Get_Servo_Flag() == true)
@@ -174,6 +241,8 @@ void HeightUpdate_Task(void const *argument)
                     if (Get_Height_Switch(Height_id) == off)
                     {
                         Current_Height = MediumHeight;
+                        Height_Flag = 2;
+                        printf("\n************到达末端高度***************\n");
                         Inf_Servo_Height(Current_Height);
                     }
                 }
@@ -182,7 +251,7 @@ void HeightUpdate_Task(void const *argument)
         }
         else if (Current_Height == MediumHeight)
         {
-            Height_id = 2; // todo临时修改
+            Height_id = 1; // todo临时修改
             OpenMV_ChangeRoi(1);
             while (!Height_task_exit)
             {
@@ -597,7 +666,8 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
 
 void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
 {
-    Set_NeedUp(QR);            //禁止高度变换
+    Set_NeedUp(QR); //高度变换开启与关闭
+    QR_Mode_Init(QR, (QRcolor_t)color);
     MV_Start();                //开启Openmv
     Disable_StopSignal();      //此时不会停车
     osDelay(300);              //等待处理缓冲数据
@@ -619,9 +689,12 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
                 osDelay(5); //避免开关卡死
             }
         dir5_Start_Symbol:
-            set_speed(VERTICAL, MIN_, 0);
-            while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
+
+            while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on && Get_Update_Result())
+            {
+                set_speed(VERTICAL, MIN_, 0);
                 osDelay(5);
+            }
             set_speed(0, 0, 0);
             if (Get_Side_Switch(1) == off)
             {
@@ -631,6 +704,12 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
                 MV_Stop(); //停止处理响应
                 Wait_Servo_Signal(Wait_Servo_Done);
                 return;
+            }
+            else if (Get_Update_Result() == false)
+            {
+                Wait_Update_finish();
+                osDelay(100);
+                goto dir5_Start_Symbol; //回到开头位置
             }
             else
             {
@@ -649,7 +728,7 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
                 osDelay(5); //避免开关卡死
             }
         dir6_Start_Symbol:
-            while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on) //为了多走一点路程，临时改为1号
+            while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on && Get_Update_Result()) //为了多走一点路程，临时改为1号
             {
                 set_speed(VERTICAL, -MIN_ * 0.7, 0);
                 osDelay(5);
@@ -663,6 +742,12 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
                 MV_Stop();            //停止处理响应
                 Wait_Servo_Signal(Wait_Servo_Done);
                 return; //退出
+            }
+            else if (Get_Update_Result() == false)
+            {
+                Wait_Update_finish();
+                osDelay(100);
+                goto dir6_Start_Symbol; //回到开头位置
             }
             else
             {
@@ -964,7 +1049,7 @@ void QR_Scan(int status, int color, int dir, int enable_imu)
     {
         Set_QR_Status(true);                                    //在这里设置mv和二维码的工作状态
         Set_IMUStatus(enable_imu);                              //经测试，有陀螺仪时容易导致卡死
-        Set_QR_Target(color);                                   //设置要抓的颜色
+        Set_QR_Target((QRcolor_t)color);                        //设置要抓的颜色
         Judge_Side(dir);                                        //根据颜色判断起始高度
         Action_Gruop(11, 1);                                    //升起爪子
         while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值

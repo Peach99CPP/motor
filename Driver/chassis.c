@@ -28,12 +28,12 @@ void w_speed_set(float w_speed)
 }
 
 /**********************************************************************
-  * @Name    get_chassis_speed
-  * @declaration : get dir speed
-  * @param   dir: [输入/出] direct char
-  * @retval   : specify direct speed
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    get_chassis_speed
+ * @declaration : get dir speed
+ * @param   dir: [输入/出] direct char
+ * @retval   : specify direct speed
+ * @author  peach99CPP
+ ***********************************************************************/
 
 float get_chassis_speed(char dir)
 {
@@ -53,15 +53,15 @@ float get_chassis_speed(char dir)
         return 0;
 }
 /**********************************************************************
-  * @Name    set_speed
-  * @brief     直接修改器底盘的速度值
-  * @param   x: [输入/出]  x方向速度
-**			 y: [输入/出]  y方向速度
-**			 w: [输入/出]  w方向速度
-  * @retval  void
-  * @author  peach99CPP
-  * @Data    2021-08-06
-***********************************************************************/
+ * @Name    set_speed
+ * @brief     直接修改器底盘的速度值
+ * @param   x: [输入/出]  x方向速度
+ **			 y: [输入/出]  y方向速度
+ **			 w: [输入/出]  w方向速度
+ * @retval  void
+ * @author  peach99CPP
+ * @Data    2021-08-06
+ ***********************************************************************/
 void set_speed(int x, int y, int w)
 {
     if (chassis.enable_switch) //只有当底盘的使能开关被打开时才允许进行操作
@@ -73,26 +73,26 @@ void set_speed(int x, int y, int w)
 }
 
 /************************************************************
-*@name:set_chassis_status
-*@function:底盘使能开关
-*@param:状态，bool值
-*@return:无
-**************************************************************/
+ *@name:set_chassis_status
+ *@function:底盘使能开关
+ *@param:状态，bool值
+ *@return:无
+ **************************************************************/
 void set_chassis_status(bool status)
 {
     chassis.enable_switch = status;
 }
 
 /**********************************************************************
-  * @Name    speed_variation
-  * @brief  对外提供速度修改的接口
-  * @param   x_var: [输入/出] x方向速度的改变量
-**			 y_var: [输入/出] y方向速度的改变量
-**			 w_var: [输入/出] w方向速度的改变量
-  * @retval  void
-  * @author  peach99CPP
-  * @Data    2021-08-06
-***********************************************************************/
+ * @Name    speed_variation
+ * @brief  对外提供速度修改的接口
+ * @param   x_var: [输入/出] x方向速度的改变量
+ **			 y_var: [输入/出] y方向速度的改变量
+ **			 w_var: [输入/出] w方向速度的改变量
+ * @retval  void
+ * @author  peach99CPP
+ * @Data    2021-08-06
+ ***********************************************************************/
 
 void speed_variation(float x_var, float y_var, float w_var)
 {
@@ -105,11 +105,11 @@ void speed_variation(float x_var, float y_var, float w_var)
 }
 
 /************************************************************
-*@name:chassis_synthetic_control
-*@function:底盘的综合控制函数，包含多种控制
-*@param:无
-*@return:无
-**************************************************************/
+ *@name:chassis_synthetic_control
+ *@function:底盘的综合控制函数，包含多种控制
+ *@param:无
+ *@return:无
+ **************************************************************/
 void chassis_synthetic_control(void)
 {
     static float x, y, w, factor;
@@ -178,12 +178,12 @@ void chassis_synthetic_control(void)
     for (i = 1; i <= 4; ++i)
     {
         /*
-        *对电机进行遍历
-        *首先获取转速期待值
-        *读取编码器参数
-        *传入PID计算函数得到计算值,以返回值形式传参
-        *由计算值控制电机
-        */
+         *对电机进行遍历
+         *首先获取转速期待值
+         *读取编码器参数
+         *传入PID计算函数得到计算值,以返回值形式传参
+         *由计算值控制电机
+         */
         motor_data[i].expect = motor_target[i];
         motor_data[i].feedback = read_encoder(i);
         control_val[i] = pid_control(&motor_data[i], &motor_param);
@@ -199,5 +199,36 @@ void chassis_synthetic_control(void)
                motor_data[debug_motor_id].control_output, motor_data[debug_motor_id].integrate);
         //        printf("%.2f  %.2f %.2f %.2f ",motor_data[1].feedback,motor_data[2].feedback,motor_data[3].feedback,motor_data[4].feedback);
         printf("\r\n");
+    }
+}
+int Get_X_speed(void)
+{
+    return chassis.x_speed;
+}
+int Get_Y_speed(void)
+{
+    return chassis.y_speed;
+}
+int Get_W_speed(void)
+{
+    return chassis.w_speed;
+}
+void Set_Dir_Speed(char dir, int speed)
+{
+    switch (dir)
+    {
+    case 'x':
+    case 'X':
+        set_speed(speed, Get_Y_speed(), Get_W_speed()) ;
+        break;
+    case 'y':
+    case 'Y':
+        set_speed(Get_X_speed(), speed, Get_W_speed());
+        break;
+    case 'w':
+    case 'W':
+        set_speed(Get_X_speed(), Get_Y_speed(), speed);
+        break;
+    default:;
     }
 }

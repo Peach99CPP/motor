@@ -312,14 +312,14 @@ void Track_RX_IRQ(void)
         rec_data = TRACK_UART.Instance->RDR; //获取数据内容
         if (Track_Row.done_flag == 0)        //未接收完成
         {
-
+            
             if (rec_data == START_BYTE && Track_Row.start_flag == 0) //接收到首字节
             {
                 Track_Row.current_index = 0; //重置下标 准备接收
                 Track_Row.start_flag = 1;    //设置标志位
                 return;                      //后面的判断于此无关 直接退出
             }
-            if (Track_Row.start_flag == 1 && rec_data == END_BYTE && Track_Row.current_index == 7) //接收到末尾字节
+            if (Track_Row.start_flag == 1 && rec_data == END_BYTE && Track_Row.current_index >= 7) //接收到末尾字节
             {
                 now_id = Get_EmptyRow_ID(now_id); //更新装载对象的下标
                 Track_Row.done_flag = 1;          //标志接收完成

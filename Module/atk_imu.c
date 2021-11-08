@@ -1,3 +1,4 @@
+
 #include "atk_imu.h"
 #include "delay.h"
 
@@ -23,8 +24,8 @@ const uint16_t gyroFsrTable[4] = {250, 500, 1000, 2000};
 const uint8_t accFsrTable[4] = {2, 4, 8, 16};
 
 /**
-  * @brief  接收串口数据解包流程
-  */
+ * @brief  接收串口数据解包流程
+ */
 static enum { waitForStartByte1,
               waitForStartByte2,
               waitForMsgID,
@@ -34,11 +35,11 @@ static enum { waitForStartByte1,
 } rxState = waitForStartByte1;
 
 /**
-  * @brief  imu901模块串口数据解析（串口接收的每一个数据需传入处理）
-  *	@note	此函数需要实时调用
-  * @param  ch: 串口接收的单个数据
-  * @retval uint8_t: 0 无包 1 有效包
-  */
+ * @brief  imu901模块串口数据解析（串口接收的每一个数据需传入处理）
+ *	@note	此函数需要实时调用
+ * @param  ch: 串口接收的单个数据
+ * @retval uint8_t: 0 无包 1 有效包
+ */
 uint8_t imu901_unpack(uint8_t ch)
 {
     static uint8_t cksum = 0, dataIndex = 0;
@@ -126,10 +127,10 @@ uint8_t imu901_unpack(uint8_t ch)
 }
 
 /**
-  * @brief  ATKP数据包解析
-  * @param  packet: atkp数据包
-  * @retval None
-  */
+ * @brief  ATKP数据包解析
+ * @param  packet: atkp数据包
+ * @retval None
+ */
 void atkpParsing(atkp_t *packet)
 {
     /* 姿态角 */
@@ -218,12 +219,12 @@ void atkpParsing(atkp_t *packet)
 
 #ifdef REG_Action
 /**
-  * @brief  写寄存器
-  * @param  reg: 寄存器列表地址
-  * @param  data: 数据
-  * @param  datalen: 数据的长度只能是 1或2
-  * @retval None
-  */
+ * @brief  写寄存器
+ * @param  reg: 寄存器列表地址
+ * @param  data: 数据
+ * @param  datalen: 数据的长度只能是 1或2
+ * @retval None
+ */
 void atkpWriteReg(enum regTable reg, uint16_t data, uint8_t datalen)
 {
     uint8_t buf[7];
@@ -248,10 +249,10 @@ void atkpWriteReg(enum regTable reg, uint16_t data, uint8_t datalen)
 }
 
 /**
-  * @brief  发送读寄存器命令
-  * @param  reg: 寄存器列表地址
-  * @retval None
-  */
+ * @brief  发送读寄存器命令
+ * @param  reg: 寄存器列表地址
+ * @retval None
+ */
 static void atkpReadRegSend(enum regTable reg)
 {
     uint8_t buf[7];
@@ -266,11 +267,11 @@ static void atkpReadRegSend(enum regTable reg)
 }
 
 /**
-  * @brief  读寄存器
-  * @param  reg: 寄存器地址
-  * @param  data: 读取到的数据
-  * @retval uint8_t: 0读取失败（超时） 1读取成功
-  */
+ * @brief  读寄存器
+ * @param  reg: 寄存器地址
+ * @param  data: 读取到的数据
+ * @retval uint8_t: 0读取失败（超时） 1读取成功
+ */
 uint8_t atkpReadReg(enum regTable reg, int16_t *data)
 {
     uint8_t ch;
@@ -312,18 +313,18 @@ uint8_t atkpReadReg(enum regTable reg, int16_t *data)
 
 #endif
 /**
-  * @brief  模块初始化
-  * @param  None
-  * @retval None
-  */
+ * @brief  模块初始化
+ * @param  None
+ * @retval None
+ */
 void imu901_init(void)
 {
     ;
     /**
-      *	 写入寄存器参数（测试）
-      *	 这里提供写入引用例子，用户可以在这写入一些默认参数，
-      *  如陀螺仪加速度量程、带宽、回传速率、PWM输出等。
-      */
+     *	 写入寄存器参数（测试）
+     *	 这里提供写入引用例子，用户可以在这写入一些默认参数，
+     *  如陀螺仪加速度量程、带宽、回传速率、PWM输出等。
+     */
 #ifdef REG_Action
     int16_t data;
     atkpWriteReg(REG_GYROFSR, 3, 1);
@@ -344,21 +345,25 @@ void imu901_init(void)
     imu901Param.accBW = data;
 #endif
 }
+//使用ATK_601时  以上内容无需修改
 
 /***********************自行编写的函数*************************************/
-#include "imu_pid.h"
-extern int if_OsRunning(void);
-#define ABS(X) (((X) > 0) ? (X) : -(X))
+#include "imu_pid.h"                    //数据的运用
+extern int if_OsRunning(void);          //用于获取系统运行状态
+#define ABS(X) (((X) > 0) ? (X) : -(X)) //宏定义实现绝对值
+uint32_t *reg_ptr;                      //数据寄存器指针
 
+#define HAL 1
+#define STD 1
 ATK_IMU_t imu =
     {
         /*移植时只需要修改以下结构体变量即可*/
 
         .imu_uart = &huart2,        //串口号
         .yaw_ptr = &(attitude.yaw), //解析出来的原始数据的指针
-        .target_angle = 0,          //pid的目标角度
+        .target_angle = 0,          // pid的目标角度
         .init_angle = 0,            //初始化角度，补偿上电时的初始角度
-        .enable_switch = 1,               //使能开关
+        .enable_switch = 1,         //使能开关
         .get_angle = Get_Yaw        //函数指针，返回经过限幅和相对0的角度
 };
 
@@ -366,6 +371,7 @@ ATK_IMU_t imu =
 #define INIT_TIMES 100
 
 #define BUFFER_SIZE 11
+
 uint8_t imu_cmd[12];
 
 void Set_IMUStatus(int status)
@@ -374,12 +380,12 @@ void Set_IMUStatus(int status)
 }
 
 /**********************************************************************
-  * @Name    IMU_IRQ
-  * @declaration :陀螺仪的中断处理函数，处理DMA收到的数据,在DMA 开启的情况下，放在HAL_UART_RxCpltCallback中
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    IMU_IRQ
+ * @declaration :陀螺仪的中断处理函数，处理DMA收到的数据,在DMA 开启的情况下，放在HAL_UART_RxCpltCallback中
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 
 void IMU_IRQ(void)
 {
@@ -390,12 +396,12 @@ void IMU_IRQ(void)
 }
 
 /**********************************************************************
-  * @Name    ATK_IMU_Init
-  * @declaration : 初始化陀螺仪，开启传输，获取补偿角
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    ATK_IMU_Init
+ * @declaration : 初始化陀螺仪，开启传输，获取补偿角
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 
 void ATK_IMU_Init(void)
 {
@@ -404,18 +410,18 @@ void ATK_IMU_Init(void)
 }
 
 /**********************************************************************
-  * @Name    Set_InitYaw
-  * @declaration : 设置当前角度为xx度
-  * @param   target: [输入/出]  想设置的角度值
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Set_InitYaw
+ * @declaration : 设置当前角度为xx度
+ * @param   target: [输入/出]  想设置的角度值
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 void Set_InitYaw(int target)
 {
-    bool os_running =0;
+    bool os_running = 0;
     Set_IMUStatus(false); //先把陀螺仪关掉，否则容易在修改过程中异常
-    if(if_OsRunning()) 
-    os_running = 1;
+    if (if_OsRunning())
+        os_running = 1;
     imu.target_angle = angle_limit(target); //同步修改
 
     float last_yaw, current_yaw;
@@ -431,9 +437,11 @@ void Set_InitYaw(int target)
         //更新数值
         last_yaw = current_yaw;
         current_yaw = *imu.yaw_ptr;
-        //10ms一次查询,根据系统运行结果执行延时函数。系统未运行时使用阻塞式，系统运行时使用系统的延时函数
-        if(os_running) osDelay(10);
-        else HAL_Delay(10);
+        // 10ms一次查询,根据系统运行结果执行延时函数。系统未运行时使用阻塞式，系统运行时使用系统的延时函数
+        if (os_running)
+            osDelay(10);
+        else
+            HAL_Delay(10);
     }
     //陀螺仪稳定，开始获取数据
     imu.init_angle = angle_limit(-angle_limit(current_yaw) + angle_limit(target));
@@ -442,12 +450,12 @@ void Set_InitYaw(int target)
 }
 
 /**********************************************************************
-  * @Name    Get_Yaw
-  * @declaration :获取经过限幅的相对于上电位置的Yaw角
-  * @param   None
-  * @retval   : 无
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Get_Yaw
+ * @declaration :获取经过限幅的相对于上电位置的Yaw角
+ * @param   None
+ * @retval   : 无
+ * @author  peach99CPP
+ ***********************************************************************/
 
 float Get_Yaw(void)
 {
@@ -456,12 +464,12 @@ float Get_Yaw(void)
 }
 
 /**********************************************************************
-  * @Name    angle_limit
-  * @declaration :
-  * @param   angle: [输入/出]
-  * @retval   :
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    angle_limit
+ * @declaration :
+ * @param   angle: [输入/出]
+ * @retval   :
+ * @author  peach99CPP
+ ***********************************************************************/
 
 float angle_limit(float angle)
 {
@@ -477,12 +485,12 @@ limit_label:
 }
 
 /**********************************************************************
-  * @Name    Get_IMUStatus
-  * @declaration : 获取陀螺仪使能状态的接口
-  * @param   None
-  * @retval   : 陀螺仪使能状态
-  * @author  peach99CPP
-***********************************************************************/
+ * @Name    Get_IMUStatus
+ * @declaration : 获取陀螺仪使能状态的接口
+ * @param   None
+ * @retval   : 陀螺仪使能状态
+ * @author  peach99CPP
+ ***********************************************************************/
 int Get_IMUStatus(void)
 {
     return imu.enable_switch;
