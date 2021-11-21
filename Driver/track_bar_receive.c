@@ -34,6 +34,7 @@ pid_paramer_t track_pid_param = // pid参数
 //初始化结构体
 Track_RXRows_t Track_Row =
     {
+        .track_uart = &huart6,
         .current_index = 0,
         .done_flag = 0,
         .start_flag = 0,
@@ -174,7 +175,7 @@ void track_bar_init(void) //相关的初始化函数
     x_rightbar.line_num = 0;
     x_rightbar.data.expect = 0;
     x_rightbar.if_switch = true;
-    __HAL_UART_ENABLE_IT(&TRACK_UART, UART_IT_RXNE);
+    __HAL_UART_ENABLE_IT(Track_Row.track_uart, UART_IT_RXNE);
 }
 
 /**********************************************************************
@@ -307,9 +308,9 @@ void track_decode(void)
 void Track_RX_IRQ(void)
 {
 
-    if (__HAL_UART_GET_IT(&TRACK_UART, UART_IT_RXNE)) //接收到数据
+    if (__HAL_UART_GET_IT(Track_Row.track_uart, UART_IT_RXNE)) //接收到数据
     {
-        rec_data = TRACK_UART.Instance->RDR; //获取数据内容
+        rec_data = Track_Row.track_uart->Instance->RDR; //获取数据内容
         if (Track_Row.done_flag == 0)        //未接收完成
         {
             

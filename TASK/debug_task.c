@@ -24,7 +24,7 @@ void Set_OSRunningFlag(int status);
 #define Encoder_Type 2
 // todo 在这里定义红蓝半场
 int Os_RunningFlag = 0;
-
+uint8_t cmd[3]={0xff,0x00,0x99};
 void Startdebug(void const *argument)
 {
     Set_OSRunningFlag(true);

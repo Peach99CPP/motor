@@ -42,6 +42,7 @@ typedef struct
 
 typedef struct
 {
+    UART_HandleTypeDef* track_uart;
     uint8_t rec_data[MAX_ROW_SIZE][MAX_TRACK_REC_SIZE];
     uint8_t current_index;
     uint8_t start_flag;
