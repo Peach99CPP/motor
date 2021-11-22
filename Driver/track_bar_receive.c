@@ -19,9 +19,8 @@ int dma_count, times_counts = 0;
 float track_weight[8] = {4, 3, 2, 1,
                          -1, -2, -3, -4};
 
-uint8_t track_dma[MAX_LINE][BUFF_SIZE] = {0}, dma_trans_pos = 0; // DMA接收的数组
-uint8_t rec_data, now_id = 0;                                    //这两个变量在接收中断中使用
-trackbar_t y_bar, x_leftbar, x_rightbar;                         //三个寻迹板结构体变量
+uint8_t rec_data, now_id = 0;            //这两个变量在接收中断中使用
+trackbar_t y_bar, x_leftbar, x_rightbar; //三个寻迹板结构体变量
 //初始化PID参数
 pid_paramer_t track_pid_param = // pid参数
     {
@@ -40,6 +39,11 @@ Track_RXRows_t Track_Row =
         .start_flag = 0,
         .rec_data = {0}};
 
+void Update_TRckerCounter(void)
+{
+    times_counts = times_counts > 32758 ? 0 : times_counts + 1;
+    dma_count--;
+}
 /**********************************************************************
  * @Name    Clear_Line
  * @declaration : 清除结构体的标志位
@@ -153,7 +157,6 @@ void set_track_pid(int kp, int ki, int kd)
 void track_bar_init(void) //相关的初始化函数
 {
     dma_count = 0;
-    dma_trans_pos = 0;
     //变量参数的初始化
     y_bar.id = forward_bar; //标注身份
     y_bar.line_num = 0;
@@ -179,26 +182,6 @@ void track_bar_init(void) //相关的初始化函数
 }
 
 /**********************************************************************
- * @Name    get_avaiable_pos
- * @declaration : 获取可用的数组下标
- * @param   None
- * @retval   : 无
- * @author  peach99CPP
- ***********************************************************************/
-uint8_t get_avaiable_pos(void)
-{
-    //新版本
-    for (uint8_t i = 0; i < MAX_LINE; ++i) //遍历数组index
-    {
-        if (track_dma[i][0] == START_BYTE && track_dma[i][BUFF_SIZE - 1] == END_BYTE) //满足协议设计
-        {
-            return i;
-        }
-    }
-    return 0X01; //一个都找不到，返回特殊值，在调用时判断返回值非错误值可以减少出错的可能
-}
-
-/**********************************************************************
  * @Name    track_decode
  * @declaration :对DMA收到的数据进行解码计算，实现循迹各项功能的核心代码
  * @param   None
@@ -213,12 +196,11 @@ void track_decode(void)
 #define MIN_NUM 2        //在压线之后，过线了才会计算一根线，根据灯的数量进行计数
 #define EDGE_VAL 7       //边缘数线状态下的循迹读回来的值
 
-    times_counts ++; //总的处理次数，查看此 数据可以判断是否卡DMA
-    dma_count--;    //待处理数-1
-    uint8_t led_num = 0;
-    static uint8_t AVaiable_Row;
-    AVaiable_Row = Get_AvaibleRow_ID(AVaiable_Row);
-    float track_value = 0, temp_val; //相关的变量声明
+    Update_TRckerCounter();                         //更新相关的计数器
+    static uint8_t led_num = 0;                     //计算灯数量的变量
+    static uint8_t AVaiable_Row;                    //可用的下标
+    AVaiable_Row = Get_AvaibleRow_ID(AVaiable_Row); //进行位置更新
+    float track_value = 0, temp_val;                //相关的变量声明
     if (AVaiable_Row != 0XFF)
     {
         //下面的和检验看情况开启
@@ -311,31 +293,34 @@ void Track_RX_IRQ(void)
     if (__HAL_UART_GET_IT(Track_Row.track_uart, UART_IT_RXNE)) //接收到数据
     {
         rec_data = Track_Row.track_uart->Instance->RDR; //获取数据内容
-        if (Track_Row.done_flag == 0)        //未接收完成
+        if (Track_Row.done_flag == 0)                   //未接收完成
         {
-            
-            if (rec_data == START_BYTE && Track_Row.start_flag == 0) //接收到首字节
+
+            if (Track_Row.start_flag == 0) //还没有收到首字节
             {
-                Track_Row.current_index = 0; //重置下标 准备接收
-                Track_Row.start_flag = 1;    //设置标志位
-                return;                      //后面的判断于此无关 直接退出
-            }
-            if (Track_Row.start_flag == 1 && rec_data == END_BYTE && Track_Row.current_index >= 7) //接收到末尾字节
-            {
-                now_id = Get_EmptyRow_ID(now_id); //更新装载对象的下标
-                Track_Row.done_flag = 1;          //标志接收完成
-                dma_count++;                      //任务运行
-                Track_Row.current_index = 0;      //重置下标
-                Track_Row.start_flag = 0;         //标志为未收到首字节
-                Track_Row.done_flag = 0;          //标志为未结束
-            }
-            else
-            {
-                if (Track_Row.start_flag == 1) //正文内容
+                if (rec_data == START_BYTE) //收到了，泪目！
                 {
-                    Track_Row.rec_data[now_id][Track_Row.current_index++] = rec_data; //装载进缓存
-                    if (Track_Row.current_index + 2 >= MAX_TRACK_REC_SIZE)            //防止错误造成的卡死
-                    {
+                    Track_Row.current_index = 0; //重置下标 准备接收
+                    Track_Row.start_flag = 1;    //设置标志位
+                    return;                      //后面的判断于此无关 直接退出
+                }
+            }
+            else //已经收到了首字节，此时就是正文还有接收完成的处理
+            {
+                if (rec_data == END_BYTE && Track_Row.current_index >= 7) //接收到末尾字节
+                {
+                    now_id = Get_EmptyRow_ID(now_id); //更新装载对象的下标
+                    Track_Row.done_flag = 1;          //标志接收完成
+                    dma_count++;                      //任务运行
+                    Track_Row.current_index = 0;      //重置下标
+                    Track_Row.start_flag = 0;         //标志为未收到首字节
+                    Track_Row.done_flag = 0;          //标志为未结束
+                }
+                else //正文内容
+                {
+                    Track_Row.rec_data[now_id][Track_Row.current_index++] = rec_data;              //装载进缓存
+                    if (Track_Row.current_index + 2 >= MAX_TRACK_REC_SIZE)                         //防止错误造成的卡死
+                    {                                                                              //加2是为了提前
                         Track_Row.current_index = 0;                                               //清除下标 重新开始接收
                         Track_Row.done_flag = 0;                                                   //标志位管理
                         Track_Row.start_flag = 0;                                                  //标志位管理
