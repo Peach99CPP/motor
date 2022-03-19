@@ -73,4 +73,8 @@ int Get_Height(void);
 void Inf_Servo_Height(int now_height);
 void QR_Mode_Height(void) ;
 
+//限制高度信息读取的软件开关
+bool Get_HeightAvailable(void);
+void Set_HeightAvailable(bool Switch_Status);
+
 #endif

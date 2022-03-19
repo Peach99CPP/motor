@@ -42,6 +42,7 @@ int MIN_ = 60;
 int VERTICAL = 10;
 
 bool update_finish = true;
+bool HeightAvailable = true;
 
 #define Wait_Servo_Done 20000 //等待动作组完成的最大等待时间
 
@@ -51,6 +52,15 @@ bool update_finish = true;
 #define Height_SWITCH(x) HW_Switch[(x) + 4 - 1] //高度的开关，第4和第5下标分配给高度红外
 
 #define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7
+
+bool Get_HeightAvailable(void)
+{
+    return HeightAvailable;
+}
+void Set_HeightAvailable(bool Switch_Status)
+{
+    HeightAvailable = Switch_Status;
+}
 
 void Recover_EnableStatus(void)
 {
@@ -136,13 +146,13 @@ void QR_Mode_Height(void)
     }
 }
 /**********************************************************************
- * @Name    Return_AdverseID
+ * @Name    Return_ReverseID
  * @declaration : 获取相对的开关编号
  * @param   id: [输入/出] 当前的开关编号
  * @retval   : 同侧的相对编号
  * @author  peach99CPP
  ***********************************************************************/
-int Return_AdverseID(int id)
+int Return_ReverseID(int id)
 {
     if (id == 1)
         return 2;
@@ -161,16 +171,16 @@ void Inf_Servo_Height(int now_height)
     if (Return_IFQR()) //在复赛决赛部分需要
     {
         static int last_height = PrimaryHeight;
-        if(last_height != now_height)//避免重复提醒
+        if (last_height != now_height) //避免重复提醒
         {
-            last_height=now_height;
+            last_height = now_height;
             printf("高度发生改变\n");
         }
         Set_Update_Status(false);
         set_speed(0, 0, 0);                 //先停车 todo  此处运行之后
         Wait_Servo_Signal(Wait_Servo_Done); //等待上一个命令完成
-        if (now_height == LowestHeight) //根据当前高度进行角度的更新操作
-            Action_Gruop(toLowest, 1);  //运行动作组
+        if (now_height == LowestHeight)     //根据当前高度进行角度的更新操作
+            Action_Gruop(toLowest, 1);      //运行动作组
         else if (now_height == MediumHeight)
             Action_Gruop(toMedium, 1);
         else if (now_height == HighestHeight)
@@ -240,14 +250,14 @@ void HeightUpdate_Task(void const *argument)
             printf("\n************Current Height:LowestHeight***************\n");
             while (!Height_task_exit)
             {
-                if (Get_Height_Switch(Height_id) == on && Height_Flag == 0 && Get_Servo_Flag() == true)
+                if (Get_Height_Switch(Height_id) == on && Height_Flag == 0 && Get_Servo_Flag() == true && Get_HeightAvailable())
                 {
                     Height_Flag = 1;
                     Current_Height = HighestHeight;
                     printf("\n************Current Height:HighestHeight***************\n");
                     Inf_Servo_Height(Current_Height);
                 }
-                if (Height_Flag == 1 && Get_Servo_Flag() == true)
+                if (Height_Flag == 1 && Get_Servo_Flag() == true && Get_HeightAvailable())
                 {
                     if (Get_Height_Switch(Height_id) == off)
                     {
@@ -267,7 +277,7 @@ void HeightUpdate_Task(void const *argument)
             printf("\n************Current Height:MediumHeight***************\n");
             while (!Height_task_exit)
             {
-                if (Get_Servo_Flag() == true && Get_Height_Switch(Height_id) == on && Height_Flag == 0)
+                if (Get_Servo_Flag() == true && Get_Height_Switch(Height_id) == on && Height_Flag == 0 && Get_HeightAvailable())
                 {
                     Height_Flag = 1;
                     Height_id = 1; // todo 此处需要检查下，因为一开始使用了临时的红外编号
@@ -275,7 +285,7 @@ void HeightUpdate_Task(void const *argument)
                     Inf_Servo_Height(Current_Height);
                     printf("\n************Current Height:HighestHeight***************\n");
                 }
-                if (Height_Flag == 1 && Get_Servo_Flag() == true)
+                if (Height_Flag == 1 && Get_Servo_Flag() == true && Get_HeightAvailable())
                 {
                     if (Get_Height_Switch(Height_id) == off)
                     {
@@ -557,7 +567,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
     dir1_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on) //当未收到MV停止信号或红外开持续导通时
         {
-            if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
+            if (Get_HW_Status(Return_ReverseID(dir)) == on) //查看对侧红外开关的状态
                 set_speed(MIN_ * 0.8, VERTICAL, 0);         //一边走一边贴边
             else
                 set_speed(MIN_ * 0.8, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
@@ -591,7 +601,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
     dir2_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
         {
-            if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
+            if (Get_HW_Status(Return_ReverseID(dir)) == on) //查看对侧红外开关的状态
                 set_speed(-MIN_ * 0.8, VERTICAL, 0);        //一边走一边贴边
             else
                 set_speed(-MIN_ * 0.8, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
@@ -687,7 +697,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
  * @param {int} color  目标的颜色 1红2蓝
  * @param {int} QR   是否开启运行
  * @param {int} imu_enable  是否启用陀螺仪辅助角度维持
- * @return {*} null 
+ * @return {*} null
  */
 void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
 {
