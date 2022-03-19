@@ -933,7 +933,7 @@ Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M7.fp.sp --apcs=
 interwork --depend=motor\startup_stm32f750xx.d -omotor\startup_stm32f750xx.o -I
 ..\Inc -I.\RTE\_motor -ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include
  -ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32
-F7xx\Include --predefine="__UVISION_VERSION SETA 535" --predefine="_RTE_ SETA 1
+F7xx\Include --predefine="__UVISION_VERSION SETA 536" --predefine="_RTE_ SETA 1
 " --predefine="STM32F750xx SETA 1" --predefine="_RTE_ SETA 1" --list=startup_st
 m32f750xx.lst startup_stm32f750xx.s
 

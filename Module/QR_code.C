@@ -83,6 +83,7 @@ void QR_decode(void)
     }
     if ((QR.color == Target_Color) && Return_QRMode()) //仅在设置了对其有响应才会执行 颜色要对 并且开启响应
     {
+//        Set_MV_Mode(false);//临时关闭openmv信号的处理
         if (Get_Servo_Flag())
         {
             Disable_ServoFlag();  //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
@@ -98,11 +99,7 @@ void QR_decode(void)
             case HighestHeight:
                 Action_Gruop(3, 1);
             default:
-                if (Get_IFUP() == false)
-                {
-                    Action_Gruop(11, 1); //机械臂升起
-                    Set_IFUP(true);
-                }
+;
             }
         }
 

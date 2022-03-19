@@ -51,6 +51,7 @@ motor\openmv.o: ..\Driver\delay.h
 motor\openmv.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 motor\openmv.o: ..\Module\servo.h
 motor\openmv.o: ..\Driver\chassis.h
+motor\openmv.o: ..\Module\QR_code.h
 motor\openmv.o: ..\TASK\read_status.h
 motor\openmv.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
 motor\openmv.o: ../Inc/FreeRTOSConfig.h

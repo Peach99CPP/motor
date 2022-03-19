@@ -24,13 +24,13 @@
     - [FreeRTOS](#RTOS)
     - [对外通讯协议](#模块通讯协议)  
  ### <p align="center">[联系作者](#联系方式)</p>    
-    
+
    
-   
-    
-       
+
+
+​       
 - - -
- 
+
 <span id="调试"></span>
 ## 调试组件
 #### 提升
@@ -215,7 +215,7 @@ struct _m_usmart_dev usmart_dev =
     2. 关于数据处理问题
        由于方波信号毛刺的存在，电机的转速值原始值存在不小的波动，如果直接采用原始数据，将会降低稳定性，特别是因为毛刺干扰了对转动反向的判断，将会瞬间得到一个与真实值相反的异常值，对于此问题，在经过相关的测试之后，决定进行滤波处理以及加入反向检测，避免对转动方向
        的误判。  
-**以下是代码示例，以1号电机为例。**
+       **以下是代码示例，以1号电机为例。**
 ```C
 /**********************************************************************
   * @Name    HAL_TIM_IC_CaptureCallback
@@ -295,7 +295,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 ```
 3. 转速值的回零问题
        在[编码器实现逻辑](#实现)中已经说过，通过检测方波边沿来进入计算的函数。该方法存在一个显著的问题在于，当**电机转速为0时，因为方波不再产生，将不再进入计算转速的函数中**，也就是说，`转速没有得到更新 停留在上一个值==,对于此问题，先后有两个解决方案 ：
-    
+   
            1. 在每一次读取完转速值后将其清0
                此方案借鉴了之前读取编码器的操作，读取之后便将其清0，但是因为滤波的操作，此方法将会降低数值的真实性以及导致速值的实时反应速度低。
             
@@ -353,8 +353,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     
     }
     
-    ``` 
-<span id="编码器效果展示"></span>
+    ```
+   <span id="编码器效果展示"></span>
 - #### 效果
 此处应有一张图
 <span id="编码器优化方向"></span>
@@ -581,21 +581,21 @@ float imu_correct_val(void)
 ## 循迹板（巡线）
 <span id="循迹板概述"></span>
 1. 循迹板信息  
-本程序使用了宏佳电子的八路激光循迹版，以下是其外观:  
+   本程序使用了宏佳电子的八路激光循迹版，以下是其外观:  
    ![电路板](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/1632028810.jpg)  
    ![对地面](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/35da41ec51cda17610018ee712c5e2b.jpg)  
 2. 必要的信息：  
-**实现逻辑**    
-[循迹板流程图直链](https://m.liuchengtu.com/lct//#R26b8d6fa19f4b990bac03dac30e8a959)
+   **实现逻辑**    
+   [循迹板流程图直链](https://m.liuchengtu.com/lct//#R26b8d6fa19f4b990bac03dac30e8a959)
    ![循迹版流程图](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/%E6%9C%AA%E5%91%BD%E5%90%8D%E8%A1%A8%E5%8D%95%20(4).png)
    ![循迹版实现逻辑](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/e15ae7b4d6a179b585d8081ca7f1fc0.jpg)
-此款循迹板支持多种输出口，包括**串口**、**IO口**、**PWM**、**ADC**等输出方式
-但因为其串口输出最高频率为20Hz，不满足要求，所以只能使用<u>最基础的直接读取IO口电平</u>的方法来实现数据的采集  
-此外，由于该款循迹板扫到白线后为低电平输出，但在代码逻辑中读到白线是高，所以最后在输出结果时需要按位进行取反操作或者在进行判断时手动取反。   
+   此款循迹板支持多种输出口，包括**串口**、**IO口**、**PWM**、**ADC**等输出方式
+   但因为其串口输出最高频率为20Hz，不满足要求，所以只能使用<u>最基础的直接读取IO口电平</u>的方法来实现数据的采集  
+   此外，由于该款循迹板扫到白线后为低电平输出，但在代码逻辑中读到白线是高，所以最后在输出结果时需要按位进行取反操作或者在进行判断时手动取反。   
    1. 两种控制模式：
       ![循迹控制模式](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/59382e6ecf34f48a803706e3dc9adc1.png)    
        **以下为代码实现，重点在<u>获取陀螺仪使能状态之后的两种处理模式</u>  
-   将循迹版的PID用于不同用途**
+      将循迹版的PID用于不同用途**
 ```c
 
 /************************************************************
@@ -933,6 +933,7 @@ void send_value(void)
   }
 ```
    - 数据处理程序   
+
     此部分是对循迹版信息的解码处理环节。功能实现的核心依赖于此函数。  
 通过对循迹版信息的处理获取当前循迹板的状态，并以此实现数线、巡线等功能。
 ```c
@@ -1119,7 +1120,7 @@ if(min_val > w) min_val = w;
 <span id="RTOS"></span>
 - #### FreeRTOS
     **在本程序中集成了`FreeRTOS`，使用的是STM32CubeMX中的`CMSIS V1`版本，经过了一定程度的封装**  
- 相对优点有： 
+   相对优点有： 
   - 提高其移植性，   
   - 同时<u>简化任务创建的操作过程</u>  
   以下是在本程序中用到的任务列表   
@@ -1131,7 +1132,7 @@ if(min_val > w) min_val = w;
     查看具体应用：[完整源码](../Module)  
   1.实现逻辑：
   - 发送时的编码  
- <u>以openmv的解码函数举例</u>
+   <u>以openmv的解码函数举例</u>
       - 帧头
       - 事件ID
       - 正负标志位
@@ -1170,7 +1171,7 @@ void cmd_encode(const uint8_t event_id, int  param)
     MV.mv_cmd[5] = (uint8_t)(event_id + pos_flag + h_byte + l_byte);//和校验
     MV.mv_cmd[6] = END_BYTE;//帧尾
 }
-```
+ ```
   - 接收时解码:   
 <u>以openmv的解码函数举例</u>
 ```c
@@ -1204,21 +1205,20 @@ void MV_rec_decode(void)
 目前正计划通过`字符填充`来解决上述问题。**提高鲁棒性**，在参数传输过程中无需考虑其值可能使接收机制产生误判的可能。
 
   - --
-  <span id="联系方式"></span>
+    <span id="联系方式"></span>
 # 有问题联系：
 - ***13311889904(TEL)***  
        
-       
+  
 - ***1831427532(QQ)***  
       
-       
+  
 - ***3120000903@mail2.gdut.edu.cn***     
   ***1831427532@qq.com***     
           
-          
+  
 - ***Wechat***   
       
    ![联系方式](https://raw.githubusercontent.com/Peach99CPP/pic/main/img/7db7780b6dc421984e3c67cde1c089b.jpg)
-    
-        
+   
 - -- 

@@ -116,10 +116,11 @@ void set_imu_status(int status)
 /**********************************************************************
   * @Name    Turn_angle
   * @declaration : 转弯的函数实现，可实现绝对角度的转弯和相对角度的转弯
-  * @param   mode: [输入/出]  转弯的类型
+  * @param   mode:   转弯的类型
                     relative(1): 相对角度
                     absolute(2): 绝对角度
-**			 angle: [输入/出]  角度数值
+**	@param	 angle:   角度数值
+    @param   track_enabled 转后是否需要开启循迹版
   * @retval   : 无
   * @author  peach99CPP
 ***********************************************************************/

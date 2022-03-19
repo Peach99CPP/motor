@@ -30,7 +30,7 @@ void _sys_exit(int x)
 {
     x = x;
 }
-//重定义fputc函数,使用队列来进行printf,此时要另外开一个task循环�?
+//重定义fputc函数,使用队列来进行printf,此时要另外开一个task循环�?
 int fputc(int ch, FILE *f)
 {
     if(tx_queue != NULL)
@@ -39,11 +39,11 @@ int fputc(int ch, FILE *f)
         {
             BaseType_t if_higher_woken = pdFALSE;
             while( xQueueSendFromISR(tx_queue, &ch, &if_higher_woken) != pdTRUE); //阻塞式。确保此时已经成功把消息放入队列
-            portYIELD_FROM_ISR(if_higher_woken);//判断是否需要进行任务调�?
+            portYIELD_FROM_ISR(if_higher_woken);//判断是否需要进行任务调�?
         }
         else
         {
-            //此时并不是在中断中被调用，可以直接写入数�?
+            //此时并不是在中断中被调用，可以直接写入数�?
             xQueueSend(tx_queue, &ch, 1);
         }
     }
@@ -59,7 +59,7 @@ void printf_init(void)
   * @Name    USART1_IRQHandler
   * @功能说明 usrat1 handler
   * @param   None
-  * @返回�?
+  * @返回�?
   * @author  peach99CPP
 ***********************************************************************/
 
@@ -70,10 +70,10 @@ void U1_IRQHandler(void)
     {
         __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
         rec =  huart1.Instance->RDR;
-        if(!(USART_RX_STA & 0x8000))//接收未完�?
+        if(!(USART_RX_STA & 0x8000))//接收未完�?
         {
 #ifdef USE_BLE
-            if(rec == 0x0a || rec == 0x21)//兼容非电脑设备的串口发�? 以！为结�?
+            if(rec == 0x0a || rec == 0x21)//兼容非电脑设备的串口发�? 以！为结�?
 
             {
                 USART_RX_STA |= 0x8000;
@@ -112,11 +112,11 @@ void U1_IRQHandler(void)
     {
         __HAL_UART_CLEAR_FLAG(&huart1, UART_FLAG_TXE);
         BaseType_t xTaskWokenByReceive = pdFALSE;
-        //发送队列中有数据需要发�?
+        //发送队列中有数据需要发�?
         if (xQueueReceiveFromISR(tx_queue, (void*)&rec, &xTaskWokenByReceive) == pdPASS)
             huart1.Instance->TDR = rec;
         else
-            //无数据发送就关闭发送中�?
+            //无数据发送就关闭发送中�?
             __HAL_UART_DISABLE_IT(&huart1, UART_IT_TXE);
     }
     else if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_ORE))//处理ORE错误导致卡死在中断里

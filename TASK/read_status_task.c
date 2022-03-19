@@ -52,6 +52,12 @@ bool update_finish = true;
 
 #define Side_SWITCH(X) HW_Switch[(X) + 6 - 1] //侧边红外的安装位置,有两个，分配下标为6 和7
 
+void Recover_EnableStatus(void)
+{
+    Set_MV_Mode(true);
+    Set_QR_Status(true);
+}
+
 /**********************************************************************
  * @Name    Get_Update_Result
  * @declaration :获取高度更新的结果
@@ -154,10 +160,15 @@ void Inf_Servo_Height(int now_height)
 {
     if (Return_IFQR()) //在复赛决赛部分需要
     {
+        static int last_height = PrimaryHeight;
+        if(last_height != now_height)//避免重复提醒
+        {
+            last_height=now_height;
+            printf("高度发生改变\n");
+        }
         Set_Update_Status(false);
         set_speed(0, 0, 0);                 //先停车 todo  此处运行之后
         Wait_Servo_Signal(Wait_Servo_Done); //等待上一个命令完成
-        printf("\n上一个动作组已经结束，开始变高度\n");
         if (now_height == LowestHeight) //根据当前高度进行角度的更新操作
             Action_Gruop(toLowest, 1);  //运行动作组
         else if (now_height == MediumHeight)
@@ -167,7 +178,6 @@ void Inf_Servo_Height(int now_height)
         else
             osDelay(100);                   //初始状态
         Wait_Servo_Signal(Wait_Servo_Done); //等待信号
-        printf("高度变换完成\r\n");
         Set_Update_Status(true);
     }
 }
@@ -227,13 +237,14 @@ void HeightUpdate_Task(void const *argument)
         {
             Height_id = 2; //使用2号来判断高度模式 /
             // todo 此处记得检查是否已经设置好对应高度的切换动作组
+            printf("\n************Current Height:LowestHeight***************\n");
             while (!Height_task_exit)
             {
                 if (Get_Height_Switch(Height_id) == on && Height_Flag == 0 && Get_Servo_Flag() == true)
                 {
                     Height_Flag = 1;
                     Current_Height = HighestHeight;
-                    printf("\n************到达中间高度***************\n");
+                    printf("\n************Current Height:HighestHeight***************\n");
                     Inf_Servo_Height(Current_Height);
                 }
                 if (Height_Flag == 1 && Get_Servo_Flag() == true)
@@ -242,7 +253,7 @@ void HeightUpdate_Task(void const *argument)
                     {
                         Current_Height = MediumHeight;
                         Height_Flag = 2;
-                        printf("\n************到达末端高度***************\n");
+                        printf("\n************Current Height:MediumHeight***************\n");
                         Inf_Servo_Height(Current_Height);
                     }
                 }
@@ -253,6 +264,7 @@ void HeightUpdate_Task(void const *argument)
         {
             Height_id = 1; // todo临时修改
             OpenMV_ChangeRoi(1);
+            printf("\n************Current Height:MediumHeight***************\n");
             while (!Height_task_exit)
             {
                 if (Get_Servo_Flag() == true && Get_Height_Switch(Height_id) == on && Height_Flag == 0)
@@ -261,7 +273,7 @@ void HeightUpdate_Task(void const *argument)
                     Height_id = 1; // todo 此处需要检查下，因为一开始使用了临时的红外编号
                     Current_Height = HighestHeight;
                     Inf_Servo_Height(Current_Height);
-                    printf("\n************到达中间高度***************\n");
+                    printf("\n************Current Height:HighestHeight***************\n");
                 }
                 if (Height_Flag == 1 && Get_Servo_Flag() == true)
                 {
@@ -270,7 +282,7 @@ void HeightUpdate_Task(void const *argument)
                         Current_Height = LowestHeight;
                         Height_Flag = 2;
                         Inf_Servo_Height(Current_Height);
-                        printf("\n************到达末端高度***************\n");
+                        printf("\n************Current Height:LowestHeight***************\n");
                     }
                     //以下在接收端经不被处理
                     if (Get_Height_Switch(2) == on && temp_roi_chnage_flag == 1)
@@ -630,7 +642,8 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
         {
             Wait_Servo_Signal(Wait_Servo_Done);
             Disable_StopSignal(); //清除停车标志位，此时可以开车
-            osDelay(100);         //没啥用，求个心安
+            Recover_EnableStatus();
+            osDelay(100); //没啥用，求个心安
             goto dir5_Start_Symbol;
         }
     }
@@ -660,13 +673,22 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
         else
         {
             Wait_Servo_Signal(Wait_Servo_Done);
-            Disable_StopSignal();   //清除停车标志位，此时可以开车
+            Disable_StopSignal(); //清除停车标志位，此时可以开车
+            Recover_EnableStatus();
             osDelay(100);           //没啥用，求个心安
             goto dir6_Start_Symbol; //回到开头位置
         }
     }
 }
 
+/**
+ * @description: 针对复赛的矩形和二维码的函数
+ * @param {int} dir  运行方向 5为从左到右 6为从右到左
+ * @param {int} color  目标的颜色 1红2蓝
+ * @param {int} QR   是否开启运行
+ * @param {int} imu_enable  是否启用陀螺仪辅助角度维持
+ * @return {*} null 
+ */
 void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
 {
     Set_NeedUp(QR); //高度变换开启与关闭
@@ -674,25 +696,26 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
     MV_Start();                //开启Openmv
     Disable_StopSignal();      //此时不会停车
     osDelay(300);              //等待处理缓冲数据
-    MV_SendCmd(2, color);      //矩形模式
+    Recover_EnableStatus();    //开启mv和二维码工作
+    MV_SendCmd(5, color);      //矩形模式，扫方块
     Set_IMUStatus(imu_enable); //控制陀螺仪开关
     if (dir == 5 || dir == 6)
     {
         Action_Gruop(14, 1);     //升起
         Set_IFUP(true);          //标志位
-        Judge_Side(dir);         //根据方向设置起始高度
-        Wait_Servo_Signal(5000); //等待信号
-        QR_Mode_Height();        //根据模式进行高度变换
+        Judge_Side(dir);         //根据方向设置起始高度对机械臂动作组进行变换
+        Wait_Servo_Signal(5000); //等待舵机的完成信号 最多的等待5s
+        QR_Mode_Height();        //根据模式进行高度变换 此时的目标高度来自judge_side的赋值
         Start_HeightUpdate();    //因为决定自己执行高度变换 所以不需要在任务开头执行高度变换
         if (dir == 5)
         {
             while (Get_Side_Switch(1) == off)
             {
-                set_speed(0, MIN_, 0);
-                osDelay(5); //避免开关卡死
+                set_speed(0, MIN_, 0); //确保此时开关的工作状态正常
+                osDelay(5);            //避免开关卡死
             }
         dir5_Start_Symbol:
-
+            // 换言之 如果高度更新未完成 或者 停车命令被启用 或者 此时已经走出区域（红外开关off）
             while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on && Get_Update_Result())
             {
                 set_speed(VERTICAL, MIN_, 0);
@@ -719,7 +742,8 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
                 Wait_Servo_Signal(Wait_Servo_Done);
                 QR_Mode_Height();
                 Disable_StopSignal(); //清除停车标志位，此时可以开车
-                osDelay(100);         //没啥用，求个心安
+                Recover_EnableStatus();
+                osDelay(100); //没啥用，求个心安
                 goto dir5_Start_Symbol;
             }
         }
@@ -756,12 +780,14 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
             {
                 Wait_Servo_Signal(Wait_Servo_Done);
                 QR_Mode_Height();
-                Disable_StopSignal();   //清除停车标志位，此时可以开车
+                Disable_StopSignal(); //清除停车标志位，此时可以开车
+                Recover_EnableStatus();
                 osDelay(100);           //没啥用，求个心安
                 goto dir6_Start_Symbol; //回到开头位置
             }
         }
     }
+    MV_Stop(); //关闭MV的所有功能 避免此时扫到仓库中物料触发命令
 }
 
 void Kiss_Ass(int dir, int enable_imu)
@@ -844,7 +870,7 @@ void Wait_Switches(int dir)
             x_pn = 0, y_pn = -1;
         }
     }
-    //开始靠近
+//开始靠近
 Closing:
     set_speed(MIN_SPEED * x_pn, MIN_SPEED * y_pn, 0); //设置一个基础速度，此速度与方向参数有关
     //等待开关都开启
@@ -1052,8 +1078,8 @@ void QR_Scan(int status, int color, int dir, int enable_imu)
     {
         Set_QR_Status(true);                                    //在这里设置mv和二维码的工作状态
         Set_IMUStatus(enable_imu);                              //经测试，有陀螺仪时容易导致卡死
-        Set_QR_Target((QRcolor_t)color);                        //设置要抓的颜色
-        Judge_Side(dir);                                        //根据颜色判断起始高度
+        Set_QR_Target((QRcolor_t)color);                        //设置目标
+        Judge_Side(dir);                                        //根据方向判断起始高度
         Action_Gruop(11, 1);                                    //升起爪子
         while (Get_Servo_Flag() == false && time_delay <= 5000) //等待完成，同时避免超时卡死设置5秒的时间阈值
         {

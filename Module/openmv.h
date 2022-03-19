@@ -15,6 +15,7 @@
 typedef struct
 {
     UART_HandleTypeDef* mv_uart;
+    bool enable_switch;
     uint8_t mv_cmd[BUFFER_SIZE];
     uint8_t rec_buffer[MAX_REC_SIZE];
     uint8_t rec_len;
@@ -37,6 +38,14 @@ typedef enum
     bar_type
 }mv_type_t;
 
+typedef enum
+{
+    LowestRing= 27,
+    MediumRing,
+    HighestRing
+}MvRing_t;
+
+
 void cmd_encode(const uint8_t event_id,int  param);
 void MV_SendCmd(const uint8_t event_id,const int  param);
 void MV_IRQ(void);
@@ -51,6 +60,9 @@ void OpenMV_ChangeRoi(int roi);
 void MV_Decode(void);
 void MV_SendOK(void);
 void MV_PID(void);
+
+void Set_MV_Mode(bool mode);
+bool Get_MV_Mode(void);
 
 void MV_Scan_Bar(mvcolor_t color);//扫描条形平台
 //扫描阶梯平台

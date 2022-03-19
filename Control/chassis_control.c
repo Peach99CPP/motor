@@ -7,6 +7,7 @@
 #include "motor.h"
 #include "imu_pid.h"
 #include "Wait_BackInf.h"
+#include "uart_handle.h"
 uint32_t time;
 
 #define LINE_FACTOR 160
@@ -53,6 +54,14 @@ void move_slantly(int dir, int speed, uint16_t delay)
     osDelay(500);
 }
 
+/**
+ * @description:  开启一个任务用于数线
+ * @param {int} direct 方向：竖向为2 横向为1
+ * @param {int} line_num 数几条线
+ * @param {int} edge_if 是否是在边缘（对阈值情况进行特殊处理）
+ * @param {int} imu_if  是否开启陀螺仪
+ * @return {*}
+ */    
 void direct_move(int direct, int line_num, int edge_if, int imu_if)
 {
     static int delay_time;
@@ -87,13 +96,18 @@ void direct_move(int direct, int line_num, int edge_if, int imu_if)
     }
     else
     {
+        //当上一次数线任务进行中时，此时不会再度调起数线任务，而是进行等待。
+        //当等待时间过长时，直接取消本次数线运动。
         delay_time = 0;
         while (!count_line_status)
         {
             delay_time++;
             osDelay(100);
             if (delay_time >= 20)
+            {
+                printf("\n数线任务等待时间过长, 已经退出\n");
                 return;
+            }
         }
         goto START_LINE;
     }
@@ -129,7 +143,7 @@ void LineTask(void const *argument)
                     goto EXIT_TASK;
                 }
                 speed_set = Limit_Speed(LINE_FACTOR * error);
-                set_speed(speed_set * error, 0, 0);
+                set_speed(speed_set , 0, 0);//修正了此前速度变化过快的错误 是因为此处等价于平方效应
                 osDelay(5);
             } while (error >= 0);
         }
