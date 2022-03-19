@@ -158,24 +158,7 @@
           <Name>-U-O142 -O2254 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("") -D00(00000000) -L00(0) -TO131090 -TC10000000 -TT10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32F75x_64_AXI.FLM -FS08000000 -FL010000 -FP0($$Device:STM32F750V8Tx$CMSIS\Flash\STM32F75x_64_AXI.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>1187</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134250528</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\TASK\read_status_task.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\motor\../TASK/read_status_task.c\1187</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -206,11 +189,6 @@
           <count>5</count>
           <WinNumber>1</WinNumber>
           <ItemText>USART_RX_BUF</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>HW_Switch</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -258,6 +236,11 @@
           <count>8</count>
           <WinNumber>2</WinNumber>
           <ItemText>x_rightbar</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>MV</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

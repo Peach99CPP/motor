@@ -38,7 +38,7 @@ bool QR_Brick = false; //是否位于三种高度 模式
 
 short swicth_status[8]; //开关状态，只在内部进行赋值
 short HW_Switch[10];    //红外开关的状态
-int MIN_ = 60;
+int MIN_ = 40;
 int VERTICAL = 10;
 
 bool update_finish = true;
@@ -800,7 +800,13 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
     }
     MV_Stop(); //关闭MV的所有功能 避免此时扫到仓库中物料触发命令
 }
-
+/**
+ * @name: Kiss_Ass
+ * @brief: 倒球使用 屁股对准门
+ * @param {int} dir 方向
+ * @param {int} enable_imu 陀螺仪使能开关
+ * @return {*}
+ */
 void Kiss_Ass(int dir, int enable_imu)
 {
     Set_IMUStatus(enable_imu); //测试一下不适用陀螺仪的运行状态
@@ -846,8 +852,8 @@ void Kiss_Ass(int dir, int enable_imu)
 void Wait_Switches(int dir)
 {
     /*关于运行时速度的变量,不宜过高否则不稳定*/
-    int Switch_Factor = 30;
-    int MIN_SPEED = 50;
+    int Switch_Factor = 40;
+    int MIN_SPEED = 70;
 
     if (read_task_exit)
         Start_Read_Switch();
@@ -855,7 +861,8 @@ void Wait_Switches(int dir)
     track_status(1, 0); //关闭循迹版，避免造成方向上的影响
     track_status(2, 0);
 
-    short flag1, flag2, x_pn, y_pn;
+    volatile static short flag1, flag2;
+    short x_pn, y_pn;
     int w1, w2, w1_factor, w2_factor;
     w1_factor = 1, w2_factor = -1;
     {
@@ -865,14 +872,15 @@ void Wait_Switches(int dir)
             w1 = 1, w2 = 2;
             x_pn = 0, y_pn = 1;
         }
-        else if (dir == 2) //负X方向
-        {
-            w1 = 4, w2 = 3;
-            x_pn = -1, y_pn = 0;
-        }
+        /***下面的已经被废弃        
+        // else if (dir == 2) //负X方向
+        // {
+        //     w1 = 4, w2 = 3;
+        //     x_pn = -1, y_pn = 0;
+        *****/
         else if (dir == 3) //正X方向
         {
-            w1 = 5, w2 = 6;
+            w1 = 3, w2 = 4;
             x_pn = 1, y_pn = 0;
         }
         else if (dir == 4) //负Y方向
@@ -883,6 +891,8 @@ void Wait_Switches(int dir)
     }
 //开始靠近
 Closing:
+    Set_IMUStatus(false);  
+    flag1 = flag2 = 0;
     set_speed(MIN_SPEED * x_pn, MIN_SPEED * y_pn, 0); //设置一个基础速度，此速度与方向参数有关
     //等待开关都开启
     do
@@ -912,6 +922,8 @@ Closing:
     }
 switch_exit:
     //    Exit_Swicth_Read(); //用完了就关闭任务
+    Set_InitYaw(0);
+    Set_IMUStatus(true);  
     set_speed(0, 0, 0); //开关
     /*******本来这里应该接一个矫正陀螺仪，但是会降低程序的灵活性，所以不添加。在调用本程序之后，自己操作陀螺仪*******/
     // todo：调用完函数根据实际需要进行陀螺仪角度的修正
@@ -1185,5 +1197,5 @@ void Ring_Move(void)
         osDelay(1);                         //给系统调度时间
     set_speed(0, 0, 0);                     //到达位置马上停车
     osDelay(1000);                          //给时间用于缓冲
-    Action_Gruop(Ring_Action, 1);           //执行对应的动作组
+    // Action_Gruop(Ring_Action, 1);           //执行对应的动作组
 }

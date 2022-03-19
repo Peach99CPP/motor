@@ -3,7 +3,7 @@
 <title>Static Call Graph - [motor\motor.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image motor\motor.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Sat Mar 19 16:45:24 2022
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Sat Mar 19 18:54:57 2022
 <BR><P>
 <H3>Maximum Stack Usage =        380 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1049,7 +1049,6 @@ Global Symbols
 <LI><a href="#[16a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_Decode
 <LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_HW_Scan
 <LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Brick_QR_Mode
-<LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Ring_Move
 <LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;QR_Scan
 <LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Inf_Servo_Height
 </UL>
@@ -1312,7 +1311,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> atk_imu.o(.data)
 </UL>
 <P><STRONG><a name="[1d]"></a>Global_Debug</STRONG> (Thumb, 412 bytes, Stack size 8 bytes, debug_task.o(i.Global_Debug))
-<BR><BR>[Stack]<UL><LI>Max Depth = 256 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 248 + Unknown Stack Size
 <LI>Call Chain = Global_Debug &rArr; Wait_Switches &rArr; Start_Read_Switch &rArr; osThreadCreate &rArr; xTaskCreate &rArr; pvPortMalloc &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
@@ -2319,13 +2318,11 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MV_HW_Scan
 </UL>
 
-<P><STRONG><a name="[14]"></a>Ring_Move</STRONG> (Thumb, 102 bytes, Stack size 24 bytes, read_status_task.o(i.Ring_Move))
-<BR><BR>[Stack]<UL><LI>Max Depth = 192 + Unknown Stack Size
-<LI>Call Chain = Ring_Move &rArr; Action_Gruop &rArr; Error_Report &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
+<P><STRONG><a name="[14]"></a>Ring_Move</STRONG> (Thumb, 94 bytes, Stack size 24 bytes, read_status_task.o(i.Ring_Move))
+<BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = Ring_Move &rArr; osDelay &rArr; vTaskDelay &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_speed
-<LI><a href="#[19]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Action_Gruop
 <LI><a href="#[f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Side_Switch
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
@@ -2393,6 +2390,7 @@ Global Symbols
 <LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cdcmple
 </UL>
 <BR>[Called By]<UL><LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ATK_IMU_Init
+<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Wait_Switches
 <LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Global_Debug
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> usmart_config.o(.data)
@@ -2755,13 +2753,14 @@ Global Symbols
 <LI><a href="#[161]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Inf_Servo_Height
 </UL>
 
-<P><STRONG><a name="[e]"></a>Wait_Switches</STRONG> (Thumb, 294 bytes, Stack size 48 bytes, read_status_task.o(i.Wait_Switches))
-<BR><BR>[Stack]<UL><LI>Max Depth = 248<LI>Call Chain = Wait_Switches &rArr; Start_Read_Switch &rArr; osThreadCreate &rArr; xTaskCreate &rArr; pvPortMalloc &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
+<P><STRONG><a name="[e]"></a>Wait_Switches</STRONG> (Thumb, 338 bytes, Stack size 40 bytes, read_status_task.o(i.Wait_Switches))
+<BR><BR>[Stack]<UL><LI>Max Depth = 240<LI>Call Chain = Wait_Switches &rArr; Start_Read_Switch &rArr; osThreadCreate &rArr; xTaskCreate &rArr; pvPortMalloc &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;track_status
 <LI><a href="#[1a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;w_speed_set
 <LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;set_speed
+<LI><a href="#[1a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Set_InitYaw
 <LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Set_IMUStatus
 <LI><a href="#[192]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Read_Switch
 <LI><a href="#[1a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Switch_Status
