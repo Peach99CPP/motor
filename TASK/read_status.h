@@ -77,4 +77,5 @@ void QR_Mode_Height(void) ;
 bool Get_HeightAvailable(void);
 void Set_HeightAvailable(bool Switch_Status);
 
+void Ring_Move(void);//放置圆环时使用
 #endif

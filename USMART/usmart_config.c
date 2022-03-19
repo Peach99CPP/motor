@@ -101,6 +101,8 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void QR_Scan(int status, int color, int dir, int enable_imu)",
         (void *)Kiss_Ass,
         "void Kiss_Ass(int dir,int enable_imu)",
+        (void*)Ring_Move,
+        "void Ring_Move(void)",
 #endif
 #if Debug_Servo == 1
 

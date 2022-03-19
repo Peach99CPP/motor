@@ -374,13 +374,13 @@ int Get_Height(void)
     return Current_Height;
 }
 /**********************************************************************
- * @Name    Return_ReverseID
+ * @Name    Return_AdverseID
  * @declaration : 获取相对的开关编号
  * @param   id: [输入/出] 当前的开关编号
  * @retval   : 同侧的相对编号
  * @author  peach99CPP
  ***********************************************************************/
-int Return_ReverseID(int id)
+int Return_AdverseID(int id)
 {
     if (id == 1)
         return 2;
@@ -439,7 +439,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
 dir1_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on) //当未收到MV停止信号或红外开持续导通时
         {
-            if (Get_HW_Status(Return_ReverseID(dir)) == on) //查看对侧红外开关的状态
+            if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
                 set_speed(MIN_ * 0.8, VERTICAL, 0);         //一边走一边贴边
             else
                 set_speed(MIN_ * 0.8, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可
@@ -472,7 +472,7 @@ dir1_Start_Symbol:
 dir2_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
         {
-            if (Get_HW_Status(Return_ReverseID(dir)) == on) //查看对侧红外开关的状态
+            if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
                 set_speed(-MIN_, VERTICAL, 0);              //一边走一边贴边
             else
                 set_speed(-MIN_, 0, 0); //此时已经有一边出去，防止开关卡死，取消垂直方向的速度，保持水平的速度即可

@@ -1169,3 +1169,21 @@ void QR_Scan(int status, int color, int dir, int enable_imu)
         }
     }
 }
+/**
+ * @name:
+ * @brief:
+ * @param {*}
+ * @return {*}
+ */
+void Ring_Move(void)
+{
+#define Ring_Action 26                      //对应动作组的编号
+#define Ring_HW_ID                          //复用的红外的编号
+#define Side_Factor 0.3                     //为保持方向给一个垂直速度
+    set_speed(MIN_ * Side_Factor, MIN_, 0); //开始动起来
+    while (Get_Side_Switch(1) == off)       //复用高度的红外进行位置的判断
+        osDelay(1);                         //给系统调度时间
+    set_speed(0, 0, 0);                     //到达位置马上停车
+    osDelay(1000);                          //给时间用于缓冲
+    Action_Gruop(Ring_Action, 1);           //执行对应的动作组
+}
