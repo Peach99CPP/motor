@@ -258,9 +258,9 @@ void HeightUpdate_Task(void const *argument)
                     printf("\n************Current Height:HighestHeight***************\n");
                     Inf_Servo_Height(Current_Height);
                 }
-                if (Height_Flag == 1 && Get_Servo_Flag() == true && Get_HeightAvailable())
+                if (Height_Flag == 1 && Get_Servo_Flag() == true)
                 {
-                    if (Get_Height_Switch(Height_id) == off)
+                    if (Get_Height_Switch(Height_id) == off && Get_HeightAvailable())
                     {
                         Current_Height = MediumHeight;
                         Height_Flag = 2;
@@ -286,9 +286,9 @@ void HeightUpdate_Task(void const *argument)
                     Inf_Servo_Height(Current_Height);
                     printf("\n************Current Height:HighestHeight***************\n");
                 }
-                if (Height_Flag == 1 && Get_Servo_Flag() == true && Get_HeightAvailable())
+                if (Height_Flag == 1 && Get_Servo_Flag() == true)
                 {
-                    if (Get_Height_Switch(Height_id) == off)
+                    if (Get_Height_Switch(Height_id) == off && Get_HeightAvailable())
                     {
                         Current_Height = LowestHeight;
                         Height_Flag = 2;
