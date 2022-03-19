@@ -1,7 +1,7 @@
 #include "openmv.h"
 #include "servo.h"
 #include "chassis.h"
-#include"QR_code.h"
+#include "QR_code.h"
 #include "read_status.h"
 
 #include "uart_handle.h"
@@ -14,14 +14,13 @@ int temp_ = 0;          //动作组计数器
 short mv_stop_flag = 0; //判断MV舵控的工作状态
 mvrec_t mv_rec;         // mv的结构体
 mv_t MV =               //为结构体赋初值
-{
-    .mv_uart = &huart4,
-    .enable_switch = true,
-    .mv_cmd = {0},
-    .rec_buffer = {0},
-    .rec_len = 0,
-    .RX_Status = 0
-}; //初始化变量
+    {
+        .mv_uart = &huart4,
+        .enable_switch = true,
+        .mv_cmd = {0},
+        .rec_buffer = {0},
+        .rec_len = 0,
+        .RX_Status = 0}; //初始化变量
 
 void Set_MV_Mode(bool mode)
 {
@@ -181,15 +180,16 @@ void MV_Decode(void)
 #define BAR_Action 30
 #define MV_BACK 0x66
 
-    if (Get_MV_Mode())//只有此时mv是对信号响应，才进入下面的逻辑判断
+    if (Get_MV_Mode()) //只有此时mv是对信号响应，才进入下面的逻辑判断
     {
         if (Get_Servo_Flag()) //空闲，可以接收指令 此时openmv和舵控都准备好执行指令
         {
-//            Set_QR_Status(false); //关闭此时二维码那边的响应操作
+            //            Set_QR_Status(false); //关闭此时二维码那边的响应操作
             if (mv_rec.event == Ball_Signal)
             {
-                Disable_ServoFlag(); //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-                Enable_StopSignal(); //使能停车信号，让动作那边执行停车操作
+                Set_HeightAvailable(false); //在下面的操作中对高度红外的读取进行屏蔽
+                Disable_ServoFlag();        //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+                Enable_StopSignal();        //使能停车信号，让动作那边执行停车操作
                 printf("要抓球\r\n");
                 switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
                 {
@@ -205,13 +205,13 @@ void MV_Decode(void)
                     Action_Gruop(Highest, 1);
                     temp_++;
                     break;
-                default:
-                    ;
+                default:;
                 }
             }
             else if (mv_rec.event == Ring_Signal)
             {
-                Enable_StopSignal(); //使能停车信号,此时进入停车状态，等待动作组执行完毕
+                Set_HeightAvailable(false); //在下面的操作中对高度红外的读取进行屏蔽
+                Enable_StopSignal();        //使能停车信号,此时进入停车状态，等待动作组执行完毕
                 printf("发现圆环了\r\n");
                 switch (Get_Height()) //获取当前的高度信息，根据高度不同执行不同的动作组
                 {
@@ -227,15 +227,15 @@ void MV_Decode(void)
                     Action_Gruop(HighestRing, 1);
                     temp_++;
                     break;
-                default:
-                    ;
+                default:;
                 }
             }
             else if (mv_rec.event == Rectangle_Signal)
             {
-                Disable_ServoFlag();    //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
-                Enable_StopSignal();    //使能停车信号，让动作那边执行停车操作
-                printf("扫到矩形\r\n"); //打印调试信息
+                Set_HeightAvailable(false); //在下面的操作中对高度红外的读取进行屏蔽
+                Disable_ServoFlag();        //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
+                Enable_StopSignal();        //使能停车信号，让动作那边执行停车操作
+                printf("扫到矩形\r\n");     //打印调试信息
                 int height = Get_Height();
                 switch (height) //根据当前高度来执行不同的动作组
                 {
@@ -251,8 +251,7 @@ void MV_Decode(void)
                     Action_Gruop(Highest, 1);
                     temp_ += 1;
                     break;
-                default:
-                    ;
+                default:;
                 }
             }
             else if (mv_rec.event == BAR_Signal) //自从修改爪子的形状之后  拨球的行为直接由舵控进行控制 因此需要对MV发回来的数据会进行解析处理

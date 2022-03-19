@@ -190,6 +190,7 @@ void Inf_Servo_Height(int now_height)
         Wait_Servo_Signal(Wait_Servo_Done); //等待信号
         Set_Update_Status(true);
     }
+    Set_HeightAvailable(true); //在下面的操作中对高度红外的读取进行屏蔽
 }
 /**********************************************************************
  * @Name    Judge_Side
