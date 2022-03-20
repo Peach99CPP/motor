@@ -45,6 +45,7 @@ void Wait_OKInf(int type,long wait_time);
 
 float get_chassis_speed(char dir);
 
+bool inte_move(int type, int dir, int val, int edge, int imu_if, long wait_time);//运动的综合
 
 extern float motor_target[5];
 extern float control_val[5];

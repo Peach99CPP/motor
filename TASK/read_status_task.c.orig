@@ -436,7 +436,7 @@ void MV_HW_Scan(int color, int dir, int enable_imu)
             osDelay(5); //先移动到此时红外开始扫描到，防止下方直接被跳过
         }
         set_speed(0, 0, 0);
-dir1_Start_Symbol:
+    dir1_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on) //当未收到MV停止信号或红外开持续导通时
         {
             if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
@@ -469,7 +469,7 @@ dir1_Start_Symbol:
             osDelay(5);             //先移动到此时红外开始扫描到，防止下方直接被跳过
         }
         set_speed(0, 0, 0);
-dir2_Start_Symbol:
+    dir2_Start_Symbol:
         while (Get_Stop_Signal() == false && Get_HW_Status(dir) == on)
         {
             if (Get_HW_Status(Return_AdverseID(dir)) == on) //查看对侧红外开关的状态
@@ -501,7 +501,7 @@ dir2_Start_Symbol:
             set_speed(0, MIN_, 0);
             osDelay(5); //避免开关卡死
         }
-dir5_Start_Symbol:
+    dir5_Start_Symbol:
         set_speed(VERTICAL, MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
             osDelay(5);
@@ -529,7 +529,7 @@ dir5_Start_Symbol:
             set_speed(0, -MIN_, 0);
             osDelay(5); //避免开关卡死
         }
-dir6_Start_Symbol:
+    dir6_Start_Symbol:
         set_speed(VERTICAL, -MIN_, 0);
         while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on)
             osDelay(5);
@@ -572,22 +572,22 @@ void Brick_Mode(int dir, int color, int enable_imu)
     Set_IFUP(true);            //标记此时机械臂已经展开
     Judge_Side(dir);           //判断起始高度
     Wait_Servo_Signal(5000);
-    MV_Start();                //开启Openmv
-    osDelay(100);              //给MV处理的时间 否则容易造成消息的丢失
-    MV_SendCmd(2, color);      //让mv开始阶梯扫描任务，扫描矩形
+    MV_Start();                       //开启Openmv
+    osDelay(100);                     //给MV处理的时间 否则容易造成消息的丢失
+    MV_SendCmd(2, color);             //让mv开始阶梯扫描任务，扫描矩形
     Inf_Servo_Height(Current_Height); //让舵控根据当前高度调整 初赛时使用
     Wait_Servo_Signal(5000);
     Start_HeightUpdate(); //开始更新高度
     Disable_StopSignal();
-    if (dir == 5)         //从左往右
+    if (dir == 5) //从左往右
     {
         while (Get_Side_Switch(1) == off) //先移动到开关检测到东西  正常情况 此句不会执行
         {
             set_speed(0, MIN_, 0); //单纯给一个水平速度
             osDelay(5);            //避免开关卡死
         }
-Brick_dir5:
-        while (!Get_Stop_Signal()  && Get_Side_Switch(1) == on)
+    Brick_dir5:
+        while (!Get_Stop_Signal() && Get_Side_Switch(1) == on)
         {
             set_speed(VERTICAL, MIN_, 0);
             osDelay(5);
@@ -619,7 +619,7 @@ Brick_dir5:
             set_speed(0, -MIN_, 0);
             osDelay(5); //避免开关卡死
         }
-Brick_dir6:
+    Brick_dir6:
         while (!Get_Stop_Signal() && Get_Side_Switch(2) == on)
         {
             set_speed(VERTICAL, -MIN_, 0);
@@ -632,7 +632,7 @@ Brick_dir6:
             Set_IFUP(false);      //标记机械臂此时已经收起
             Exit_Height_Upadte(); //退出高度更新任务
             Set_QR_Status(false); //关闭对二维码的响应
-                        MV_Stop();
+            MV_Stop();
             return;
         }
         else
@@ -687,7 +687,7 @@ void QR_Scan(int status, int color, int dir, int enable_imu)
                 set_speed(0, MIN_, 0); //先给一个速度一直走 避免初始时开关直接没亮导致任务直接结束
                 osDelay(5);
             }
-QR_Scan5_Symbol:
+        QR_Scan5_Symbol:
             set_speed(VERTICAL, MIN_, 0); //给一个平行和垂直的速度，一边紧贴着一边移动
             while (Get_Stop_Signal() == false && Get_Side_Switch(1) == on)
                 osDelay(5);
@@ -715,7 +715,7 @@ QR_Scan5_Symbol:
                 set_speed(0, -MIN_, 0);
                 osDelay(5); //避免开关卡死
             }
-QR_Scan6_Symbol:
+        QR_Scan6_Symbol:
             set_speed(VERTICAL, -MIN_, 0);
             while (Get_Stop_Signal() == false && Get_Side_Switch(2) == on)
                 osDelay(5);
@@ -753,18 +753,20 @@ void Kiss_Ass(int dir, int enable_imu)
     Set_IMUStatus(enable_imu); //测试一下不适用陀螺仪的运行状态
     if (dir == 1)
     {
+        //保险措施 需要确保此时的红外位置
         while (Get_HW_Status(dir + 2) == off)
         {
             set_speed(MIN_, 0, 0);
             osDelay(5);
         }
+        //红外此时是开启说明车身
         while (Get_HW_Status(dir + 2) == on)
         {
             set_speed(-MIN_ * 2, 0, 0);
             osDelay(5);
         }
         set_speed(0, 0, 0);
-        // TODO 在此时运行倒下去的动作组，把东西倒下去F
+        // TODO 在此时运行倒下去的动作组，把东西倒下去
     }
     else if (dir == 2)
     {
@@ -779,8 +781,9 @@ void Kiss_Ass(int dir, int enable_imu)
             osDelay(5);
         }
         set_speed(0, 0, 0);
-        // TODO 在此时运行倒下去的动作组，把东西倒下去F
+        // TODO 在此时运行倒下去的动作组，把东西倒下去
     }
+    osDelay(200);//给一个停车的缓冲时间
 }
 
 /**********************************************************************
@@ -848,8 +851,7 @@ Closing:
         //任务调度
         osDelay(10);
 
-    }
-    while (flag1 == off || flag2 == off);   //只有两个都接通，才退出该循环
+    } while (flag1 == off || flag2 == off); //只有两个都接通，才退出该循环
     osDelay(500);
     if (flag1 == off || flag2 == off)
     {
@@ -973,8 +975,7 @@ RECLOSE:
         if (status == err)
             Start_Read_Switch(); //防止此时任务退出而卡死在循环里
         osDelay(20);             //任务调度
-    }
-    while (status == on);        //直到开关断开，此时说明到达边界
+    } while (status == on);      //直到开关断开，此时说明到达边界
     set_speed(0, 0, 0);          //停车
 }
 

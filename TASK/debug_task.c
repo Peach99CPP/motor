@@ -24,7 +24,7 @@ void Set_OSRunningFlag(int status);
 #define Encoder_Type 2
 // todo 在这里定义红蓝半场
 int Os_RunningFlag = 0;
-uint8_t cmd[3]={0xff,0x00,0x99};
+uint8_t cmd[3] = {0xff, 0x00, 0x99};
 void Startdebug(void const *argument)
 {
     Set_OSRunningFlag(true);
@@ -50,11 +50,11 @@ void Startdebug(void const *argument)
 void Global_Debug(void)
 {
 #if Blue_Route == 1
-    move_by_encoder(2, 30);
-    Wait_OKInf(Encoder_Type, Wait_Dealy_MAX);
-    direct_move(2, 3, 0, 1);
-    Wait_OKInf(Line_Type, Wait_Dealy_MAX);
-    printf("\r\n数线完成\r\n");
+    move_by_encoder(2, 30);                   //往前走一点距离确保前方循迹版过线
+    Wait_OKInf(Encoder_Type, Wait_Dealy_MAX); //等待数线任务完成
+    direct_move(2, 3, 0, 1);                  //往前直接走三条线 todo 待修改
+    Wait_OKInf(Line_Type, Wait_Dealy_MAX);    //等待任务完成
+    printf("\r\n数线完成\r\n");               //交互信息
     Wait_Switches(1);
     printf("贴边完成\r\n");
     Set_InitYaw(0);
@@ -62,6 +62,7 @@ void Global_Debug(void)
     printf("定左侧完成\r\n");
     MV_HW_Scan(1, 2, 1);
     printf("条形完成\r\n");
+
     Turn_angle(1, 180, 1);
     direct_move(2, 1, 0, 1);
     Wait_OKInf(Line_Type, Wait_Dealy_MAX);
@@ -89,13 +90,13 @@ void Global_Debug(void)
     // osDelay(1000);
     // Action_Gruop(7, 1);
     // osDelay(1000);
-    Lateral_infrared(1);
-    Kiss_Ass(1,1);
-    Ass_Door(1);
-    osDelay(5000);
-    Ass_Door(0);
-    move_by_encoder(2, 10);
-    Wait_OKInf(Encoder_Type, Wait_Dealy_MAX);
+    Lateral_infrared(1);                      //打开侧面红外
+    Kiss_Ass(1, 1);                           //定位过去
+    Ass_Door(1);                              //打开屁股后面的门 倒球
+    osDelay(5000);                            //确保倒球完成
+    Ass_Door(0);                              //可以关门
+    move_by_encoder(2, 10);                   //往前走一点
+    Wait_OKInf(Encoder_Type, Wait_Dealy_MAX); //确保完成
     Turn_angle(1, 180, 0);
     Wait_Switches(1);
     Set_InitYaw(90);
@@ -175,12 +176,12 @@ void Game_On(void)
     {
         GameTaskTask_Exit = 0;
         osThreadDef(GameTask, GameTaskTaskFunc, osPriorityHigh, 0, 1024); //定义任务结构体
-        GameTaskHandle = osThreadCreate(osThread(GameTask), NULL);       //创建任务
+        GameTaskHandle = osThreadCreate(osThread(GameTask), NULL);        //创建任务
     }
 }
 void GameTaskTaskFunc(void const *argument)
 {
-    while(!GameTaskTask_Exit)
+    while (!GameTaskTask_Exit)
     {
         Global_Debug();
     }

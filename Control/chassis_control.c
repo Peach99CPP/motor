@@ -206,8 +206,7 @@ void LineTask(void const *argument)
     }
 EXIT_TASK:
     set_speed(0, 0, 0);
-    count_line_status = 1;
-
+    //在下面的两个分支中都会执行Delay
     if (if_need_zero)
         Turn_angle(1, 180, 1);
     else
@@ -220,10 +219,17 @@ EXIT_TASK:
         x_leftbar.if_switch = false;
         x_rightbar.if_switch = false;
     }
+    count_line_status = 1;
     vTaskDelete(NULL);
     Line_Handle = NULL;
 }
-
+/**
+ * @name: move_by_encoder
+ * @brief: 用于开启编码器运行任务的函数
+ * @param {int} direct 方向 竖直为2  水平为1 
+ * @param {int} val 参照平面坐标系的XY轴正负
+ * @return {*} 无
+ */
 void move_by_encoder(int direct, int val)
 {
     static int encoder_delay;
@@ -435,4 +441,33 @@ void Wait_OKInf(int type, long wait_time)
         }
     }
     osDelay(200);
+}
+
+/**
+ * @name:  inte_move
+ * @brief: 运动的集成
+ * @param {int} type  类型 1 为数线 2为输编码器
+ * @param {int} dir   方向 1为横向 2为竖向
+ * @param {int} val    数  需要的数值 分别对应数线的数值和编码器数值
+ * @param {int} edge    在数线模式下使用 用于区分是否为边缘状态
+ * @param {int} imu_if  过程中是否开启陀螺仪
+ * @param {long} wait_time  最长的等待时间
+ * @return {*}              返回是否运行成功  当返回false代表有错误产生
+ */
+bool inte_move(int type, int dir, int val, int edge, int imu_if, long wait_time)
+{
+    if (type == 1)
+    {
+        direct_move(dir, val, edge, imu_if);
+        Wait_OKInf(type, wait_time);
+        return true;
+    }
+    else if (type == 2)
+    {
+        move_by_encoder(dir, val);
+        Wait_OKInf(type, wait_time);
+        return true;
+    }
+    printf("传入的参数类型出错 \n");
+    return false;
 }

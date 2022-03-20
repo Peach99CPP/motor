@@ -418,5 +418,5 @@ void Wait_OKInf(int type, long wait_time)
             osDelay(5);
         }
     }
-        osDelay(100);
+    osDelay(100);
 }
