@@ -28,10 +28,10 @@ uint8_t cmd[3] = {0xff, 0x00, 0x99};
 void Startdebug(void const *argument)
 {
     Set_OSRunningFlag(true);
-    MV_Start();
-    Start_Read_Switch();
-    avoid_keep();
-    osDelay(100);
+    // MV_Start();// todo在此处将MV关闭 避免误触指令 后续根据需求开启
+    Start_Read_Switch(); //开启读取开关状态的任务
+    avoid_keep();        //开始读取超声波信号的任务
+    osDelay(100);        //延迟一下 等待系统稳定
 #if DUBUG_MOTOR == 1
     track_status(1, 0);
     track_status(2, 0);

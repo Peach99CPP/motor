@@ -4,6 +4,7 @@
 #include "time_cnt.h"
 #include "track_bar_receive.h"
 #include "imu_pid.h"
+#include "atk_imu.h"
 #include "motor.h"
 #include "imu_pid.h"
 #include "Wait_BackInf.h"
@@ -30,6 +31,8 @@ void EncoderTask(void const *argument);
 void move_slantly(int dir, int speed, uint16_t delay)
 {
     set_imu_status(true);
+    track_status(1, 0);
+    track_status(2, 0);
     int x_factor, y_factor;
     switch (dir)
     {
@@ -50,8 +53,13 @@ void move_slantly(int dir, int speed, uint16_t delay)
     }
     set_speed(x_factor * speed, y_factor * speed, 0);
     osDelay(delay);
-    set_speed(0, 0, 0);
-    osDelay(500);
+    // todo 下面的更改需要进行进一步的测试以确保性能
+    set_speed(0, 0, 0);    //停车
+    set_imu_status(false); //关闭陀螺仪
+    track_status(1, 1);    //开启循迹板来矫正姿态
+    track_status(2, 1);    //两个向都开启
+    osDelay(800);          //给一定的时间
+    Set_InitYaw(0);        //设置角度
 }
 
 /**
@@ -60,8 +68,8 @@ void move_slantly(int dir, int speed, uint16_t delay)
  * @param {int} line_num 数几条线
  * @param {int} edge_if 是否是在边缘（对阈值情况进行特殊处理）
  * @param {int} imu_if  是否开启陀螺仪
- * @return {*}
- */    
+ * @return {*} 无需返回值
+ */
 void direct_move(int direct, int line_num, int edge_if, int imu_if)
 {
     static int delay_time;
@@ -143,7 +151,7 @@ void LineTask(void const *argument)
                     goto EXIT_TASK;
                 }
                 speed_set = Limit_Speed(LINE_FACTOR * error);
-                set_speed(speed_set , 0, 0);//修正了此前速度变化过快的错误 是因为此处等价于平方效应
+                set_speed(speed_set, 0, 0); //修正了此前速度变化过快的错误 是因为此处等价于平方效应
                 osDelay(5);
             } while (error >= 0);
         }
@@ -226,7 +234,7 @@ EXIT_TASK:
 /**
  * @name: move_by_encoder
  * @brief: 用于开启编码器运行任务的函数
- * @param {int} direct 方向 竖直为2  水平为1 
+ * @param {int} direct 方向 竖直为2  水平为1
  * @param {int} val 参照平面坐标系的XY轴正负
  * @return {*} 无
  */
