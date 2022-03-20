@@ -71,11 +71,12 @@ int Get_MV_Servo_Flag(void);
 int Get_Height(void);
 //只在内部使用的函数
 void Inf_Servo_Height(int now_height);
-void QR_Mode_Height(void) ;
+void QR_Mode_Height(void);
 
 //限制高度信息读取的软件开关
 bool Get_HeightAvailable(void);
 void Set_HeightAvailable(bool Switch_Status);
 
-void Ring_Move(void);//放置圆环时使用
+void Ring_Move(void); //放置圆环时使用
+void Disc_Mea(void);  //圆盘机的实现
 #endif

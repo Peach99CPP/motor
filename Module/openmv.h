@@ -63,6 +63,7 @@ void MV_PID(void);
 
 void Set_MV_Mode(bool mode);
 bool Get_MV_Mode(void);
+int Get_DiscStatus(void);
 
 void MV_Scan_Bar(mvcolor_t color);//扫描条形平台
 //扫描阶梯平台

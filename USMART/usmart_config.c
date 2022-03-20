@@ -122,6 +122,8 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void Kiss_Ass(int dir,int enable_imu)",
         (void *)Ring_Move, //移动到圆环
         "void Ring_Move(void)",
+        (void *)Disc_Mea,
+        "void Disc_Mea(void)",
         //综合
         (void *)Wait_For_Avoid, //避障
         "void Wait_For_Avoid(int dir)",
@@ -135,7 +137,7 @@ struct _m_usmart_nametab usmart_nametab[] =
 //得到各个受控函数的名字
 //得到函数总数量
 struct _m_usmart_dev usmart_dev =
-{
+    {
         usmart_nametab,
         usmart_init,
         usmart_cmd_rec,

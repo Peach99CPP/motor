@@ -22,6 +22,33 @@ mv_t MV =               //为结构体赋初值
         .rec_len = 0,
         .RX_Status = 0}; //初始化变量
 
+volatile int disc_countval = 0, color_val = 0;
+
+void Disc_Report(void)
+{
+    disc_countval++;
+    printf("圆盘机拨球,当前目标%d,次数：%d \t\n", color_val, disc_countval);
+    if (disc_countval >= 9)
+    {
+        disc_countval = 0;
+        color_val++;
+    }
+}
+int Get_DiscStatus(void)
+{
+    osDelay(5);         //防止整个系统被卡死 5ms为周期进行查询
+    if (color_val == 1) //需要切换到黄球
+    {
+        return 1;
+    }
+    else if (color_val == 2)//表明此时都抓完了
+    {
+        return 2;
+    }
+    else
+        return 0;
+}
+
 void Set_MV_Mode(bool mode)
 {
     MV.enable_switch = mode;

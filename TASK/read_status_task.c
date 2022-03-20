@@ -872,7 +872,7 @@ void Wait_Switches(int dir)
             w1 = 1, w2 = 2;
             x_pn = 0, y_pn = 1;
         }
-        /***下面的已经被废弃        
+        /***下面的已经被废弃
         // else if (dir == 2) //负X方向
         // {
         //     w1 = 4, w2 = 3;
@@ -891,7 +891,7 @@ void Wait_Switches(int dir)
     }
 //开始靠近
 Closing:
-    Set_IMUStatus(false);  
+    Set_IMUStatus(false);
     flag1 = flag2 = 0;
     set_speed(MIN_SPEED * x_pn, MIN_SPEED * y_pn, 0); //设置一个基础速度，此速度与方向参数有关
     //等待开关都开启
@@ -923,7 +923,7 @@ Closing:
 switch_exit:
     //    Exit_Swicth_Read(); //用完了就关闭任务
     Set_InitYaw(0);
-    Set_IMUStatus(true);  
+    Set_IMUStatus(true);
     set_speed(0, 0, 0); //开关
     /*******本来这里应该接一个矫正陀螺仪，但是会降低程序的灵活性，所以不添加。在调用本程序之后，自己操作陀螺仪*******/
     // todo：调用完函数根据实际需要进行陀螺仪角度的修正
@@ -1198,4 +1198,23 @@ void Ring_Move(void)
     set_speed(0, 0, 0);                     //到达位置马上停车
     osDelay(1000);                          //给时间用于缓冲
     // Action_Gruop(Ring_Action, 1);           //执行对应的动作组
+}
+void Disc_Mea(void)
+{
+    Action_Gruop(25, 1);          //执行预备动作组
+    Wait_Servo_Signal(2000);      //等待动作组
+    Wait_Switches(1);             //撞击挡板修正角度以及定位
+    MV_Start();                   //开启openmv
+    Action_Gruop(35, 1);          //执行第二个动作组
+    Wait_Servo_Signal(2000);      //等待动作组完成
+    MV_SendCmd(6, 1);             // 1红2蓝 3黄
+    while (Get_DiscStatus() == 0) //等到9个目标球都抓完
+        ;
+    Action_Gruop(33, 1);     //执行切换仓库动作组
+    Wait_Servo_Signal(2000); //等待动作组完成
+    MV_SendCmd(6, 3);        //通知MV切换目标颜色
+    while (Get_DiscStatus() == 1)
+        ;
+    Action_Gruop(24, 1);     //结束的动作组
+    Wait_Servo_Signal(2000); //等待动作组完成
 }
