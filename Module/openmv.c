@@ -27,8 +27,8 @@ volatile int disc_countval = 0, color_val = 0;
 void Disc_Report(void)
 {
     disc_countval++;
-    printf("圆盘机拨球,当前目标%d,次数：%d \t\n", color_val, disc_countval);
-    if (disc_countval >= 9)
+    printf("\n\t圆盘机拨球,当前目标%d,次数：%d \t\n", color_val, disc_countval);
+    if ((disc_countval >= 8 && color_val == 0)|| (disc_countval >= 4 && color_val == 1))
     {
         disc_countval = 0;
         color_val++;
@@ -285,8 +285,8 @@ void MV_Decode(void)
             {
                 //主要区别在于此处不需要停车进行等待，所以只需清除舵控的标志位即可。
                 Disable_ServoFlag(); //只需要清除舵机标志位即可 不需要停车
-                printf("条形平台拨球\r\n");
                 Action_Gruop(BAR_Action, 1); //执行拨球动作组
+                Disc_Report();
             }
             else if (mv_rec.event == MV_BACK)
             {

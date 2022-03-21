@@ -102,6 +102,10 @@ struct _m_usmart_nametab usmart_nametab[] =
         (void *)direct_move,
         "void direct_move(int direct, int line_num, int edge_if,int imu_if)",
         // mv部分
+        (void*)MV_Start,
+        "void MV_Start(void)",
+        (void*)MV_Stop,
+        "void MV_Stop(void)",
         (void *)MV_SendCmd,
         "void MV_SendCmd(const uint8_t event_id, const int param)",
         //陀螺仪
@@ -110,7 +114,7 @@ struct _m_usmart_nametab usmart_nametab[] =
         (void *)Set_InitYaw,
         "void Set_InitYaw(int target)",
         (void *)Turn_angle,
-        "Turn_angle(int mode, int angle, int track_enabled)",
+        "void Turn_angle(int mode, int angle, int track_enabled)",
         //开关运用
         (void *)Wait_Switches, //撞击挡板来修正角度
         "void Wait_Switches(int dir)",

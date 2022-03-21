@@ -722,7 +722,7 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
         {
             while (Get_Side_Switch(1) == off)
             {
-                set_speed(0, MIN_, 0); //确保此时开关的工作状态正常
+                set_speed(0, MIN_*0.5, 0); //确保此时开关的工作状态正常
                 osDelay(5);            //避免开关卡死
             }
         dir5_Start_Symbol:
@@ -762,7 +762,7 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
         {
             while (Get_Side_Switch(2) == off)
             {
-                set_speed(0, -MIN_, 0);
+                set_speed(0, -MIN_*0.5, 0);
                 osDelay(5); //避免开关卡死
             }
         dir6_Start_Symbol:
@@ -852,8 +852,8 @@ void Kiss_Ass(int dir, int enable_imu)
 void Wait_Switches(int dir)
 {
     /*关于运行时速度的变量,不宜过高否则不稳定*/
-    int Switch_Factor = 40;
-    int MIN_SPEED = 70;
+    int Switch_Factor = 80;
+    int MIN_SPEED = 100;
 
     if (read_task_exit)
         Start_Read_Switch();
@@ -1201,20 +1201,26 @@ void Ring_Move(void)
 }
 void Disc_Mea(void)
 {
-    Action_Gruop(25, 1);          //执行预备动作组
-    Wait_Servo_Signal(2000);      //等待动作组
-    Wait_Switches(1);             //撞击挡板修正角度以及定位
-    MV_Start();                   //开启openmv
-    Action_Gruop(35, 1);          //执行第二个动作组
+    MV_Stop();
+    Action_Gruop(25, 1);     //执行预备动作组
+    Wait_Servo_Signal(2000); //等待动作组
+    printf("\n开始靠近圆盘机\n");
+    Wait_Switches(1);    //撞击挡板修正角度以及定位
+    Action_Gruop(35, 1); //执行第二个动作组
+    printf("\n开始扫描\n");
     Wait_Servo_Signal(2000);      //等待动作组完成
+    MV_Start();                   //开启openmv
     MV_SendCmd(6, 1);             // 1红2蓝 3黄
     while (Get_DiscStatus() == 0) //等到9个目标球都抓完
         ;
+    printf("\n开始更换目标球颜色\n");
     Action_Gruop(33, 1);     //执行切换仓库动作组
     Wait_Servo_Signal(2000); //等待动作组完成
     MV_SendCmd(6, 3);        //通知MV切换目标颜色
     while (Get_DiscStatus() == 1)
         ;
+    printf("\n收起\n");
     Action_Gruop(24, 1);     //结束的动作组
     Wait_Servo_Signal(2000); //等待动作组完成
+    MV_Stop();
 }
