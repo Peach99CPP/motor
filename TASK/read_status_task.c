@@ -30,6 +30,17 @@ ScanDir_t Height_Mode = Primary_Head;
 Height_t Current_Height = PrimaryHeight;
 Game_Color_t Current_Color = Not_Running;
 
+int Time_constant_before = 730, Time_constant_after = 1000;
+
+void Trans_Cons(int val1, int val2)
+{
+    if (val1 >= 0)
+        Time_constant_before = val1;
+    if (val2 >= 0)
+        Time_constant_after = val2;
+    printf("\n\t当前方案为延时 %dms后进行高度变换\n\t变换后延时%dms后继续前进\t\n", Time_constant_before, Time_constant_after);
+}
+
 int Height_id = 1;
 int read_task_exit = 1, Height_task_exit = 1; //任务退出标志
 short Height_Flag = 0;
@@ -176,7 +187,7 @@ void Inf_Servo_Height(int now_height)
             last_height = now_height;
             printf("高度发生改变\n");
         }
-        Set_Update_Status(false);
+        Set_Update_Status(false);           //让车子那边的函数进入停止状态
         set_speed(0, 0, 0);                 //先停车 todo  此处运行之后
         Wait_Servo_Signal(Wait_Servo_Done); //等待上一个命令完成
         if (now_height == LowestHeight)     //根据当前高度进行角度的更新操作
@@ -188,6 +199,10 @@ void Inf_Servo_Height(int now_height)
         else
             osDelay(100);                   //初始状态
         Wait_Servo_Signal(Wait_Servo_Done); //等待信号
+        if(now_height == LowestHeight)
+        {
+            osDelay(Time_constant_after);//todo 调试时的特殊需要
+        }
         Set_Update_Status(true);
     }
     Set_HeightAvailable(true); //在下面的操作中对高度红外的读取进行屏蔽
@@ -290,6 +305,8 @@ void HeightUpdate_Task(void const *argument)
                 {
                     if (Get_Height_Switch(Height_id) == off && Get_HeightAvailable())
                     {
+                        // todo 尝试方案一  延时进行高度变换
+                        osDelay(Time_constant_before);
                         Current_Height = LowestHeight;
                         Height_Flag = 2;
                         Inf_Servo_Height(Current_Height);
@@ -722,8 +739,8 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
         {
             while (Get_Side_Switch(1) == off)
             {
-                set_speed(0, MIN_*0.5, 0); //确保此时开关的工作状态正常
-                osDelay(5);            //避免开关卡死
+                set_speed(0, MIN_ * 0.5, 0); //确保此时开关的工作状态正常
+                osDelay(5);                  //避免开关卡死
             }
         dir5_Start_Symbol:
             // 换言之 如果高度更新未完成 或者 停车命令被启用 或者 此时已经走出区域（红外开关off）
@@ -762,7 +779,7 @@ void Brick_QR_Mode(int dir, int color, int QR, int imu_enable)
         {
             while (Get_Side_Switch(2) == off)
             {
-                set_speed(0, -MIN_*0.5, 0);
+                set_speed(0, -MIN_ * 0.5, 0);
                 osDelay(5); //避免开关卡死
             }
         dir6_Start_Symbol:

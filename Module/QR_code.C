@@ -8,7 +8,6 @@ uint8_t tail_cmd[4] = {'T', 'A', 'I', 'L'};
 #define QR_BUFFER_SIZE 9                //一帧数据有多少个字节
 #define BUFFER_END (QR_BUFFER_SIZE - 1) //数据的结尾，下标形式
 
-
 QRcolor_t Target_Color = init_status;
 
 extern UART_HandleTypeDef huart3; //避免出现不必要的警告
@@ -83,7 +82,7 @@ void QR_decode(void)
     }
     if ((QR.color == Target_Color) && Return_QRMode()) //仅在设置了对其有响应才会执行 颜色要对 并且开启响应
     {
-//        Set_MV_Mode(false);//临时关闭openmv信号的处理
+        //        Set_MV_Mode(false);//临时关闭openmv信号的处理
         if (Get_Servo_Flag())
         {
             Disable_ServoFlag();  //标记此时舵控正在运行过程中，本函数在传输舵控指令中也会被调用，此处只是为了增强记忆
@@ -98,11 +97,9 @@ void QR_decode(void)
                 break;
             case HighestHeight:
                 Action_Gruop(3, 1);
-            default:
-;
+            default:;
             }
         }
-
         QR.color = init_status;
     }
     QR.rec_len = 0;                            //清除计数器

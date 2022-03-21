@@ -1,6 +1,6 @@
 Dependencies for Project 'motor', Target 'motor': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
-F (../Src/main.c)(0x6236AE1C)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I ../Drivers/CMSIS/Include -I ..\Driver -I ..\Control -I ..\USMART -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1 -I ..\TASK -I ..\Module -I ..\Math-I.\RTE\_motor-ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F750xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F750xx-o motor\main.o --omf_browse motor\main.crf --depend motor\main.d)
+F (../Src/main.c)(0x6237FEB5)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I ../Drivers/CMSIS/Include -I ..\Driver -I ..\Control -I ..\USMART -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1 -I ..\TASK -I ..\Module -I ..\Math-I.\RTE\_motor-ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F750xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F750xx-o motor\main.o --omf_browse motor\main.crf --depend motor\main.d)
 I (../Inc/main.h)(0x619A48FD)
 I (../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h)(0x610905DD)
 I (../Inc/stm32f7xx_hal_conf.h)(0x619A48FC)
@@ -475,7 +475,7 @@ I (D:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x60252374)
 I (..\Module\servo.h)(0x616E56F4)
 I (..\Driver\chassis.h)(0x6236A92A)
 I (..\Module\QR_code.h)(0x6188F18C)
-I (..\TASK\read_status.h)(0x6236D801)
+I (..\TASK\read_status.h)(0x6238023D)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h)(0x623593EC)
 I (../Inc/FreeRTOSConfig.h)(0x619A48F8)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h)(0x610905A4)
@@ -490,7 +490,7 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h)(0x610905A4)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h)(0x610905A4)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h)(0x610905A4)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x610905A4)
-F (..\Module\QR_code.C)(0x62354F86)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I ../Drivers/CMSIS/Include -I ..\Driver -I ..\Control -I ..\USMART -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1 -I ..\TASK -I ..\Module -I ..\Math-I.\RTE\_motor-ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F750xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F750xx-o motor\qr_code.o --omf_browse motor\qr_code.crf --depend motor\qr_code.d)
+F (..\Module\QR_code.C)(0x62380DD7)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I ../Drivers/CMSIS/Include -I ..\Driver -I ..\Control -I ..\USMART -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1 -I ..\TASK -I ..\Module -I ..\Math-I.\RTE\_motor-ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F750xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F750xx-o motor\qr_code.o --omf_browse motor\qr_code.crf --depend motor\qr_code.d)
 I (..\Module\QR_code.h)(0x6188F18C)
 I (../Inc/main.h)(0x619A48FD)
 I (../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h)(0x610905DD)
@@ -539,7 +539,7 @@ I (..\Math\pid.h)(0x61404D7F)
 I (../Inc/tim.h)(0x619A48F9)
 I (..\Driver\delay.h)(0x61162FA2)
 I (D:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x60252374)
-I (..\TASK\read_status.h )(0x6236D801)
+I (..\TASK\read_status.h )(0x6238023D)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h)(0x623593EC)
 I (../Inc/FreeRTOSConfig.h)(0x619A48F8)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h)(0x610905A4)
@@ -1325,7 +1325,7 @@ I (../Inc/tim.h)(0x619A48F9)
 I (..\Driver\delay.h)(0x61162FA2)
 I (..\Control\chassis_control.h)(0x615416C4)
 I (..\Driver\imu_pid.h)(0x616E5580)
-I (..\TASK\read_status.h )(0x6236D801)
+I (..\TASK\read_status.h )(0x6238023D)
 I (..\Driver\avoid_obs.h)(0x61715145)
 I (..\Module\atk_imu.h)(0x6156761E)
 I (..\Driver\track_bar_receive.h)(0x6236AE1B)
@@ -1577,8 +1577,8 @@ I (../Inc/usart.h)(0x619A48FA)
 I (D:\Keil_v5\ARM\ARMCC\include\string.h)(0x6025237E)
 I (D:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x60252374)
 I (..\Math\pid.h)(0x61404D7F)
-F (..\TASK\read_status_task.c)(0x62370209)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I ../Drivers/CMSIS/Include -I ..\Driver -I ..\Control -I ..\USMART -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1 -I ..\TASK -I ..\Module -I ..\Math-I.\RTE\_motor-ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F750xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F750xx-o motor\read_status_task.o --omf_browse motor\read_status_task.crf --depend motor\read_status_task.d)
-I (..\TASK\read_status.h )(0x6236D801)
+F (..\TASK\read_status_task.c)(0x62380BD7)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I ../Drivers/CMSIS/Include -I ..\Driver -I ..\Control -I ..\USMART -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1 -I ..\TASK -I ..\Module -I ..\Math-I.\RTE\_motor-ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F750xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F750xx-o motor\read_status_task.o --omf_browse motor\read_status_task.crf --depend motor\read_status_task.d)
+I (..\TASK\read_status.h )(0x6238023D)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h)(0x623593EC)
 I (D:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x6025237E)
 I (D:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025237E)
@@ -1715,7 +1715,7 @@ F (..\Math\pid.c)(0x61404F22)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=inter
 I (..\Math\pid.h)(0x61404D7F)
 I (D:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x6025237E)
 I (..\Driver\time_cnt.h)(0x61337D25)
-F (..\USMART\usmart_config.c)(0x6236EF24)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I ../Drivers/CMSIS/Include -I ..\Driver -I ..\Control -I ..\USMART -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1 -I ..\TASK -I ..\Module -I ..\Math-I.\RTE\_motor-ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F750xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F750xx-o motor\usmart_config.o --omf_browse motor\usmart_config.crf --depend motor\usmart_config.d)
+F (..\USMART\usmart_config.c)(0x62380235)(--c99 -c --cpu Cortex-M7.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc -I ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I ../Drivers/CMSIS/Include -I ..\Driver -I ..\Control -I ..\USMART -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM7/r0p1 -I ..\TASK -I ..\Module -I ..\Math-I.\RTE\_motor-ID:\Keil_v5\Arm\Packs\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\Keil_v5\Arm\Packs\Keil\STM32F7xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="536" -D_RTE_ -DSTM32F750xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F750xx-o motor\usmart_config.o --omf_browse motor\usmart_config.crf --depend motor\usmart_config.d)
 I (..\USMART\usmart.h)(0x613C4A1A)
 I (..\USMART\usmart_str.h)(0x61151430)
 I (../Inc/main.h)(0x619A48FD)
@@ -1784,7 +1784,7 @@ I (..\Control\chassis_control.h)(0x615416C4)
 I (..\Module\openmv.h)(0x6236DAD5)
 I (..\Module\servo.h)(0x616E56F4)
 I (..\Module\atk_imu.h)(0x6156761E)
-I (..\TASK\read_status.h)(0x6236D801)
+I (..\TASK\read_status.h)(0x6238023D)
 I (..\Module\general.h)(0x61627B6C)
 I (..\Module\QR_code.h)(0x6188F18C)
 I (..\Driver\avoid_obs.h)(0x61715145)

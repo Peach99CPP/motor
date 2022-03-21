@@ -133,6 +133,9 @@ struct _m_usmart_nametab usmart_nametab[] =
         "void Wait_For_Avoid(int dir)",
         (void *)Global_Debug, //跑路线
         "void Global_Debug(void)",
+        //临时添加 todo 后续记得进行移除
+        (void*)Trans_Cons,
+        "void Trans_Cons(int val1,int val2)",
 
 };
 ///////////////////////////////////END///////////////////////////////////////////////

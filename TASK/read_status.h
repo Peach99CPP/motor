@@ -1,3 +1,13 @@
+/*
+ * @Author: rlantic
+ * @Date: 2022-03-20 15:29:29
+ * @LastEditors: OBKoro1
+ * @LastEditTime: 2022-03-21 12:42:37
+ * @FilePath: \MDK-ARMd:\program\motor\motor\TASK\read_status.h
+ * @Description: 
+ * 
+ * Copyright (c) 2022 by 用户/公司名, All Rights Reserved. 
+ */
 /************************************************************************
  *
  * FileName   : read_status.h
@@ -79,4 +89,6 @@ void Set_HeightAvailable(bool Switch_Status);
 
 void Ring_Move(void); //放置圆环时使用
 void Disc_Mea(void);  //圆盘机的实现
+
+void Trans_Cons(int val1,int val2);
 #endif
